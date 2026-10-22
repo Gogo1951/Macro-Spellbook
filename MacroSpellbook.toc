@@ -34,6 +34,3 @@ src\Data\Warrior.lua
 src\Trainer.lua
 src\Macros.lua
 src\SpellBookTab.lua
-
-# Optional: delete this line and src\Modules\TalentUnlock.lua to remove it
-src\Modules\TalentUnlock.lua
