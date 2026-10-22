@@ -1,0 +1,39 @@
+## Interface: 16001
+## Title: Macro Spellbook
+## Notes: Adds a spellbook tab of one-click macros for your class's spells, with mouseover and cursor options.
+## Author: NotStraws
+## Version: @project-version@
+## SavedVariables: MacroSpellbookDB
+## SavedVariablesPerCharacter: MacroSpellbookCharDB
+
+libs\LibStub\LibStub.lua
+libs\LibSpellBookTabs-1.0\LibSpellBookTabs-1.0.lua
+
+src\Config\Config.lua
+src\Config\Druid.lua
+src\Config\Hunter.lua
+src\Config\Mage.lua
+src\Config\Paladin.lua
+src\Config\Priest.lua
+src\Config\Rogue.lua
+src\Config\Shaman.lua
+src\Config\Warlock.lua
+src\Config\Warrior.lua
+
+src\Data\Data.lua
+src\Data\Druid.lua
+src\Data\Hunter.lua
+src\Data\Mage.lua
+src\Data\Paladin.lua
+src\Data\Priest.lua
+src\Data\Rogue.lua
+src\Data\Shaman.lua
+src\Data\Warlock.lua
+src\Data\Warrior.lua
+
+src\Trainer.lua
+src\Macros.lua
+src\SpellBookTab.lua
+
+# Optional: delete this line and src\Modules\TalentUnlock.lua to remove it
+src\Modules\TalentUnlock.lua

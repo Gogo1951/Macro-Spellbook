@@ -1,0 +1,7 @@
+package-as: MacroSpellbook
+
+ignore:
+  - .github
+  - .luacheckrc
+  - .pkgmeta
+  - tools

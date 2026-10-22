@@ -1,0 +1,37 @@
+name: Lint and Release
+
+# Runs only when a tag is pushed or the workflow is started by hand, and only for the repo owner:
+# both jobs are skipped for anyone else, even collaborators with write access.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run luacheck
+        uses: lunarmodules/luacheck@v1
+
+  release:
+    needs: lint
+    if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner
+    runs-on: ubuntu-latest
+    env:
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # packager needs history for changelog generation
+
+      - name: Package and upload to CurseForge
+        uses: BigWigsMods/packager@v2
+        with:
+          args: -p ${{ secrets.CURSEFORGE_PROJECT_ID }}
