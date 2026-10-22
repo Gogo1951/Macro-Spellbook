@@ -34,4 +34,4 @@ jobs:
       - name: Package and upload to CurseForge
         uses: BigWigsMods/packager@v2
         with:
-          args: -p ${{ secrets.CURSEFORGE_PROJECT_ID }}
+          args: -p ${{ vars.CURSEFORGE_PROJECT_ID }}
