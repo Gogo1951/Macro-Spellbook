@@ -14,7 +14,7 @@ local _, smb = ...
 --   in alphabetical order. Add noGlow = true to a section, e.g. { name = "Auras", noGlow = true, spells =
 --   { ... } }, to stop its spells glowing when they aren't on your action bars.
 --
--- mouseoverEnemy / mouseoverFriend: spells that offer "Cast on mouseover" (right-click a macro), cast on a
+-- mouseoverEnemy / mouseoverFriend: spells that offer "Cast On Mouseover" (right-click a macro), cast on a
 --   hostile / friendly mouseover target. A spell in both lists casts on either. Every harmful spell with a
 --   range (melee included) counts as a mouseoverEnemy spell without being listed, except cursor spells, so
 --   mouseoverEnemy only needs the ones the game doesn't flag. Other spells in neither list never offer
@@ -22,10 +22,10 @@ local _, smb = ...
 --   right after it, that casts on your focus target (or your target when you have no hostile / friendly
 --   focus).
 --
--- cursor: ground-targeted spells that offer "Cast at cursor" (right-click a macro): the spell lands where
+-- cursor: ground-targeted spells that offer "Cast At Cursor" (right-click a macro): the spell lands where
 --   the cursor points, with no targeting circle to click.
 --
--- raidRank1: spells that offer "Downrank in raids" (right-click a macro): the macro casts the spell's rank 1
+-- raidRank1: spells that offer "Downrank In Raids" (right-click a macro): the macro casts the spell's rank 1
 --   while you are in a raid group and its highest rank otherwise.
 --
 -- channeled: channelled spells that offer "Spammable" (right-click a macro): the cast gets a
@@ -35,7 +35,7 @@ local _, smb = ...
 -- stealth: stealth spells that offer "Spammable" (right-click a macro): the cast gets a [nostealth]
 --   condition, so pressing the macro again while stealthed doesn't take you out of stealth.
 --
--- stances: spells that offer "Switch to <stance>" (right-click a macro), as
+-- stances: spells that offer "Switch To <stance>" (right-click a macro), as
 --   { ["Hamstring"] = { "Battle Stance", "Berserker Stance" }, ... }: the stances the spell can be cast in.
 --   With it on, the macro first switches to the first listed stance when you're in none of them. A spell
 --   whose tooltip says "Requires ... Stance" offers it too, with the stances the tooltip names (the list
@@ -43,7 +43,7 @@ local _, smb = ...
 --   change and the spell can't always go off on the same press, so press the macro again if the spell
 --   fails. Only Warriors use it.
 --
--- petAbilities: summon spells that offer "Cast <ability> if summoned" (right-click a macro), as
+-- petAbilities: summon spells that offer "Cast <ability> If Summoned" (right-click a macro), as
 --   { ["Summon Imp"] = "Fire Shield", ... }. With it on, the macro casts the ability while that pet is out
 --   and summons the pet otherwise. The pet is matched by its creature family: the name after "Summon ".
 --   Only Hunters and Warlocks use it.

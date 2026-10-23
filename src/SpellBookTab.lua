@@ -34,12 +34,12 @@ local function showMacroMenu(button)
             addOption("Cast On Focus", "focus")
             return
         end
-        if macro.target then addOption("Cast on mouseover", "mouseover") end
-        if macro.cursor then addOption("Cast at cursor", "cursor") end
-        if macro.petAbility then addOption("Cast " .. macro.petAbility .. " if summoned", "pet") end
-        if macro.raidRank1 then addOption("Downrank in raids", "raidRank1") end
+        if macro.target then addOption("Cast On Mouseover", "mouseover") end
+        if macro.cursor then addOption("Cast At Cursor", "cursor") end
+        if macro.petAbility then addOption("Cast " .. macro.petAbility .. " If Summoned", "pet") end
+        if macro.raidRank1 then addOption("Downrank In Raids", "raidRank1") end
         if macro.spam then addOption("Spammable", "spam") end
-        if macro.stances then addOption("Switch to " .. macro.stances[1], "stance") end
+        if macro.stances then addOption("Switch To " .. macro.stances[1], "stance") end
         if macro.target then addOption("Cast On Focus", "focus") end
         if smb.offersPetAttack(macro) then addOption("Enable Pet Attack", "petAttack") end
         if smb.offersStartAttack(macro) then
