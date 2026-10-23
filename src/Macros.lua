@@ -171,11 +171,26 @@ local function categoryOf(name)
     return UNLISTED, "Unsorted", UNLISTED
 end
 
--- The macro conditional a spell's mouseover option uses, or nil for spells without one. A spell in both
--- lists casts on any unit.
-local function targetOf(name)
+-- Whether a spell is cast on an enemy unit: harmful and with a range. Self-centred AoE such as Arcane
+-- Explosion or Hellfire has no range, so it is left out. The C_Spell functions take the spell's id; the
+-- older globals take its name (a number would be read as a spellbook slot).
+local function targetsEnemy(name, id)
+    if C_Spell and C_Spell.IsSpellHarmful and C_Spell.SpellHasRange then
+        return id ~= nil and C_Spell.IsSpellHarmful(id) == true and C_Spell.SpellHasRange(id) == true
+    end
+    if IsHarmfulSpell and SpellHasRange then
+        return IsHarmfulSpell(name) == true and SpellHasRange(name) == true
+    end
+    return false
+end
+
+-- The macro conditional a spell's mouseover option uses, or nil for spells without one. Enemy spells are
+-- the mouseoverEnemy list plus every spell targetsEnemy finds, except cursor spells. A spell that is both
+-- an enemy and a friend spell casts on any unit.
+local function targetOf(name, id)
     local c = classConfig()
-    local enemy, friend = c.isEnemySpell(name), c.isFriendSpell(name)
+    local enemy = c.isEnemySpell(name) or (not c.isCursorSpell(name) and targetsEnemy(name, id))
+    local friend = c.isFriendSpell(name)
     if enemy and friend then return "exists" end
     if enemy then return "harm" end
     if friend then return "help" end
@@ -493,7 +508,7 @@ local function makeMacro(name, icon, unlearned, id)
         priority = priority,
         category = category,
         noGlow = categoryRank ~= UNLISTED and classConfig().categories[categoryRank].noGlow == true,
-        target = targetOf(name),
+        target = targetOf(name, id),
         cursor = classConfig().isCursorSpell(name) ~= nil,
         petAbility = classConfig().petAbilities[name],
         raidRank1 = classConfig().isRaidRank1Spell(name) ~= nil,

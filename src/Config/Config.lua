@@ -15,8 +15,10 @@ local _, smb = ...
 --   { ... } }, to stop its spells glowing when they aren't on your action bars.
 --
 -- mouseoverEnemy / mouseoverFriend: spells that offer "Cast on mouseover" (right-click a macro), cast on a
---   hostile / friendly mouseover target. A spell in both lists casts on either. Spells in neither list never
---   offer it. The same spells offer "Cast On Focus": the page then also lists a second macro for the spell,
+--   hostile / friendly mouseover target. A spell in both lists casts on either. Every harmful spell with a
+--   range (melee included) counts as a mouseoverEnemy spell without being listed, except cursor spells, so
+--   mouseoverEnemy only needs the ones the game doesn't flag. Other spells in neither list never offer
+--   it. The same spells offer "Cast On Focus": the page then also lists a second macro for the spell,
 --   right after it, that casts on your focus target (or your target when you have no hostile / friendly
 --   focus).
 --
