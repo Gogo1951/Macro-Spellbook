@@ -27,7 +27,8 @@ read_globals = {
 	"GetNumSpellTabs", "GetNumTrainerServices", "GetShapeshiftFormInfo", "GetSpellBookItemInfo",
 	"GetSpellBookItemName", "GetSpellBookItemTexture", "GetSpellTabInfo", "GetSpellTexture",
 	"GetTrainerServiceLevelReq", "InCombatLockdown",
-	"IsPassiveSpell", "IsTradeskillTrainer", "LibStub", "PickupMacro", "PlaySound", "RunNextFrame",
+	"IsHarmfulSpell", "IsPassiveSpell", "IsTradeskillTrainer", "LibStub", "PickupMacro", "PlaySound", "RunNextFrame",
+	"SpellHasRange",
 	"UnitClass", "UnitFactionGroup", "UnitRace",
 
 	-- Frames / objects / constants
