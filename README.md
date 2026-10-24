@@ -71,14 +71,15 @@ Mute Error Sounds turns off your Sound Effects and Error Speech settings for a s
 * nevcairiel's [Bartender4](https://www.curseforge.com/wow/addons/bartender4)
 * Tuller's [Dominos](https://www.curseforge.com/wow/addons/dominos)
 * oishii1992's [Myslot](https://www.curseforge.com/wow/addons/myslot)
+* Fusionpit's [What's Training?](https://www.curseforge.com/wow/addons/whats-training)
+* Zerkaa's [What's Training ? (Forever)](https://www.curseforge.com/wow/addons/whats-training-forever)
 
 ### 🟡 Overlaps
 
 * Snakybo's [Clicked](https://www.curseforge.com/wow/addons/clicked)
 * jnwhiteh's [Clique](https://www.curseforge.com/wow/addons/clique)
+* polyglotcoder's [Macro Toolkit](https://www.curseforge.com/wow/addons/macro-toolkit)
 * skov11's [Macro+](https://www.curseforge.com/wow/addons/macro)
-* Fusionpit's [What's Training?](https://www.curseforge.com/wow/addons/whats-training)
-* Zerkaa's [What's Training ? (Forever)](https://www.curseforge.com/wow/addons/whats-training-forever)
 
 ### 🔴 Alternatives
 
