@@ -33,5 +33,4 @@ ignore:
   - README-Testing.md
   - Tests
   - tools
-  - Data/Legacy-Import
   - Data/Wrath
