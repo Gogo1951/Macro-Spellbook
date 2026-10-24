@@ -20,6 +20,9 @@ function ns.RegisterOptionsPanels()
 	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.SpellbookPage, ns.BuildSpellbookPageOptions())
 	AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.SpellbookPage, L["TAB_SPELLBOOK_PAGE"], L["ADDON_TITLE"])
 
+	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.MacroDefaults, ns.BuildMacroDefaultsOptions())
+	AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.MacroDefaults, L["TAB_MACRO_DEFAULTS"], L["ADDON_TITLE"])
+
 	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.CustomMacros, ns.BuildCustomMacrosOptions)
 	AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.CustomMacros, L["TAB_CUSTOM_MACROS"], L["ADDON_TITLE"])
 

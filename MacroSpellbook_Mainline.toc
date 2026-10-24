@@ -1,5 +1,5 @@
 ## Title: Macro Spellbook
-## Notes: Adds a spellbook tab of one-click macros for your class's spells, with mouseover and cursor options.
+## Notes: Mouseover macros, cursor casting and self-cast macros for every class spell, built in one click from a new spellbook tab with no macro syntax. Right-click to add focus, spell rank, downrank, stopcasting, auto attack, pet attack or trinket use.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/MacroSpellbook/Includes/Images/Icon.tga
@@ -17,10 +17,10 @@
 ## Category-zhCN: 动作条
 ## Category-zhTW: 快捷列
 
-## Interface: TBD
+## Interface: 120105
 ## X-Flavor: Mainline
 ## Version: @project-version@
-## X-Curse-Project-ID: TBD
+## X-Curse-Project-ID: 1756085
 ## X-Wago-ID: TBD
 
 ## SavedVariables: MacroSpellbookDB
@@ -38,28 +38,44 @@ Includes/Libraries/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfig-3.0.lua
 Includes/Libraries/AceDBOptions-3.0/AceDBOptions-3.0.lua
-Includes/Libraries/LibSpellBookTabs-1.0/LibSpellBookTabs-1.0.lua
 
 # Localization
 Locales/enUS.lua
+Locales/deDE.lua
+Locales/esES.lua
+Locales/esMX.lua
+Locales/frFR.lua
+Locales/itIT.lua
+Locales/koKR.lua
+Locales/ptBR.lua
+Locales/ruRU.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
 
 # Data
 Data/Flavor.lua
 Data/Data.lua
-Data/Group-Versions.lua
 Data/Mainline/Class-Spell-Lists-Mainline.lua
 Data/Mainline/Trainer-Spells-Mainline.lua
+Data/Mainline/Group-Versions-Mainline.lua
 Data/Default-Settings.lua
 
 # Macro Spellbook
 Features/Core.lua
 Features/Utilities.lua
 Features/Announcements.lua
+# MIGRATION (remove after 2026-11-23)
 Features/Migrations.lua
+Features/Macro-Options.lua
+Features/Macro-Body.lua
+Features/Custom-Macros.lua
+Features/Equipment-Macros.lua
 Features/Macro-Builder.lua
 Features/Macro-Sync.lua
 Features/Spellbook-Page.lua
+Features/Spellbook-Tabs.lua
 Features/Spellbook-Host-Modern.lua
+Features/Key-Bindings.lua
 
 # Diagnostics
 Diagnostics/Diagnostics-Core.lua
@@ -75,6 +91,7 @@ Diagnostics/Report-Runner.lua
 Options/Options-Utilities.lua
 Options/Options-General.lua
 Options/Options-Spellbook-Page.lua
+Options/Options-Macro-Defaults.lua
 Options/Options-Custom-Macros.lua
 Options/Options-Profiles.lua
 Options/Options-Feedback-Support.lua
@@ -82,5 +99,5 @@ Diagnostics/Options-Diagnostics.lua
 Options/Options.lua
 
 # Feedback Welcome! (=
-# Macro Spellbook on GitHub // https://github.com/notstraws/MacroSpellbook
+# Macro Spellbook on GitHub // https://github.com/Gogo1951/Macro-Spellbook
 # Macro Spellbook on Discord // https://discord.gg/eh8hKq992Q

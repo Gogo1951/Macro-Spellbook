@@ -1,10 +1,6 @@
 local _, ns = ...
 
---[[
-	The group version of a single-target spell, as [singleSpellId] = groupSpellId, for the "Right-Click For
-	Group Version" option. Shared by every flavor: a pair whose spells this client doesn't know drops out,
-	since both names come from the client.
-]]
+-- [singleSpellId] = groupSpellId, -- Single Spell -> Group Spell
 ns.GROUP_VERSIONS = {
 	-- Druid
 	[1126] = 21849, -- Mark of the Wild -> Gift of the Wild
@@ -32,3 +28,27 @@ ns.GROUP_VERSIONS = {
 	[14752] = 27681, -- Divine Spirit -> Prayer of Spirit
 	[976] = 27683, -- Shadow Protection -> Prayer of Shadow Protection
 }
+
+--[[
+How We Got the Data
+
+Last Validated
+	Never.
+
+Notes
+	- Each row pairs a single-target spell with its group version, as [singleSpellId] = groupSpellId: Mark of the Wild with Gift of the Wild, Arcane Intellect with Arcane Brilliance, each mage Teleport with its Portal, each paladin Blessing with its Greater Blessing, and the priest buffs with their Prayers.
+	- The "Right-Click For Group Version" option reads it (ResolveClassConfig in Features/Macro-Builder.lua): a learned single spell whose group version is also learned can cast the group version on a right-click.
+	- Both names come from the client, so a pair whose spells this client does not know drops out at runtime until the Data Review prunes it from this folder.
+
+SQL (CMaNGOS)
+	TODO: Add SQL Query
+
+Wowhead
+	None.
+
+wago.tools
+	None.
+
+QuestieDB
+	None.
+]]

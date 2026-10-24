@@ -70,6 +70,7 @@ Mute Error Sounds turns off your Sound Effects and Error Speech settings for a s
 
 * nevcairiel's [Bartender4](https://www.curseforge.com/wow/addons/bartender4)
 * Tuller's [Dominos](https://www.curseforge.com/wow/addons/dominos)
+* oishii1992's [Myslot](https://www.curseforge.com/wow/addons/myslot)
 
 ### 🟡 Overlaps
 

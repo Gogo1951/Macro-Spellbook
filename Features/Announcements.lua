@@ -20,3 +20,14 @@ function ns:PrintMessage(message)
 			.. "|r"
 	)
 end
+
+local warned = {}
+
+-- Prints a config problem once per session.
+function ns.WarnOnce(message)
+	if warned[message] then
+		return
+	end
+	warned[message] = true
+	ns:PrintMessage(message)
+end

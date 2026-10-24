@@ -1,10 +1,11 @@
 local _, ns = ...
 local L = ns.L
+local GetColor = ns.GetColor
 
 --[[
 	Hosts the page on the Classic engine (Classic Era, TBC, MoP Classic): a tab under the class's skill line
-	tabs down the book's right edge toggles a window of its own holding the page, laid out as WoW Forever's
-	two-page spread. Laying the page over the book's spell pages lost to UI skins (ElvUI restyles and
+	tabs down the book's right edge toggles a window of its own holding the page, laid out as a two-page
+	spread. Laying the page over the book's spell pages lost to UI skins (ElvUI restyles and
 	re-layers the book), so the window stays clear of the book. Both are parented to UIParent and only the
 	tab is anchored to the book, so nothing Blizzard owns is written to and the book's own buttons stay
 	untainted; native tab clicks are watched with hooksecurefunc.
@@ -13,22 +14,22 @@ local L = ns.L
 local ICON_MACRO = "Interface\\MacroFrame\\MacroFrame-Icon" -- the "M" key shown on Blizzard's macro window
 
 --[[
-	The window's size before it is scaled to fit the screen, and the page layout drawn inside it: Forever's
-	(the Retail-engine book's) 680 wide, three column pages side by side, with even margins since the window
-	has no spine art to clear.
+	The window's size and the page layout drawn inside it: two 470 wide, two column pages side by side, with
+	even margins since the window has no spine art to clear. A 100% UI is 768 points tall, so this size shows
+	unscaled there with the screen margin to spare; smaller UIs still shrink it to fit.
 ]]
-local WINDOW_WIDTH, WINDOW_HEIGHT = 1580, 840
+local WINDOW_WIDTH, WINDOW_HEIGHT = 1100, 660
 local SCREEN_MARGIN = 40 -- kept clear around the window when it is scaled down to fit
 local PAGE_INSETS = { left = 4, top = -24, right = -6, bottom = 6 }
 local WINDOW_GEOMETRY = {
-	viewWidth = 680,
+	viewWidth = 470,
 	viewTop = -35,
-	viewLeft = 70,
-	viewRight = 70,
+	viewLeft = 50,
+	viewRight = 50,
 	viewBottom = 75,
-	columns = 3,
+	columns = 2,
 	footerBottom = 46,
-	pagingRight = -60,
+	pagingRight = -50,
 	pagingBottom = 40,
 	nameFont = "SystemFont_Large",
 	subTextFont = "SystemFont_Med1",
@@ -147,6 +148,16 @@ local function ToggleWindow()
 	window:SetShown(not window:IsShown())
 end
 
+-- The key binding's toggle (Features/Key-Bindings.lua), the same as a click on the tab.
+ns.ToggleSpellbookPage = ToggleWindow
+
+-- Closes the window, so the page's Open Options entry isn't left covering the Options Interface.
+function ns.HideSpellbookWindow()
+	if window then
+		window:Hide()
+	end
+end
+
 -- The last skill line tab the book shows, which the page's tab lines up under.
 local function LastShownSkillLineTab()
 	local last
@@ -197,6 +208,11 @@ local function CreateTab()
 	tab:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip:SetText(L["ADDON_TITLE"])
+		GameTooltip:AddLine(L["SPELLBOOK_TAB_DESCRIPTION"], 1, 1, 1, true)
+		GameTooltip:AddDoubleLine(
+			GetColor("INFO") .. L["TOOLTIP_KEY_CLICK"] .. "|r",
+			GetColor("INFO") .. L["TOOLTIP_ACTION_OPEN_PAGE"] .. "|r"
+		)
 		GameTooltip:Show()
 	end)
 	tab:SetScript("OnLeave", HideTooltip)

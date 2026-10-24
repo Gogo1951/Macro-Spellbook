@@ -14,6 +14,23 @@ function ns.GetColor(key)
 end
 
 --------------------------------------------------------------------------------
+-- Macro Names
+--------------------------------------------------------------------------------
+
+--[[
+	A WoW macro name cut to at most maxBytes (default ns.MACRO_NAME_MAX_LENGTH), backing up to the start of
+	any UTF-8 character the cut would split, so a Russian, Korean or Chinese name never ends in a broken byte.
+]]
+function ns.TrimMacroName(name, maxBytes)
+	maxBytes = maxBytes or ns.MACRO_NAME_MAX_LENGTH
+	local cut = maxBytes + 1
+	while cut > 1 and (name:byte(cut) or 0) >= 0x80 and name:byte(cut) < 0xC0 do
+		cut = cut - 1
+	end
+	return name:sub(1, cut - 1)
+end
+
+--------------------------------------------------------------------------------
 -- Class Spells
 --------------------------------------------------------------------------------
 

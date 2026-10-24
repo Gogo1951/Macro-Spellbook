@@ -45,9 +45,34 @@ local function GroupLabel(labelKey, entries)
 	return L["MENU_GROUP_VALUE"]:format(L[labelKey], count == 1 and on or L["MENU_OPTIONS_COUNT"]:format(count))
 end
 
--- Every spell macro has a menu; custom and equipment macros don't. A focus copy's menu only removes it.
-local function ShowMacroMenu(button)
-	local macro = button.macro
+-- The macro text's lines, for the menu's preview, with pipes escaped so the text shows as written.
+local function BodyLines(macro)
+	local lines = {}
+	for line in (macro.body .. "\n"):gmatch("([^\n]*)\n") do
+		lines[#lines + 1] = line:gsub("|", "||")
+	end
+	return lines
+end
+
+-- "Macro Text  142 / 255", the count in red once the text is over what a macro holds.
+local function MacroLengthLine(macro)
+	local length = #macro.body
+	return GetColor("HELP")
+		.. L["MENU_MACRO_TEXT"]
+		.. "|r  "
+		.. GetColor(length > ns.MACRO_BODY_MAX_LENGTH and "OFF" or "HELP")
+		.. L["MENU_MACRO_LENGTH"]:format(length, ns.MACRO_BODY_MAX_LENGTH)
+		.. "|r"
+end
+
+local ShowMacroMenu
+
+--[[
+	Every spell macro has a menu; custom and equipment macros don't. A focus copy's menu only removes it. macro
+	is the button's macro unless the menu is reopening on one the page has since rebuilt around.
+]]
+function ShowMacroMenu(button, macro)
+	macro = macro or button.macro
 	if not ns.HasOptions(macro) then
 		return
 	end
@@ -55,9 +80,22 @@ local function ShowMacroMenu(button)
 		rootDescription:CreateTitle(MacroHeading(L["TOOLTIP_ACTION_MACRO_OPTIONS"], macro))
 		rootDescription:CreateSpacer()
 		--[[
-			each group of options is a submenu (Combat Check, Ability Rank, Targeting, Attack, Utilities,
-			Scripts, then Use Before Casting); a group's submenu appears with its first option, so a group the
-			macro offers nothing in leaves no empty entry. Its label shows what is on in it (GroupLabel), set
+			the preview at the bottom has one line per line of macro text; a change that adds or removes a line
+			reopens the menu, next frame, so the preview gets the right number of lines
+		]]
+		local lineCount = #BodyLines(macro)
+		local function changed()
+			if #BodyLines(macro) ~= lineCount then
+				C_Timer.After(0, function()
+					ShowMacroMenu(button, macro)
+				end)
+			end
+		end
+		--[[
+			each group of options is a submenu (Combat Check, Spell Rank, Targeting, Before Casting, After
+			Casting, Casting Rules, Error Messages, then Use Items First), the middle ones in the order their lines
+			run in the macro text; a group's submenu appears with its first option, so a group the macro offers
+			nothing in leaves no empty entry. Its label shows what is on in it (GroupLabel), set
 			again each time the menu redraws, so ticking a box in the submenu updates it.
 		]]
 		local pendingGroup, menu, entries
@@ -104,6 +142,7 @@ local function ShowMacroMenu(button)
 				elseif button.macro == macro then
 					SetMacro(button, macro)
 				end
+				changed()
 			end)
 		end
 		if macro.focus then
@@ -121,6 +160,7 @@ local function ShowMacroMenu(button)
 			local function setCheck(check)
 				ns.SetCombatCheck(macro, check or nil)
 				Refresh(button:GetParent()) -- also rewrites the focus copy
+				changed()
 			end
 			for _, choice in ipairs({
 				{ "MENU_ONLY_IN_COMBAT", "combatOnly" },
@@ -144,6 +184,7 @@ local function ShowMacroMenu(button)
 			local function setChoice(choice)
 				ns.SetAbilityRank(macro, choice or nil)
 				Refresh(button:GetParent()) -- also rewrites the focus copy
+				changed()
 			end
 			local function addChoice(label, choice)
 				track(label, function()
@@ -167,28 +208,29 @@ local function ShowMacroMenu(button)
 		addOption(L["MENU_CAST_ON_TARGETS_TARGET"], "targetTarget")
 		addOption(L["MENU_CAST_ON_FOCUS"], "focus")
 		addOption(L["MENU_CAST_AT_CURSOR"], "cursor")
-		addOption(L["MENU_TARGET_NEAREST_ENEMY"], "targetEnemy")
-		group("MENU_GROUP_ATTACK")
-		addOption(L["MENU_STOP_ATTACK"], "stopAttack")
-		addOption(L["MENU_START_AUTO_ATTACK"], "startAttack")
-		if ns.AutoShotLabelKey() then
-			addOption(L[ns.AutoShotLabelKey()], "autoShot")
+		if macro.groupSpell then
+			addOption(L["MENU_RIGHT_CLICK_FOR"]:format(macro.groupSpell), "groupVersion")
 		end
-		addOption(L["MENU_ENABLE_PET_ATTACK"], "petAttack")
+		group("MENU_GROUP_BEFORE_CAST")
 		addOption(L["MENU_STOP_CASTING"], "stopCast")
 		if ns.OffersOption(macro, "stopCast") then
 			addNote("MENU_STOP_CASTING_NOTE")
 		end
-		group("MENU_GROUP_UTILITY")
-		if macro.petAbility then
-			addOption(L["MENU_CAST_IF_SUMMONED"]:format(macro.petAbility), "pet")
-		end
+		addOption(L["MENU_STOP_ATTACK"], "stopAttack")
+		addOption(L["MENU_LEAVE_FORM_BEFORE"], "cancelForm")
+		addOption(L["MENU_TARGET_NEAREST_ENEMY"], "targetEnemy")
+		addOption(L["MENU_ENABLE_PET_ATTACK"], "petAttack")
 		if macro.stances then
 			addOption(L["MENU_SWITCH_TO"]:format(macro.stances[1]), "stance")
 		end
-		addOption(L["MENU_LEAVE_FORM_BEFORE"], "cancelForm")
-		if macro.groupSpell then
-			addOption(L["MENU_RIGHT_CLICK_FOR"]:format(macro.groupSpell), "groupVersion")
+		group("MENU_GROUP_AFTER_CAST")
+		addOption(L["MENU_START_AUTO_ATTACK"], "startAttack")
+		if ns.AutoShotLabelKey() then
+			addOption(L[ns.AutoShotLabelKey()], "autoShot")
+		end
+		group("MENU_GROUP_CASTING_RULES")
+		if macro.petAbility then
+			addOption(L["MENU_CAST_IF_SUMMONED"]:format(macro.petAbility), "pet")
 		end
 		addOption(L["MENU_SPAMMABLE"], "spam")
 		addOption(L["MENU_DOWNRANK_IN_RAIDS"], "raidRank1")
@@ -198,10 +240,10 @@ local function ShowMacroMenu(button)
 		if ns.OffersOption(macro, "noToggle") then
 			addNote("MENU_NEVER_TURN_OFF_NOTE")
 		end
-		group("MENU_GROUP_SCRIPTS")
+		group("MENU_GROUP_ERRORS")
 		addOption(L["MENU_HIDE_ERRORS"], "hideErrors")
 		addOption(L["MENU_MUTE_ERRORS"], "muteErrors")
-		group("MENU_USE_BEFORE_CASTING")
+		group("MENU_GROUP_USE_ITEMS_FIRST")
 		if ns.OffersUseItems(macro) then
 			-- the equipped on-use items, plus any slot already ticked so it can be unticked after a gear swap
 			local slots, listed = {}, {}
@@ -224,9 +266,27 @@ local function ShowMacroMenu(button)
 					menu:CreateCheckbox(ns.SlotLabel(slot) .. (at and " (" .. at .. ")" or ""), isOn, function()
 						ns.ToggleUseSlot(macro, slot)
 						Refresh(button:GetParent()) -- rewrites the focus copy too
+						changed()
 					end)
 				end
 			end
+		end
+		-- the macro text as it stands, read as each line draws so a ticked option shows at once
+		rootDescription:CreateDivider()
+		local function addPreviewLine(text)
+			rootDescription:CreateTitle(text()):AddInitializer(function(frame)
+				if frame.fontString then
+					frame.fontString:SetTextToFit(text())
+				end
+			end)
+		end
+		addPreviewLine(function()
+			return MacroLengthLine(macro)
+		end)
+		for i = 1, lineCount do
+			addPreviewLine(function()
+				return GetColor("TEXT") .. (BodyLines(macro)[i] or "") .. "|r"
+			end)
 		end
 	end)
 end
@@ -255,7 +315,7 @@ local ICON_SIZE = 36
 
 -- parchment ink, matching the native spell names and subtext
 local INK_COLOR = { 0.18, 0.106, 0.059 }
--- faded ink for hints, labels and a spell's options note: the ink at 60% over the parchment, opaque so it also works as a |c code
+-- faded ink for hints, labels and a spell's rank or options note: the ink at 60% over the parchment, opaque so it also works as a |c code
 local FADED_INK_COLOR = { 0.44, 0.37, 0.28 }
 
 --[[
@@ -413,7 +473,15 @@ local function CreateMacroButton(parent)
 		end
 		GameTooltip:AddLine(self.macro.body, 1, 1, 1, true)
 		GameTooltip:AddLine(" ")
-		if self.macro.unlearned then
+		if self.blockReason == "long" then
+			local line = L["TOOLTIP_TOO_LONG"]:format(self.blockLength, ns.MACRO_BODY_MAX_LENGTH)
+			GameTooltip:AddLine(GetColor("OFF") .. line .. "|r", nil, nil, nil, true)
+			GameTooltip:AddLine(" ")
+		elseif self.blockReason == "taken" then
+			local line = L["TOOLTIP_NAME_TAKEN"]:format(self.macro.macroName)
+			GameTooltip:AddLine(GetColor("OFF") .. line .. "|r", nil, nil, nil, true)
+			GameTooltip:AddLine(" ")
+		elseif self.macro.unlearned then
 			GameTooltip:AddLine(GetColor("OFF") .. L["TOOLTIP_NOT_LEARNED"] .. "|r", nil, nil, nil, true)
 			GameTooltip:AddLine(" ")
 		elseif self.glow:IsShown() then
@@ -452,8 +520,7 @@ end
 
 --[[
 	The options a spell's note can name, most telling first: the note names the one that is on, or counts
-	them when more than one is. stopCast and startAttack count only when ticked, since their default would
-	put them on every spell.
+	them when more than one is.
 ]]
 local OPTION_SUBTEXTS = {
 	{ "pet", "SUBTEXT_PET" },
@@ -477,17 +544,20 @@ local OPTION_SUBTEXTS = {
 	{ "cancelForm", "SUBTEXT_LEAVE_FORM" },
 	{ "noToggle", "SUBTEXT_NO_TOGGLE" },
 	{ "autoShot" },
-	{ "startAttack", "SUBTEXT_START_ATTACK", ticked = true },
+	{ "startAttack", "SUBTEXT_START_ATTACK" },
 	{ "stopAttack", "SUBTEXT_STOP_ATTACK" },
-	{ "stopCast", "SUBTEXT_STOP_CASTING", ticked = true },
+	{ "stopCast", "SUBTEXT_STOP_CASTING" },
 	{ "hideErrors", "SUBTEXT_HIDE_ERRORS" },
 	{ "muteErrors", "SUBTEXT_MUTE_ERRORS" },
 }
 
-local AUTO_SHOT_SUBTEXTS = {
-	MENU_START_AUTO_SHOT = "SUBTEXT_AUTO_SHOT",
-	MENU_START_WAND = "SUBTEXT_WAND",
-}
+-- The autoShot note: Auto Shot's own name from the client, or "Wand" rather than the wand's "Shoot".
+local function AutoShotSubText()
+	if ns.AutoShotLabelKey() == "MENU_START_WAND" then
+		return L["SUBTEXT_WAND"]
+	end
+	return ns.AutoShotName()
+end
 
 --[[
 	A spell macro's note: the name of its one option that is on, "N Options" when several are, or nil when
@@ -502,8 +572,6 @@ local function OptionSubText(macro)
 			on = ns.UseItemSlots(macro)[1] ~= nil
 		elseif key == "fixedRank" then
 			on = ns.FixedRank(macro) ~= nil
-		elseif entry.ticked then
-			on = ns.IsOptionTicked(macro, key)
 		else
 			on = ns.IsOptionOn(macro, key)
 		end
@@ -511,8 +579,13 @@ local function OptionSubText(macro)
 			count = count + 1
 			if not first then
 				-- a fixed rank's note is the rank's own text ("Rank 3")
-				first = key == "fixedRank" and ns.FixedRank(macro)
-					or L[entry[2] or AUTO_SHOT_SUBTEXTS[ns.AutoShotLabelKey()]]
+				if key == "fixedRank" then
+					first = ns.FixedRank(macro)
+				elseif key == "autoShot" then
+					first = AutoShotSubText()
+				else
+					first = L[entry[2]]
+				end
 			end
 		end
 	end
@@ -522,9 +595,13 @@ local function OptionSubText(macro)
 	return first
 end
 
--- bars is a ns.ScanActionBars() result, scanned here when nil.
-function SetMacro(button, macro, bars)
+--[[
+	bars is a ns.ScanActionBars() result and characterIndexes a ns.CharacterMacroIndexes() one, each read here
+	when nil. A macro the page can't place (ns.MacroBlockReason) says why in red in place of its note.
+]]
+function SetMacro(button, macro, bars, characterIndexes)
 	button.macro = macro
+	button.blockReason, button.blockLength = ns.MacroBlockReason(macro, characterIndexes)
 	UpdateGlow(button, bars or ns.ScanActionBars())
 	button.icon:SetTexture(macro.icon)
 	button.icon:SetDesaturated(macro.unlearned == true)
@@ -533,7 +610,10 @@ function SetMacro(button, macro, bars)
 		button.border:SetAtlas(frameAtlas, false)
 	end
 	button.name:SetText(macro.name)
-	if macro.custom then
+	if button.blockReason then
+		local subText = button.blockReason == "long" and L["SUBTEXT_TOO_LONG"] or L["SUBTEXT_NAME_TAKEN"]
+		button.subText:SetText(GetColor("OFF") .. subText .. "|r")
+	elseif macro.custom then
 		button.subText:SetText(L["SUBTEXT_CUSTOM"])
 		button.subText:SetTextColor(unpack(INK_COLOR))
 	elseif macro.equipment then
@@ -548,8 +628,10 @@ function SetMacro(button, macro, bars)
 			button.subText:SetText(subText)
 			button.subText:SetTextColor(unpack(FADED_INK_COLOR))
 		else
-			button.subText:SetText(ns.HasCastOptions(macro) and L["SUBTEXT_MACRO"] or L["SUBTEXT_SELF"])
-			button.subText:SetTextColor(unpack(INK_COLOR))
+			-- with no option on, the spell's own subtext, as the game's spellbook shows it ("Rank 4", "Racial")
+			local spellID = TooltipSpellID(macro)
+			button.subText:SetText(spellID and C_Spell.GetSpellSubtext(spellID) or "")
+			button.subText:SetTextColor(unpack(FADED_INK_COLOR))
 		end
 	end
 end
@@ -673,6 +755,7 @@ local function Layout(page)
 		page.empty:SetText(L["PAGE_EMPTY"])
 		page.empty:ClearAllPoints()
 		page.empty:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 8, -12)
+		page.empty:SetWidth(viewWidth - 16)
 		page.empty:Show()
 		controls:Hide()
 		return
@@ -684,12 +767,10 @@ local function Layout(page)
 
 	local halves = Paginate(height + viewTop - geometry.viewBottom, headerHeight, geometry.columns)
 	local maxPages = math.ceil(#halves / spread)
-	page.paging = true
 	controls:SetMaxPages(maxPages)
-	page.paging = false
 	controls:SetShown(maxPages > 1)
 	local current = math.min(controls:GetCurrentPage(), maxPages)
-	local bars = ns.ScanActionBars()
+	local bars, characterIndexes = ns.ScanActionBars(), ns.CharacterMacroIndexes()
 	for side = 1, spread do
 		local x = origins[side]
 		for _, entry in ipairs(halves[(current - 1) * spread + side] or {}) do
@@ -700,7 +781,7 @@ local function Layout(page)
 			else
 				local button = page.buttons:Acquire()
 				button:SetPoint("TOPLEFT", page, "TOPLEFT", x + entry.column * cellWidth + 8, viewTop - entry.y - 4)
-				SetMacro(button, entry.macro, bars)
+				SetMacro(button, entry.macro, bars, characterIndexes)
 			end
 		end
 	end
@@ -735,6 +816,83 @@ local function UpdateMacroCount(page)
 	)
 end
 
+--[[
+	The "Page 1/2" arrows at the book's bottom right, built here rather than from Blizzard's paging template,
+	which reads a format string the Classic engine's clients don't define. A click or wheel step that turns
+	the page calls page:OnPageChanged(); SetMaxPages and SetCurrentPage never do.
+]]
+local PAGE_BUTTON_SIZE = 32
+local PAGE_PREV_TEXTURE = "Interface\\Buttons\\UI-SpellbookIcon-PrevPage"
+local PAGE_NEXT_TEXTURE = "Interface\\Buttons\\UI-SpellbookIcon-NextPage"
+
+local function CreatePageButton(parent, texture)
+	local button = CreateFrame("Button", nil, parent)
+	button:SetSize(PAGE_BUTTON_SIZE, PAGE_BUTTON_SIZE)
+	button:SetNormalTexture(texture .. "-Up")
+	button:SetPushedTexture(texture .. "-Down")
+	button:SetDisabledTexture(texture .. "-Disabled")
+	button:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
+	return button
+end
+
+local function CreatePagingControls(page)
+	local controls = CreateFrame("Frame", nil, page)
+	controls:SetSize(2 * PAGE_BUTTON_SIZE, PAGE_BUTTON_SIZE)
+	local current, maxPages = 1, 1
+	local nextButton = CreatePageButton(controls, PAGE_NEXT_TEXTURE)
+	nextButton:SetPoint("RIGHT")
+	local prevButton = CreatePageButton(controls, PAGE_PREV_TEXTURE)
+	prevButton:SetPoint("RIGHT", nextButton, "LEFT")
+	controls.PageText = controls:CreateFontString(nil, "OVERLAY", "SystemFont_Med3")
+	controls.PageText:SetTextColor(unpack(INK_COLOR))
+	controls.PageText:SetPoint("RIGHT", prevButton, "LEFT", -8, 0)
+
+	local function Update()
+		controls.PageText:SetText(PAGE_NUMBER:format(current) .. "/" .. maxPages)
+		prevButton:SetEnabled(current > 1)
+		nextButton:SetEnabled(current < maxPages)
+	end
+
+	local function Turn(step)
+		local target = math.max(1, math.min(maxPages, current + step))
+		if target ~= current then
+			current = target
+			Update()
+			PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
+			page:OnPageChanged()
+		end
+	end
+
+	prevButton:SetScript("OnClick", function()
+		Turn(-1)
+	end)
+	nextButton:SetScript("OnClick", function()
+		Turn(1)
+	end)
+
+	function controls:SetMaxPages(pages)
+		maxPages = math.max(1, pages)
+		current = math.min(current, maxPages)
+		Update()
+	end
+	function controls:GetMaxPages()
+		return maxPages
+	end
+	function controls:GetCurrentPage()
+		return current
+	end
+	function controls:SetCurrentPage(pageNumber)
+		current = math.max(1, math.min(maxPages, pageNumber))
+		Update()
+	end
+	function controls:OnMouseWheel(delta)
+		Turn(delta > 0 and -1 or 1)
+	end
+
+	Update()
+	return controls
+end
+
 -- Rebuilds the list from the spellbook and the class lists, updates changed macros, then redraws.
 function Refresh(page)
 	ns.CollectMacros()
@@ -744,6 +902,20 @@ function Refresh(page)
 end
 
 local pages = {} -- every page built, so a settings change can redraw the open one
+
+--[[
+	Gives a settings menu entry the explanation its Options Interface control shows, as AceConfig shows it: the
+	label as a gold title, then a white line. Builds whose menus can't take a tooltip show the entry bare.
+]]
+local function AddMenuTooltip(element, labelKey, descKey)
+	if not element.SetTooltip then
+		return
+	end
+	element:SetTooltip(function(tooltip)
+		tooltip:SetText(L[labelKey], 1, 0.82, 0, true)
+		tooltip:AddLine(L[descKey], 1, 1, 1, true)
+	end)
+end
 
 local function BuildPage(page)
 	pages[#pages + 1] = page
@@ -757,6 +929,8 @@ local function BuildPage(page)
 
 	page.empty = page:CreateFontString(nil, "OVERLAY", "SystemFont_Med3")
 	page.empty:SetTextColor(unpack(INK_COLOR))
+	page.empty:SetJustifyH("LEFT")
+	page.empty:SetWordWrap(true)
 
 	-- usage hint along the bottom of the left page, level with the paging arrows; Layout places it
 	page.footer = page:CreateFontString(nil, "OVERLAY", "SystemFont_Med1")
@@ -767,37 +941,55 @@ local function BuildPage(page)
 	local function SetupSettingsMenu(_, rootDescription)
 		rootDescription:CreateTitle(SETTINGS)
 		if ns.ForEachUnlearnedSpell then
-			rootDescription:CreateCheckbox(L["SETTINGS_SHOW_UNLEARNED"], ns.ShowsUnlearned, function()
-				ns.SetShowUnlearned(not ns.ShowsUnlearned())
-				if page.pagingControls.SetCurrentPage then
-					page.paging = true
+			AddMenuTooltip(
+				rootDescription:CreateCheckbox(L["SETTINGS_SHOW_UNLEARNED"], ns.ShowsUnlearned, function()
+					ns.SetShowUnlearned(not ns.ShowsUnlearned())
 					page.pagingControls:SetCurrentPage(1)
-					page.paging = false
-				end
-				Refresh(page)
-			end)
+					Refresh(page)
+				end),
+				"SETTINGS_SHOW_UNLEARNED",
+				"OPTIONS_SHOW_UNLEARNED_DESCRIPTION"
+			)
 		end
-		rootDescription:CreateCheckbox(L["SETTINGS_COUNT_SPELLS_ON_BARS"], ns.CountsSpellsOnBars, function()
-			ns.SetCountSpellsOnBars(not ns.CountsSpellsOnBars())
-			Layout(page)
-		end)
-		if ns.ClassOffersPetAttack() then
-			rootDescription:CreateCheckbox(L["SETTINGS_PET_ATTACK_DEFAULT"], ns.PetAttacksByDefault, function()
-				ns.SetPetAttacksByDefault(not ns.PetAttacksByDefault())
-				Refresh(page) -- rewrites the macros that follow the default
-			end)
-		end
-		if ns.IsMeleeClass() then
-			rootDescription:CreateCheckbox(L["SETTINGS_START_ATTACK_DEFAULT"], ns.StartsAttackByDefault, function()
-				ns.SetStartsAttackByDefault(not ns.StartsAttackByDefault())
-				Refresh(page) -- rewrites the macros that follow the default
-			end)
+		AddMenuTooltip(
+			rootDescription:CreateCheckbox(L["SETTINGS_COUNT_SPELLS_ON_BARS"], ns.CountsSpellsOnBars, function()
+				ns.SetCountSpellsOnBars(not ns.CountsSpellsOnBars())
+				Layout(page)
+			end),
+			"SETTINGS_COUNT_SPELLS_ON_BARS",
+			"OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"
+		)
+		rootDescription:CreateDivider()
+		AddMenuTooltip(
+			rootDescription:CreateButton(L["SETTINGS_MARK_ALL_PLACED"], function()
+				ns.MarkAllPlaced()
+				ns:OnActionbarSlotChanged() -- redraws the glows
+			end),
+			"SETTINGS_MARK_ALL_PLACED",
+			"SETTINGS_MARK_ALL_PLACED_DESCRIPTION"
+		)
+		if ns.HasPlacedMarks() then
+			AddMenuTooltip(
+				rootDescription:CreateButton(L["SETTINGS_CLEAR_PLACED"], function()
+					ns.ClearPlacedMarks()
+					ns:OnActionbarSlotChanged() -- redraws the glows
+				end),
+				"SETTINGS_CLEAR_PLACED",
+				"SETTINGS_CLEAR_PLACED_DESCRIPTION"
+			)
 		end
 		rootDescription:CreateDivider()
-		rootDescription:CreateButton(L["SETTINGS_MARK_ALL_PLACED"], function()
-			ns.MarkAllPlaced()
-			ns:OnActionbarSlotChanged() -- redraws the glows
-		end)
+		AddMenuTooltip(
+			rootDescription:CreateButton(L["SETTINGS_OPEN_OPTIONS"], function()
+				-- the Classic engine's window sits on the HIGH strata, so it would cover the Options Interface
+				if ns.HideSpellbookWindow and not InCombatLockdown() then
+					ns.HideSpellbookWindow()
+				end
+				ns:OpenOptionsPanel()
+			end),
+			"SETTINGS_OPEN_OPTIONS",
+			"SETTINGS_OPEN_OPTIONS_DESCRIPTION"
+		)
 	end
 
 	--[[
@@ -836,27 +1028,11 @@ local function BuildPage(page)
 		page.macroCount:SetPoint("RIGHT", page.options, "LEFT", -6, 0)
 	end
 
-	-- the native page's "Page 1/2" arrows, bottom right of the book. The template reads its "Page 1/2" format
-	-- from the global PAGE_NUMBER_WITH_MAX while it loads, and the Classic engine's clients don't define it, so
-	-- lend it one for the CreateFrame call
-	local lendPageFormat = PAGE_NUMBER_WITH_MAX == nil
-	if lendPageFormat then
-		PAGE_NUMBER_WITH_MAX = (PAGE_NUMBER or "Page %d") .. "/%d"
-	end
-	local controls = CreateFrame("Frame", nil, page, "PagingControlsHorizontalTemplate")
-	if lendPageFormat then
-		PAGE_NUMBER_WITH_MAX = nil
-	end
+	local controls = CreatePagingControls(page)
 	page.pagingControls = controls
 	controls:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", page.geometry.pagingRight, page.geometry.pagingBottom)
-	controls.PageText:SetFontObject("SystemFont_Med3")
-	controls.PageText:SetTextColor(unpack(INK_COLOR))
-	controls.spacing = 8
-	controls.prevPageSound, controls.nextPageSound = SOUNDKIT.IG_ABILITY_PAGE_TURN, SOUNDKIT.IG_ABILITY_PAGE_TURN
 	function page:OnPageChanged()
-		if not self.paging then
-			Layout(self)
-		end
+		Layout(self)
 	end
 	page:EnableMouseWheel(true)
 	page:SetScript("OnMouseWheel", function(_, delta)
@@ -888,6 +1064,31 @@ function ns:RefreshOpenPages()
 		end
 	end
 	return refreshed
+end
+
+--[[
+	Brings the macros the add-on made in step with a change made outside the page, whether or not a page is
+	open. Macros can't be edited in combat, so then the rewrite waits for combat to end.
+]]
+local syncPending = false
+
+function ns:RefreshMacros()
+	if ns:RefreshOpenPages() then
+		return
+	end
+	if InCombatLockdown() then
+		syncPending = true
+		return
+	end
+	ns.CollectMacros()
+	ns.SyncAllMacros()
+end
+
+function ns:OnPlayerRegenEnabled()
+	if syncPending then
+		syncPending = false
+		ns:RefreshMacros()
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -949,12 +1150,28 @@ function ns:OnActionbarSlotChanged()
 	end
 end
 
--- A macro made or deleted, here or in the macro window, changes the slot counts as well as the glows.
-function ns:OnUpdateMacros()
-	ns:OnActionbarSlotChanged()
+--[[
+	A macro made, renamed or deleted, here or in the macro window, changes the slot counts, the glows and
+	which names are taken; redraw the open page's buttons once per burst, since syncing fires one per macro.
+]]
+local macrosPending = false
+
+local function RedrawButtons()
+	macrosPending = false
 	for _, page in ipairs(pages) do
 		if page:IsVisible() then
+			local bars, characterIndexes = ns.ScanActionBars(), ns.CharacterMacroIndexes()
+			for i = 1, page.buttons.used do
+				SetMacro(page.buttons[i], page.buttons[i].macro, bars, characterIndexes)
+			end
 			UpdateMacroCount(page)
 		end
+	end
+end
+
+function ns:OnUpdateMacros()
+	if not macrosPending then
+		macrosPending = true
+		C_Timer.After(0, RedrawButtons)
 	end
 end
