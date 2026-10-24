@@ -4,7 +4,7 @@ Mouseover macros, cursor casting and self-cast macros for every class spell, bui
 
 **TL;DR:** Never write a mouseover macro again. Every spell you know is already a macro, so pick your options and drag it onto your bars.
 
-<img width="1200" height="423" alt="README-Infographic" src="https://github.com/user-attachments/assets/dc642b4f-61be-4001-94ab-3a8c2768006d" />
+<img width="800" src="https://github.com/user-attachments/assets/dc642b4f-61be-4001-94ab-3a8c2768006d" />
 
 ## Setup
 
@@ -21,7 +21,7 @@ Mouseover macros, cursor casting and self-cast macros for every class spell, bui
 
 ⚙️ **Options With a Right-Click** // Add stopcasting, auto attack, pet attack, focus or your trinkets with a tick. The macro rewrites itself, and warns you before it gets too long.
 
-📈 **Smart Spell Ranks** // Downrank in raids to save mana, or let your heals and buffs pick the highest rank your friendly target can take.
+📈 **Smart Spell Ranks** // Automatically update your abilities to use max rank after you train, or dynamically adjust your buffs pick the highest rank your friendly target can receive.
 
 📚 **Your Whole Kit in One Place** // Macros glow until they're on your bars, and the page also holds your on-use gear, your own custom macros, and spells you haven't trained yet.
 
