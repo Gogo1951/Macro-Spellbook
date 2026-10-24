@@ -43,15 +43,15 @@ Mute Error Sounds turns off your Sound Effects and Error Speech settings for a s
 
 ## Testing & Localization Status
 
-🔴 World of Warcraft // 12.1.0
+🟡 World of Warcraft // 12.1.0
 
-🔴 Mists of Pandaria Classic // 5.5.4
+🟢 Mists of Pandaria Classic // 5.5.4
 
 🟢 Burning Crusade Anniversary // 2.5.6
 
 🟢 World of Warcraft: Forever // 1.60.1
 
-🟡 World of Warcraft: Season of Discovery // 1.15.9
+🟢 World of Warcraft: Season of Discovery // 1.15.9
 
 🟢 World of Warcraft: Classic // 1.15.9
 
