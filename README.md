@@ -4,7 +4,7 @@ Mouseover, cursor and self-cast macros for every class spell, built in one click
 
 **TL;DR:** Never write a mouseover macro again. Every spell you know is already a macro that keeps itself up to date, so pick your options and drag it onto your bars.
 
-<img width="800" src="https://github.com/user-attachments/assets/dc642b4f-61be-4001-94ab-3a8c2768006d" />
+<img width="800" src="https://github.com/user-attachments/assets/caab128c-2911-4a05-aeeb-bf1902a1ada0" />
 
 ## Setup
 
