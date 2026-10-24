@@ -1,6 +1,8 @@
 local _, ns = ...
 local L = ns.L
 local GetColor = ns.GetColor
+local HideTooltip = ns.HideTooltip
+local HasTemplate = ns.HasTemplate
 
 --[[
 	Hosts the page on the Classic engine (Classic Era, TBC, MoP Classic): a tab under the class's skill line
@@ -11,7 +13,7 @@ local GetColor = ns.GetColor
 	untainted; native tab clicks are watched with hooksecurefunc.
 ]]
 
-local ICON_MACRO = "Interface\\MacroFrame\\MacroFrame-Icon" -- the "M" key shown on Blizzard's macro window
+local ICON_MACRO = ns.ICON_MACRO
 
 --[[
 	The window's size and the page layout drawn inside it: two 470 wide, two column pages side by side, with
@@ -44,16 +46,6 @@ local TAB_GAP = 17 -- the space the book leaves between its skill line tabs
 
 local book = SpellBookFrame
 local tab, window
-
-local function HideTooltip(owner)
-	if GameTooltip:IsOwned(owner) then
-		GameTooltip:Hide()
-	end
-end
-
-local function HasTemplate(template)
-	return C_XMLUtil.GetTemplateInfo(template) ~= nil
-end
 
 -- The tab shows only over the book's own spell pages, never the pet book or another tab of it.
 local function ShowsSpells()

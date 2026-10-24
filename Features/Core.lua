@@ -40,6 +40,10 @@ function ns:OnPlayerLogin()
 
 	-- MIGRATION (remove after 2026-11-23)
 	ns:ImportLegacySettings()
+	-- MIGRATION (remove after 2026-11-23)
+	ns:MigrateSpammable()
+	-- MIGRATION (remove after 2026-11-23)
+	ns:MigrateBuffKind()
 
 	ns.RegisterOptionsPanels()
 	ns:RegisterFeatureEvents()
@@ -48,6 +52,10 @@ end
 
 -- A profile switch, reset or copy changes every macro option, so the page and the macros it made follow it.
 function ns:ApplyProfile()
+	-- MIGRATION (remove after 2026-11-23)
+	ns:MigrateSpammable()
+	-- MIGRATION (remove after 2026-11-23)
+	ns:MigrateBuffKind()
 	ns:RefreshMacros()
 	for _, registryName in pairs(ns.OPTIONS_REGISTRY) do
 		AceConfigRegistry:NotifyChange(registryName)
@@ -74,6 +82,7 @@ ns.EVENT_NAMES = {
 	"PLAYER_TARGET_CHANGED",
 	"UPDATE_MOUSEOVER_UNIT",
 	"PLAYER_REGEN_ENABLED",
+	"PLAYER_REGEN_DISABLED",
 	"UPDATE_BINDINGS",
 	"TRAINER_SHOW",
 	"TRAINER_UPDATE",
@@ -89,6 +98,7 @@ local EVENT_HANDLERS = {
 	PLAYER_TARGET_CHANGED = "OnPlayerTargetChanged",
 	UPDATE_MOUSEOVER_UNIT = "OnUpdateMouseoverUnit",
 	PLAYER_REGEN_ENABLED = "OnPlayerRegenEnabled",
+	PLAYER_REGEN_DISABLED = "OnPlayerRegenDisabled",
 	UPDATE_BINDINGS = "OnUpdateBindings",
 	TRAINER_SHOW = "OnTrainerShow",
 	TRAINER_UPDATE = "OnTrainerUpdate",

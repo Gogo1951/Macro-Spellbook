@@ -1,5 +1,5 @@
 ## Title: Macro Spellbook
-## Notes: Mouseover macros, cursor casting and self-cast macros for every class spell, built in one click from a new spellbook tab with no macro syntax. Right-click to add focus, spell rank, downrank, stopcasting, auto attack, pet attack or trinket use.
+## Notes: Mouseover, cursor and self-cast macros for every class spell, built in one click from a new spellbook tab with no macro syntax. They update as you level, train and swap specs. Right-click to add focus, stopcasting, auto attack, pet attack or trinkets.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/MacroSpellbook/Includes/Images/Icon.tga
@@ -74,6 +74,9 @@ Features/Macro-Builder.lua
 Features/Unlearned-Spells.lua
 Features/Trainer-Recording.lua
 Features/Macro-Sync.lua
+Features/Macro-Menu.lua
+Features/Spellbook-Paging.lua
+Features/Macro-Button.lua
 Features/Spellbook-Page.lua
 Features/Spellbook-Host-Classic.lua
 Features/Key-Bindings.lua

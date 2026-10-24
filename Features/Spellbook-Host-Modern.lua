@@ -1,16 +1,18 @@
 local ADDON_NAME, ns = ...
 
 --[[
-	Adds the page as a tab of the Retail-engine spellbook (Blizzard_PlayerSpells). LibSpellBookTabs owns the tab,
-	its placement and the parchment page.
+	Adds the page as a tab of the Retail-engine spellbook (Blizzard_PlayerSpells). Features/Spellbook-Tabs.lua
+	owns the tab, its placement and the parchment page.
 ]]
 
-local ICON_MACRO = "Interface\\MacroFrame\\MacroFrame-Icon" -- the "M" key shown on Blizzard's macro window
+local ICON_MACRO = ns.ICON_MACRO
 
-local libSpellBookTabs = LibStub("LibSpellBookTabs-1.0")
+local SpellbookTabs = ns.SpellbookTabs
 
-libSpellBookTabs:RegisterTab(ADDON_NAME, {
+SpellbookTabs:RegisterTab(ADDON_NAME, {
 	name = ns.L["ADDON_TITLE"],
+	description = ns.L["SPELLBOOK_TAB_DESCRIPTION"],
+	hint = { ns.L["TOOLTIP_KEY_CLICK"], ns.L["TOOLTIP_ACTION_OPEN_PAGE"] },
 	icon = ICON_MACRO,
 	onCreate = ns.BuildSpellbookPage,
 	onShow = ns.RefreshSpellbookPage,
@@ -21,12 +23,12 @@ libSpellBookTabs:RegisterTab(ADDON_NAME, {
 	the spellbook, loading it where it isn't yet, and turns to the page.
 ]]
 function ns.ToggleSpellbookPage()
-	if libSpellBookTabs:IsOpen(ADDON_NAME) and PlayerSpellsFrame and PlayerSpellsFrame:IsShown() then
+	if SpellbookTabs:IsOpen(ADDON_NAME) and PlayerSpellsFrame and PlayerSpellsFrame:IsShown() then
 		HideUIPanel(PlayerSpellsFrame)
 		return
 	end
 	if PlayerSpellsUtil and PlayerSpellsUtil.OpenToSpellBookTab then
 		PlayerSpellsUtil.OpenToSpellBookTab()
 	end
-	libSpellBookTabs:Open(ADDON_NAME)
+	SpellbookTabs:Open(ADDON_NAME)
 end

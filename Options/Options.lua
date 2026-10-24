@@ -9,22 +9,27 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 --------------------------------------------------------------------------------
 
 --[[
-	Called from ns:OnPlayerLogin once ns.db exists. AddToBlizOptions returns (frame, categoryID); the root's
-	category ID is what Settings.OpenToCategory needs, since a title lookup fails wherever the ID is a number.
+	Called from ns:OnPlayerLogin once ns.db exists. AddToBlizOptions returns (frame, categoryID); a category ID
+	is what Settings.OpenToCategory needs, since a title lookup fails wherever the ID is a number. The root's is
+	kept, and so are those of the panels the page's settings menu opens directly, by ns.OPTIONS_REGISTRY key.
 ]]
 function ns.RegisterOptionsPanels()
 	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.General, ns.BuildGeneralOptions())
 	local mainPanel, mainCategoryID = AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.General, L["ADDON_TITLE"])
-	ns.optionsFrames = { main = mainPanel, categoryID = mainCategoryID }
+	ns.optionsFrames = { main = mainPanel, categoryID = mainCategoryID, categories = {} }
 
 	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.SpellbookPage, ns.BuildSpellbookPageOptions())
 	AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.SpellbookPage, L["TAB_SPELLBOOK_PAGE"], L["ADDON_TITLE"])
 
 	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.MacroDefaults, ns.BuildMacroDefaultsOptions())
-	AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.MacroDefaults, L["TAB_MACRO_DEFAULTS"], L["ADDON_TITLE"])
+	local _, macroDefaultsID =
+		AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.MacroDefaults, L["TAB_MACRO_DEFAULTS"], L["ADDON_TITLE"])
+	ns.optionsFrames.categories.MacroDefaults = macroDefaultsID
 
 	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.CustomMacros, ns.BuildCustomMacrosOptions)
-	AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.CustomMacros, L["TAB_CUSTOM_MACROS"], L["ADDON_TITLE"])
+	local _, customMacrosID =
+		AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.CustomMacros, L["TAB_CUSTOM_MACROS"], L["ADDON_TITLE"])
+	ns.optionsFrames.categories.CustomMacros = customMacrosID
 
 	local profilesOptions = ns.BuildProfilesOptions()
 	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.Profiles, profilesOptions)
@@ -42,7 +47,8 @@ end
 -- Opening the Panel
 --------------------------------------------------------------------------------
 
-function ns:OpenOptionsPanel()
+-- Opens the root panel, or the panel named by an ns.OPTIONS_REGISTRY key whose category ID was kept.
+function ns:OpenOptionsPanel(panel)
 	if InCombatLockdown() then
 		ns:PrintMessage(L["CHAT_OPTIONS_IN_COMBAT"])
 		return
@@ -50,11 +56,12 @@ function ns:OpenOptionsPanel()
 	if not ns.optionsFrames then
 		return
 	end
-	if Settings and Settings.OpenToCategory and ns.optionsFrames.categoryID then
-		Settings.OpenToCategory(ns.optionsFrames.categoryID)
+	local categoryID = ns.optionsFrames.categories[panel] or ns.optionsFrames.categoryID
+	if Settings and Settings.OpenToCategory and categoryID then
+		Settings.OpenToCategory(categoryID)
 		return
 	end
-	AceConfigDialog:Open(ns.OPTIONS_REGISTRY.General)
+	AceConfigDialog:Open(ns.OPTIONS_REGISTRY[panel] or ns.OPTIONS_REGISTRY.General)
 end
 
 --------------------------------------------------------------------------------

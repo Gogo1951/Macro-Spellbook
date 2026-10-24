@@ -37,24 +37,15 @@ ns.MESSAGE_ID_FILTERED_EVENTS = {}
     before acting on a firing. A firing the handler would ignore folds into the
     counters under id 0 with the reason; one it acts on logs in full.
     UPDATE_MOUSEOVER_UNIT fires for every unit the cursor crosses, and
-    Features/Macro-Builder.lua acts on it only out of combat, when a Dynamic
-    Rank macro also casts on the mouseover (its RanksRewritable and the
-    mouseover-only rewrite), so the test mirrors those.
+    Features/Macro-Builder.lua queues a rewrite only out of combat while any
+    macro has Dynamic Rank on, by its own setting or its kind's default (its
+    RanksRewritable), so the test makes that same call.
 ]]
 local GATED_EVENTS = {
 	UPDATE_MOUSEOVER_UNIT = {
-		reason = "no Dynamic Rank mouseover macro to rewrite",
+		reason = "out of combat with no Dynamic Rank macro, or in combat",
 		acts = function()
-			local profile = ns.db and ns.db.profile
-			if not profile or InCombatLockdown() then
-				return false
-			end
-			for name in pairs(profile.targetRank) do
-				if profile.mouseover[name] then
-					return true
-				end
-			end
-			return false
+			return ns.db ~= nil and not InCombatLockdown() and ns.AnyTargetRank()
 		end,
 	},
 }

@@ -33,10 +33,12 @@ local function IsHigherRank(spell, name)
 end
 
 --[[
-	Calls fn(name, icon, id) for the rank 1 of every class trainer spell whose name isn't in learned: the
-	bundled ones (Data/) by level, then the ones this character's trainers offered (Trainer-Recording.lua),
-	then the class lists' extraSpells. Data/ includes the rank 1 of each talent that has trainer ranks, so those
-	talents show until learned; talents without trainer ranks need an extraSpells entry.
+	Calls fn(name, icon, id, level, talent) for the rank 1 of every class trainer spell whose name isn't in
+	learned: the bundled ones (Data/) by level, then the ones this character's trainers offered
+	(Trainer-Recording.lua), then the class lists' extraSpells. level is the row's learn level, nil for an
+	extraSpells entry; talent is true for a row Data/ marks as a talent. Data/ includes the rank 1 of each
+	talent that has trainer ranks, so those talents show until learned; talents without trainer ranks need an
+	extraSpells entry.
 	Spells whose data isn't loaded yet are skipped: the page refreshes on SPELL_DATA_LOAD_RESULT.
 ]]
 function ns.ForEachUnlearnedSpell(fn, learned)
@@ -64,7 +66,7 @@ function ns.ForEachUnlearnedSpell(fn, learned)
 				if higherRank == false then
 					seen[name] = true
 					if not learned[name] and not C_Spell.IsSpellPassive(spell.id) then
-						fn(name, C_Spell.GetSpellTexture(spell.id), spell.id)
+						fn(name, C_Spell.GetSpellTexture(spell.id), spell.id, spell.level, spell.talent == true)
 					end
 				end
 			end

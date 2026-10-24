@@ -60,7 +60,7 @@ end
 --[[
 	The player's custom macros, one inline group each: its name, the page section it is listed in, its body
 	and, when it can't go on the page, why. A builder function, so the rows are the list itself and redraw on every change. Removing
-	one takes a click to put back, so it confirms; Restore Defaults puts back the class's starting set.
+	one loses what the player typed, so it confirms; Restore Defaults puts back the class's starting set.
 ]]
 local function MacroRow(index, entry, order)
 	return {
@@ -69,12 +69,13 @@ local function MacroRow(index, entry, order)
 		inline = true,
 		order = order,
 		args = {
+			nameLabel = ns.OptionsRowLabel(L["OPTIONS_CUSTOM_NAME"], 1),
 			name = {
 				type = "input",
-				name = L["OPTIONS_CUSTOM_NAME"],
+				name = "",
 				desc = L["OPTIONS_CUSTOM_NAME_DESCRIPTION"]:format(ns.MACRO_NAME_MAX_LENGTH),
-				width = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_REMOVE_ICON_WIDTH,
-				order = 1,
+				width = ns.OPTIONS_CONTROL_WIDTH - ns.OPTIONS_REMOVE_ICON_WIDTH,
+				order = 2,
 				get = function()
 					return entry.name
 				end,
@@ -86,12 +87,12 @@ local function MacroRow(index, entry, order)
 			remove = {
 				type = "execute",
 				name = "",
-				desc = L["OPTIONS_CUSTOM_REMOVE"],
+				desc = L["OPTIONS_CUSTOM_REMOVE_DESCRIPTION"],
 				image = "Interface/Buttons/UI-GroupLoot-Pass-Up",
 				imageWidth = 16,
 				imageHeight = 16,
 				width = ns.OPTIONS_REMOVE_ICON_WIDTH,
-				order = 2,
+				order = 3,
 				confirm = true,
 				confirmText = L["OPTIONS_CUSTOM_REMOVE_CONFIRM"],
 				func = function()
@@ -103,7 +104,7 @@ local function MacroRow(index, entry, order)
 				type = "group",
 				name = "",
 				inline = true,
-				order = 3,
+				order = 4,
 				args = {
 					label = ns.OptionsRowLabel(L["OPTIONS_CUSTOM_SECTION"], 1),
 					select = {
@@ -130,11 +131,11 @@ local function MacroRow(index, entry, order)
 			},
 			body = {
 				type = "input",
-				name = L["OPTIONS_CUSTOM_BODY"],
+				name = L["MACRO_TEXT"],
 				desc = L["OPTIONS_CUSTOM_BODY_DESCRIPTION"],
 				multiline = 5,
 				width = "full",
-				order = 4,
+				order = 5,
 				get = function()
 					return entry.body
 				end,
@@ -153,7 +154,7 @@ local function MacroRow(index, entry, order)
 				end,
 				fontSize = "medium",
 				width = "full",
-				order = 5,
+				order = 6,
 			},
 		},
 	}
