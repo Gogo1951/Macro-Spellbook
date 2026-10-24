@@ -4,8 +4,10 @@ A World of Warcraft forever addon that allow players to easily configure macro's
 
 ## Configuring your class
 
-Each class has its own file in `src/Config/` (for example `src/Config/Warlock.lua`). It sets the page's sections,
-which spells offer mouseover or cursor casting, and your own custom macros. `src/Config/Config.lua` explains
-each list. Edit your class's file, then type `/reload` in game.
+The page's sections follow your spellbook's own tabs: General, then your class's trees or specs. Your custom
+macros and equipped items come after them, and, with Show Unlearned Spells on, the spells you haven't learned yet
+come last.
 
-Spells that aren't in any section appear under "Unsorted" at the end of the page.
+Each flavor's class lists live in `Data/<Flavor>/Class-Spell-Lists-<Flavor>.lua`. They set which spells offer
+mouseover or cursor casting and the default custom macros; the comment at the top of each file explains each
+list. Edit your class's lists, then type `/reload` in game.
