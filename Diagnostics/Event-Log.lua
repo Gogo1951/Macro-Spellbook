@@ -16,9 +16,10 @@ local EVENT_LOG_MAX_ARG_LENGTH = 255
     (Core's ns.EVENT_NAMES). The burstiest, ACTIONBAR_SLOT_CHANGED at login and
     SPELL_DATA_LOAD_RESULT while unlearned spells load, are the very firings a
     "the glow is wrong" or "the page never filled in" report needs, so both
-    stay in. The lookup in LogEvent stays so a firehose can be excluded here if
-    one is ever registered; one that is sometimes signal has its deciding
-    handler write those firings back through ns:LogEventNow.
+    stay in. The one sustained firehose, UPDATE_MOUSEOVER_UNIT, is sometimes
+    signal, so it is classified per firing below rather than excluded. The
+    lookup in LogEvent stays so a firehose can be excluded here if one is ever
+    registered.
 ]]
 ns.DIAGNOSTIC_EVENT_EXCLUDE = {}
 
@@ -32,17 +33,66 @@ ns.DIAGNOSTIC_EVENT_EXCLUDE = {}
 ns.MESSAGE_ID_FILTERED_EVENTS = {}
 
 --[[
+    Firehoses that carry no message id, each with the test its handler makes
+    before acting on a firing. A firing the handler would ignore folds into the
+    counters under id 0 with the reason; one it acts on logs in full.
+    UPDATE_MOUSEOVER_UNIT fires for every unit the cursor crosses, and
+    Features/Macro-Builder.lua acts on it only out of combat, when a Dynamic
+    Rank macro also casts on the mouseover (its RanksRewritable and the
+    mouseover-only rewrite), so the test mirrors those.
+]]
+local GATED_EVENTS = {
+	UPDATE_MOUSEOVER_UNIT = {
+		reason = "no Dynamic Rank mouseover macro to rewrite",
+		acts = function()
+			local profile = ns.db and ns.db.profile
+			if not profile or InCombatLockdown() then
+				return false
+			end
+			for name in pairs(profile.targetRank) do
+				if profile.mouseover[name] then
+					return true
+				end
+			end
+			return false
+		end,
+	},
+}
+
+-- Folds one firing into its id's counter, keeping the first-seen text.
+local function CountSuppressed(messageID, event, text)
+	local suppressed = ns.diagnostics.suppressed
+	if not suppressed then
+		return
+	end
+	local entry = suppressed[messageID]
+	if entry then
+		entry.count = entry.count + 1
+		return
+	end
+	suppressed[messageID] = { event = event, text = text, count = 1 }
+end
+
+--[[
     Per-firing filter for the events above. A firing whose id the add-on does
     not correlate folds into a per-id counter (first-seen text plus a count)
     rendered as one block at the end of the report, so firehose traffic can't
     evict the entries the log exists to carry. A firing carrying no numeric id
     in the filtered position is unclassifiable, and unclassifiable is signal:
     it logs verbatim. With no correlated ids yet, every classifiable firing is
-    counted.
+    counted. A gated firehose is counted whenever its handler would ignore it.
 
     Returns true when the firing was counted and must not reach the buffer.
 ]]
 function ns:SuppressUncorrelatedMessage(event, ...)
+	local gated = GATED_EVENTS[event]
+	if gated then
+		if gated.acts() then
+			return false
+		end
+		CountSuppressed(0, event, gated.reason)
+		return true
+	end
 	local idPosition = ns.MESSAGE_ID_FILTERED_EVENTS[event]
 	if not idPosition then
 		return false
@@ -51,21 +101,12 @@ function ns:SuppressUncorrelatedMessage(event, ...)
 	if type(messageID) ~= "number" then
 		return false
 	end
-	local suppressed = ns.diagnostics.suppressed
-	if not suppressed then
-		return true
-	end
-	local entry = suppressed[messageID]
-	if entry then
-		entry.count = entry.count + 1
-		return true
-	end
 	local text = ""
 	if select("#", ...) > idPosition then
 		local raw = string.sub(tostring((select(idPosition + 1, ...))), 1, EVENT_LOG_MAX_ARG_LENGTH)
 		text = (raw:gsub("|", "||"))
 	end
-	suppressed[messageID] = { event = event, text = text, count = 1 }
+	CountSuppressed(messageID, event, text)
 	return true
 end
 

@@ -138,7 +138,7 @@ ns.DiagnosticsStrings = {
 	MACROS_TITLE = "Macro Context",
 	MACROS_DESCRIPTION = "Shows your free macro slots, which macros "
 		.. TITLE
-		.. " made, any of your own macros sharing a page macro's name, the equipped items it offers, and the trainer spells it recorded.",
+		.. " made and for which character, any macro holding a page macro's name, the equipped items it offers, the Mute Errors sound settings, and the trainer spells it recorded.",
 	VALIDATE_TITLE = "Validate Data: %s",
 	VALIDATE_DESCRIPTION = "Checks every id in this data file against this client and exports the results as tab-separated text.",
 	VALIDATE_PROGRESS = "%s / %s IDs",

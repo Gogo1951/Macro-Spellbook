@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="MACROSPELLBOOK_TOGGLE" category="Macro Spellbook">
+		MacroSpellbook_Toggle()
+	</Binding>
+</Bindings>

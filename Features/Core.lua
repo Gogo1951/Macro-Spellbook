@@ -48,7 +48,7 @@ end
 
 -- A profile switch, reset or copy changes every macro option, so the page and the macros it made follow it.
 function ns:ApplyProfile()
-	ns:RefreshOpenPages()
+	ns:RefreshMacros()
 	for _, registryName in pairs(ns.OPTIONS_REGISTRY) do
 		AceConfigRegistry:NotifyChange(registryName)
 	end
@@ -73,6 +73,8 @@ ns.EVENT_NAMES = {
 	"UPDATE_MACROS",
 	"PLAYER_TARGET_CHANGED",
 	"UPDATE_MOUSEOVER_UNIT",
+	"PLAYER_REGEN_ENABLED",
+	"UPDATE_BINDINGS",
 	"TRAINER_SHOW",
 	"TRAINER_UPDATE",
 }
@@ -84,8 +86,10 @@ local EVENT_HANDLERS = {
 	SPELL_DATA_LOAD_RESULT = "OnSpellDataLoadResult",
 	ACTIONBAR_SLOT_CHANGED = "OnActionbarSlotChanged",
 	UPDATE_MACROS = "OnUpdateMacros",
-	PLAYER_TARGET_CHANGED = "OnUnitsChanged",
-	UPDATE_MOUSEOVER_UNIT = "OnUnitsChanged",
+	PLAYER_TARGET_CHANGED = "OnPlayerTargetChanged",
+	UPDATE_MOUSEOVER_UNIT = "OnUpdateMouseoverUnit",
+	PLAYER_REGEN_ENABLED = "OnPlayerRegenEnabled",
+	UPDATE_BINDINGS = "OnUpdateBindings",
 	TRAINER_SHOW = "OnTrainerShow",
 	TRAINER_UPDATE = "OnTrainerUpdate",
 }

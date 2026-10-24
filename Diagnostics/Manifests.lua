@@ -105,10 +105,10 @@ end
 	guards. Every pair the add-on picks between at load is listed as both halves, and a FAIL on one half is
 	the report working: it says which branch this client took. The spellbook read (C_SpellBook's skill lines,
 	or the spell tab globals) picks ns.ForEachClassSpell; the tooltip reads (C_TooltipInfo's getters, or the
-	hidden scan tooltip's Set methods) pick ns.ScanTooltipLines and ns.GetTrainerServiceSpellId; the
-	spellbook itself is Blizzard_PlayerSpells with LibSpellBookTabs on the Retail engine, SpellBookFrame on
-	the Classic engine; the page's header, settings cog and paging arrows each fall back without their
-	template.
+	hidden scan tooltip's Set methods) pick ns.ScanTooltipLines and ns.GetTrainerServiceSpellId; the macro
+	slot limits come from Constants.MacroConsts or the MAX_*_MACROS globals; the spellbook itself is
+	Blizzard_PlayerSpells with LibSpellBookTabs on the Retail engine, SpellBookFrame on the Classic engine;
+	the page's header, settings cog and paging arrows each fall back without their template.
 ]]
 ns.DIAGNOSTIC_API_CHECKS = {
 	-- { label, testFunction }
@@ -149,20 +149,19 @@ ns.DIAGNOSTIC_API_CHECKS = {
 
 	-- Every spell the page names, sorts or builds a macro for.
 	Method("C_Spell", "GetSpellName"),
+	Method("C_Spell", "GetSpellInfo"),
 	Method("C_Spell", "GetSpellTexture"),
 	Method("C_Spell", "GetSpellSubtext"),
 	Method("C_Spell", "IsSpellHarmful"),
 	Method("C_Spell", "SpellHasRange"),
 	Method("C_Spell", "IsSpellPassive"),
 	Method("C_Spell", "RequestLoadSpellData"),
+	Method("C_Spell", "GetSpellLevelLearned", "C_Spell.GetSpellLevelLearned (guarded)"),
 	Method("C_Spell", "GetSpellDescription"),
 	Method("C_Spell", "IsSpellDataCached"),
+	Global("IsPlayerSpell"),
 	Method("C_CreatureInfo", "GetCreatureFamilyInfo"),
 	Method("C_Item", "GetItemSpell"),
-	Method("C_Item", "GetItemInfo"),
-	Method("C_Item", "GetItemInfoInstant"),
-	Method("C_Item", "RequestLoadItemDataByID"),
-	Method("C_Item", "DoesItemExistByID"),
 	Global("GetShapeshiftFormInfo"),
 	Global("GetNumShapeshiftForms"),
 	Global("GetInventoryItemLink"),
@@ -186,16 +185,34 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	Global("GetMacroIndexByName"),
 	Global("GetMacroInfo"),
 	Global("GetNumMacros"),
+	-- The macro slot limits, Retail-engine half then Classic-engine half.
+	{
+		"Constants.MacroConsts",
+		function()
+			return type(Constants) == "table" and type(Constants.MacroConsts) == "table"
+		end,
+	},
+	Global("MAX_ACCOUNT_MACROS"),
+	Global("MAX_CHARACTER_MACROS"),
 	Global("PickupMacro"),
 	Global("GetActionInfo"),
 	Global("GetActionText"),
 	Global("InCombatLockdown"),
+	-- The Mute Errors option's sound settings.
+	Method("C_CVar", "GetCVar"),
+	Method("C_CVar", "SetCVar"),
 
 	-- Recording trainer spells.
 	Global("GetNumTrainerServices"),
 	Global("GetTrainerServiceLevelReq"),
 	Global("IsTradeskillTrainer"),
 	Method("C_Trainer", "GetTrainerType"),
+	{
+		"Enum.TrainerType",
+		function()
+			return type(Enum) == "table" and type(Enum.TrainerType) == "table"
+		end,
+	},
 
 	-- The Retail-engine spellbook and LibSpellBookTabs.
 	Global("PlayerSpellsFrame"),
@@ -218,12 +235,49 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	},
 	Global("hooksecurefunc"),
 	-- The page itself, on either book.
-	Template("PagingControlsHorizontalTemplate"),
 	Method("C_XMLUtil", "GetTemplateInfo"),
 	Method("C_Texture", "GetAtlasInfo"),
 	Method("MenuUtil", "CreateContextMenu"),
 
 	Method("Settings", "OpenToCategory"),
+	--[[
+		The key binding: its toggle opens the Retail-engine book through PlayerSpellsUtil where the client has
+		it, and the General panel shows the bound key. Then the three routes ns:OpenKeyBindings tries for the
+		Set Key button, in its order; one route passing whole is enough, and the report says which one this
+		client has.
+	]]
+	Method("PlayerSpellsUtil", "OpenToSpellBookTab", "PlayerSpellsUtil.OpenToSpellBookTab (guarded)"),
+	Global("GetBindingKey"),
+	{
+		"GetBindingText (guarded)",
+		function()
+			return type(GetBindingText) == "function"
+		end,
+	},
+	{
+		"Settings.KEYBINDINGS_CATEGORY_ID",
+		function()
+			return type(Settings) == "table" and Settings.KEYBINDINGS_CATEGORY_ID ~= nil
+		end,
+	},
+	Method("SettingsPanel", "GetCategoryList"),
+	{
+		"SettingsPanel category list GetAllCategories",
+		function()
+			if not (type(SettingsPanel) == "table" and type(SettingsPanel.GetCategoryList) == "function") then
+				return false
+			end
+			local ok, list = pcall(SettingsPanel.GetCategoryList, SettingsPanel)
+			return ok and type(list) == "table" and type(list.GetAllCategories) == "function"
+		end,
+	},
+	{
+		"KeyBindingFrame_LoadUI (legacy)",
+		function()
+			return type(KeyBindingFrame_LoadUI) == "function" or type(KeyBindingFrame) == "table"
+		end,
+	},
+	Global("ShowUIPanel"),
 	Method("C_Timer", "After"),
 	Method("C_EventUtils", "IsEventValid"),
 	Global("GetCVar"),
@@ -316,6 +370,7 @@ local PER_SPELL_OPTIONS = {
 	"cancelForm",
 	"autoShot",
 	"groupVersion",
+	"useItems",
 }
 
 --------------------------------------------------------------------------------
@@ -416,6 +471,51 @@ local function ClassListLines(lines)
 	lines[#lines + 1] = string.format("  default custom macros: %d", #(lists.customMacros or {}))
 end
 
+--[[
+	The class gates the options read off ns.ClassConfig, which resolves the class lists on first use: a
+	form class offers Leave Form Before, a ranged attack named on this client offers its Start option.
+]]
+local function ClassGateLines(lines)
+	local config = ns.ClassConfig()
+	lines[#lines + 1] = string.format(
+		"Class gates: pet class %s, melee class %s, form class %s, ranged attack for the after-cast option %s",
+		YesNo(config.petAttack),
+		YesNo(config.melee),
+		YesNo(config.forms),
+		tostring(config.autoShot or "none")
+	)
+end
+
+--[[
+	Right-Click For Group Version is offered on a spell only when this client names both halves of its
+	GROUP_VERSIONS pair and the spellbook holds the group version, both read by name as the page reads them.
+]]
+local function GroupVersionLines(lines)
+	local learned = {}
+	pcall(ns.ForEachClassSpell, function(name)
+		if name then
+			learned[name] = true
+		end
+	end)
+	local pairsTotal, named, offered = 0, 0, {}
+	for singleId, groupId in pairs(ns.GROUP_VERSIONS or {}) do
+		pairsTotal = pairsTotal + 1
+		local single, group = C_Spell.GetSpellName(singleId), C_Spell.GetSpellName(groupId)
+		if single and group then
+			named = named + 1
+			if learned[single] then
+				offered[#offered + 1] =
+					string.format("%s -> %s (group version learned %s)", single, group, YesNo(learned[group]))
+			end
+		end
+	end
+	table.sort(offered)
+	lines[#lines + 1] = string.format("Group versions: %d of %d pairs named on this client", named, pairsTotal)
+	for _, line in ipairs(offered) do
+		lines[#lines + 1] = "  " .. line
+	end
+end
+
 local function SpellbookLines(lines)
 	local total, byLine, order = 0, {}, {}
 	local ok, problem = pcall(ns.ForEachClassSpell, function(_, _, _, lineName, line)
@@ -464,15 +564,27 @@ local function PageListLines(lines)
 	for _, category in ipairs(order) do
 		lines[#lines + 1] = string.format("  %s: %d", category, byCategory[category])
 	end
+	local byKind = {}
+	for _, kind in ipairs(ns.MACRO_KINDS) do
+		local count = 0
+		for _, macro in ipairs(ns.macros or {}) do
+			if macro.kind == kind.key and not macro.focus then
+				count = count + 1
+			end
+		end
+		byKind[#byKind + 1] = kind.key .. "=" .. count
+	end
+	lines[#lines + 1] = "  by kind: " .. table.concat(byKind, ", ")
 end
 
 --[[
 	The state most likely to explain a "the tab isn't there", "a spell is missing" or "an option isn't offered"
 	report: who the player is and which data folder and spellbook this client gave them, whether the page's tab
 	and page exist, how much of the class lists this client could name (an ID it can't name never matches, so
-	that spell loses its options), the spells the options gate on, what the spellbook
-	holds by skill line, every page setting and which class options apply, the unlearned-spells sources, the
-	options panel route, and what the page last listed. Existence/value reads only.
+	that spell loses its options), the spells and class gates the options depend on, the group versions on
+	offer, what the spellbook holds by skill line, every page setting and which class options apply, the
+	unlearned-spells sources, the options panel route, and what the page last listed. Existence/value reads
+	only.
 ]]
 function ns:BuildPageContextReport()
 	local lines = { ns.GetDiagnosticClientHeader(), "" }
@@ -497,6 +609,8 @@ function ns:BuildPageContextReport()
 		lines[#lines + 1] = SpellLine(spell)
 	end
 	lines[#lines + 1] = string.format("Stance bar forms: %d", GetNumShapeshiftForms() or 0)
+	ClassGateLines(lines)
+	GroupVersionLines(lines)
 	SpellbookLines(lines)
 
 	lines[#lines + 1] = ""
@@ -504,20 +618,29 @@ function ns:BuildPageContextReport()
 	if profile then
 		lines[#lines + 1] = "Profile: " .. tostring(ns.db:GetCurrentProfile())
 		lines[#lines + 1] = string.format(
-			"Page settings: show unlearned %s (unlearned file loaded %s), count spells on bars %s",
+			"Page settings: show unlearned %s (unlearned file loaded %s), count spells on bars %s, marked placed %d",
 			OnOff(profile.showUnlearned),
 			YesNo(ns.ForEachUnlearnedSpell ~= nil),
-			OnOff(profile.countSpellsOnBars)
+			OnOff(profile.countSpellsOnBars),
+			CountKeys(profile.markedPlaced)
 		)
 		lines[#lines + 1] = string.format(
-			"Defaults: pet attack %s (class offers %s), start attack %s (melee class %s), stop casting %s (class offers %s)",
-			OnOff(profile.petAttackDefault),
+			"Class options: pet attack %s, stop casting %s (melee class %s)",
 			YesNo(ns.ClassOffersPetAttack()),
-			OnOff(profile.startAttackDefault),
-			YesNo(ns.IsMeleeClass()),
-			OnOff(profile.stopCastDefault),
-			YesNo(not ns.IsMeleeClass())
+			YesNo(not ns.IsMeleeClass()),
+			YesNo(ns.IsMeleeClass())
 		)
+		local kindDefaults = {}
+		for _, kind in ipairs(ns.MACRO_KINDS) do
+			local on = {}
+			for _, key in ipairs(ns.DEFAULTABLE_OPTIONS) do
+				if ns.KindDefault(kind.key, key) then
+					on[#on + 1] = key
+				end
+			end
+			kindDefaults[#kindDefaults + 1] = kind.key .. "=" .. (#on > 0 and table.concat(on, "+") or "none")
+		end
+		lines[#lines + 1] = "Kind defaults: " .. table.concat(kindDefaults, ", ")
 		local counts = {}
 		for _, key in ipairs(PER_SPELL_OPTIONS) do
 			counts[#counts + 1] = key .. "=" .. CountKeys(profile[key])
@@ -540,6 +663,10 @@ function ns:BuildPageContextReport()
 		tostring(ns.optionsFrames and ns.optionsFrames.categoryID),
 		settingsRoute and "Settings.OpenToCategory" or "AceConfigDialog:Open"
 	)
+	lines[#lines + 1] = string.format(
+		"Key binding: MACROSPELLBOOK_TOGGLE %s",
+		tostring(GetBindingKey("MACROSPELLBOOK_TOGGLE") or "not bound")
+	)
 
 	lines[#lines + 1] = ""
 	PageListLines(lines)
@@ -550,31 +677,42 @@ end
 -- Macro Context
 --------------------------------------------------------------------------------
 
-local MAX_MACRO_BODY = 255
-
-local function MaxAccountMacros()
-	return MAX_ACCOUNT_MACROS or 120
-end
-
--- The add-on's own owned-macro check, read without the migration's adoption.
-local function IsRecordedOwned(macroName, index)
-	if not ns.db then
-		return false
+--[[
+	How Features/Macro-Sync.lua's ownership check would answer for a page macro at index, read without its
+	writes: "owned" (recorded as this character's), "claim" (a general macro recorded before owners were, which
+	the first character to find it claims), "adopt" (unrecorded, but its body is the page's own, so it is
+	adopted on the next sync), or "taken" (the player's own macro, which the page never touches).
+]]
+local function Ownership(macro, index, maxAccount)
+	local general = index <= maxAccount
+	local list = general and ns.db.global.ownedMacros or ns.db.char.ownedMacros
+	local record = list[macro.macroName]
+	local spellMacro = not macro.custom and not macro.equipment
+	if record == true and general and not macro.equipment then
+		return "claim"
 	end
-	local list = index > MaxAccountMacros() and ns.db.char.ownedMacros or ns.db.global.ownedMacros
-	return list[macroName] == true
+	if record ~= nil then
+		local expected = (general and not macro.equipment) and ns.db.keys.char or true
+		return record == expected and "owned" or "taken"
+	end
+	local body = select(3, GetMacroInfo(index))
+	if body == macro.body or (spellMacro and body == ns.BareBody(macro.name)) then
+		return "adopt"
+	end
+	return "taken"
 end
 
 local function CustomMacroLines(lines, profile)
+	local maxBody = ns.MACRO_BODY_MAX_LENGTH
 	local invalid, seen, duplicates = 0, {}, 0
 	for _, entry in ipairs(profile.customMacros) do
 		local name, body = entry.name, entry.body
-		if type(name) ~= "string" or name == "" or type(body) ~= "string" or body == "" or #body > MAX_MACRO_BODY then
+		if type(name) ~= "string" or name == "" or type(body) ~= "string" or body == "" or #body > maxBody then
 			invalid = invalid + 1
-		elseif seen[name:sub(1, 16)] then
+		elseif seen[ns.TrimMacroName(name)] then
 			duplicates = duplicates + 1
 		else
-			seen[name:sub(1, 16)] = true
+			seen[ns.TrimMacroName(name)] = true
 		end
 	end
 	lines[#lines + 1] = string.format(
@@ -582,59 +720,110 @@ local function CustomMacroLines(lines, profile)
 		#profile.customMacros,
 		YesNo(profile.customMacrosSeeded),
 		invalid,
-		MAX_MACRO_BODY,
+		maxBody,
 		duplicates
+	)
+end
+
+-- The sound settings the Mute Errors option turns off around its cast and puts back within a second.
+local MUTE_ERRORS_CVARS = { "Sound_EnableSFX", "Sound_EnableErrorSpeech" }
+
+local function MuteErrorsLine(lines)
+	local values = {}
+	for _, cvar in ipairs(MUTE_ERRORS_CVARS) do
+		values[#values + 1] = string.format("%s %s", cvar, tostring(C_CVar.GetCVar(cvar)))
+	end
+	lines[#lines + 1] = string.format(
+		"Mute Errors: %d macros use it; %s; MacroSpellbookMute global present %s",
+		CountKeys(ns.db.profile.muteErrors),
+		table.concat(values, ", "),
+		YesNo(type(MacroSpellbookMute) == "function")
 	)
 end
 
 --[[
 	The state behind "clicking a macro does nothing", "my own macro was left alone" or "the macro didn't
-	update": combat, free macro slots (character macros spill into general ones once full, and the add-on
-	reads Blizzard_MacroUI's limits, with fallbacks until that has loaded), which macros the add-on recorded
-	as its own, every page macro whose name an unrecorded macro already holds, page macros out of step with
-	their WoW macro, what is on the action bars, the equipped items with a Use: effect, the custom macros, and
-	the trainer recording. Existence/value reads only.
+	update": combat, free macro slots (character macros spill into general ones once full), which macros the
+	add-on recorded as its own and for whom, each page macro as ns.FindMacroIndex finds it (another
+	character's general macro holding the name sends this one to a character slot, or nowhere once those are
+	full), page macros too long to write, out of step with their WoW macro or held by the player's own macro,
+	what is on the action bars, the equipped items with a Use: effect, the custom macros, the Mute Errors sound
+	settings, and the trainer recording. Existence/value reads only.
 ]]
 function ns:BuildMacroContextReport()
 	local lines = { ns.GetDiagnosticClientHeader(), "" }
 	lines[#lines + 1] = "In combat: " .. YesNo(InCombatLockdown())
-	local numAccount, numCharacter = GetNumMacros()
+	local numAccount, maxAccount, numCharacter, maxCharacter = ns.MacroCounts()
 	lines[#lines + 1] = string.format(
-		"Macros: %d of %s general, %d of %s character%s",
+		"Macros: %d of %d general, %d of %d character (limits from %s)",
 		numAccount or 0,
-		tostring(MAX_ACCOUNT_MACROS or 120),
+		maxAccount,
 		numCharacter or 0,
-		tostring(MAX_CHARACTER_MACROS or 18),
-		(MAX_ACCOUNT_MACROS and MAX_CHARACTER_MACROS) and "" or " (Blizzard_MacroUI not loaded yet: fallback limits)"
+		maxCharacter,
+		(type(Constants) == "table" and type(Constants.MacroConsts) == "table") and "Constants.MacroConsts"
+			or (MAX_ACCOUNT_MACROS and MAX_CHARACTER_MACROS) and "the MAX_*_MACROS globals"
+			or "the fallback, Blizzard_MacroUI not loaded yet"
 	)
 	if not ns.db then
 		lines[#lines + 1] = "(database not loaded)"
 		return table.concat(lines, "\n")
 	end
-	lines[#lines + 1] = string.format(
-		"Recorded as the add-on's: %d general, %d character",
-		CountKeys(ns.db.global.ownedMacros),
-		CountKeys(ns.db.char.ownedMacros)
-	)
-
-	local taken, outOfStep, missing = {}, 0, 0
-	for _, macro in ipairs(ns.macros or {}) do
-		local index = GetMacroIndexByName(macro.macroName)
-		if index == 0 then
-			missing = missing + 1
-		elseif not IsRecordedOwned(macro.macroName, index) then
-			taken[#taken + 1] = macro.macroName
-		elseif select(3, GetMacroInfo(index)) ~= macro.body then
-			outOfStep = outOfStep + 1
+	local thisCharacter, otherCharacters, shared = 0, 0, 0
+	for _, record in pairs(ns.db.global.ownedMacros) do
+		if record == ns.db.keys.char then
+			thisCharacter = thisCharacter + 1
+		elseif type(record) == "string" then
+			otherCharacters = otherCharacters + 1
+		else
+			shared = shared + 1
 		end
 	end
 	lines[#lines + 1] = string.format(
-		"Page macros (as of the page's last redraw): %d not created yet, %d recorded but not matching the page",
-		missing,
-		outOfStep
+		"Recorded as the add-on's: general %d this character's, %d other characters', %d shared (equipment, or from before owners were recorded); character %d",
+		thisCharacter,
+		otherCharacters,
+		shared,
+		CountKeys(ns.db.char.ownedMacros)
 	)
-	lines[#lines + 1] = "Names held by a macro the add-on hasn't recorded: "
+
+	local counts = { owned = 0, claim = 0, adopt = 0, missing = 0, tooLong = 0, outOfStep = 0 }
+	local taken, heldByOther = {}, {}
+	for _, macro in ipairs(ns.macros or {}) do
+		if #macro.body > ns.MACRO_BODY_MAX_LENGTH then
+			counts.tooLong = counts.tooLong + 1
+		end
+		local index, takenByOther = ns.FindMacroIndex(macro)
+		if takenByOther then
+			heldByOther[#heldByOther + 1] = macro.macroName
+		end
+		if index == 0 then
+			counts.missing = counts.missing + 1
+		else
+			local ownership = Ownership(macro, index, maxAccount)
+			if ownership == "taken" then
+				taken[#taken + 1] = macro.macroName
+			else
+				counts[ownership] = counts[ownership] + 1
+				if select(3, GetMacroInfo(index)) ~= macro.body then
+					counts.outOfStep = counts.outOfStep + 1
+				end
+			end
+		end
+	end
+	lines[#lines + 1] = string.format(
+		"Page macros (as of the page's last redraw): %d this character's, %d to claim, %d to adopt, %d not created yet; %d of those out of step with the page; %d over %d bytes, never written",
+		counts.owned,
+		counts.claim,
+		counts.adopt,
+		counts.missing,
+		counts.outOfStep,
+		counts.tooLong,
+		ns.MACRO_BODY_MAX_LENGTH
+	)
+	lines[#lines + 1] = "Names held by the player's own macro (never touched): "
 		.. (taken[1] and table.concat(taken, ", ") or "none")
+	lines[#lines + 1] = "Names held by another character's general macro (made in a character slot instead): "
+		.. (heldByOther[1] and table.concat(heldByOther, ", ") or "none")
 
 	local scanOk, bars = pcall(ns.ScanActionBars)
 	if scanOk then
@@ -666,6 +855,7 @@ function ns:BuildMacroContextReport()
 	end
 
 	CustomMacroLines(lines, ns.db.profile)
+	MuteErrorsLine(lines)
 	lines[#lines + 1] = string.format(
 		"Trainer recording: file loaded %s, %d spells recorded on this character",
 		YesNo(ns.OnTrainerShow ~= nil),
@@ -680,10 +870,14 @@ end
 
 --[[
 	Every game record Macro Spellbook names by ID, for the Localization tab's Game Names report: the client
-	strings it reads or matches, the slot names its Equipment section shows, and every spell and creature
-	family in the player's class lists, each read as the features read it. The spells are the player's class
-	only, the class whose page this character sees. A spell loads late, so its row asks for it.
+	strings it reads or matches, the slot names its Equipment section shows, every spell and creature family
+	in the player's class lists, every GROUP_VERSIONS spell, and the ranged attack the after-cast option
+	starts, each read as the features read it. The class-list spells are the player's class only, the class
+	whose page this character sees. A spell loads late, so its row asks for it.
 ]]
+
+-- Mirrors AUTO_SHOTS in Features/Macro-Builder.lua: Auto Shot, or the wand's Shoot, before MoP only.
+local AUTO_SHOT_SPELL_IDS = { HUNTER = 75, MAGE = 5019, PRIEST = 5019, WARLOCK = 5019 }
 local function UiLabel(constant)
 	return {
 		constant = constant,
@@ -712,8 +906,8 @@ end
 ns.DIAGNOSTIC_NAME_LOOKUPS = {
 	-- { constant, kind, id, lookup, request }
 	UiLabel("SPELL_REQUIRED_FORM"),
-	UiLabel("RANK"),
 	UiLabel("SETTINGS"),
+	UiLabel("PAGE_NUMBER"),
 	UiLabel("ITEM_SPELL_TRIGGER_ONUSE"),
 	UiLabel("ERR_NOT_IN_COMBAT"),
 	UiLabel("HEADSLOT"),
@@ -788,6 +982,14 @@ do
 			end
 		end
 	end
+	for singleId, groupId in pairs(ns.GROUP_VERSIONS or {}) do
+		AddSpell("GROUP_VERSIONS", singleId)
+		AddSpell("GROUP_VERSIONS", groupId)
+	end
+	local autoShotId = ns.EXPANSION < 5 and AUTO_SHOT_SPELL_IDS[PlayerClass()]
+	if autoShotId then
+		AddSpell("AUTO_SHOTS", autoShotId)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -795,9 +997,10 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-	One entry per data file, and one report row per entry on the Data tab. Both tables are keyed by class
-	token, so each collector walks every class and answers once per spell ID, keeping the class and where the
-	ID sits as its DATA_* values. A class list entry with several rank IDs answers once per rank.
+	One entry per data file, and one report row per entry on the Data tab. The class lists and trainer spells
+	are keyed by class token, so their collectors walk every class and answer once per spell ID, keeping the
+	class and where the ID sits as its DATA_* values; a class list entry with several rank IDs answers once
+	per rank. The group versions answer once per half of each pair, naming the other half.
 ]]
 local function KeyValue(key)
 	return key
@@ -848,6 +1051,16 @@ local function CollectClassListSpells(listsByClass)
 	return entries
 end
 
+-- GROUP_VERSIONS is keyed by the single-target spell; each pair answers once per half.
+local function CollectGroupVersionSpells(groupBySingle)
+	local entries = {}
+	for singleId, groupId in pairs(groupBySingle) do
+		entries[#entries + 1] = { id = singleId, row = { half = "single", pair = groupId } }
+		entries[#entries + 1] = { id = groupId, row = { half = "group", pair = singleId } }
+	end
+	return entries
+end
+
 local function CollectTrainerSpells(spellsByClass)
 	local entries = {}
 	for classToken, rows in pairs(spellsByClass) do
@@ -886,6 +1099,17 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 					{ "DATA_RACE", RowField("race") },
 					{ "DATA_TALENT", RowField("talent") },
 				},
+			},
+		},
+	},
+	{
+		label = "Group-Versions",
+		sources = {
+			{
+				table = "GROUP_VERSIONS",
+				kind = "spell",
+				collect = CollectGroupVersionSpells,
+				dataColumns = { { "DATA_HALF", RowField("half") }, { "DATA_PAIR", RowField("pair") } },
 			},
 		},
 	},

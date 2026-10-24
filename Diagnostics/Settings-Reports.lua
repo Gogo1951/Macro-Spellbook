@@ -24,17 +24,22 @@ local function FrameLine(label, frame)
 end
 
 --[[
-	The Classic-engine host keeps its tab and page to itself, so they are found by shape among UIParent's
-	children: the page carries the geometry and frame pools the page builder gives it, the tab the checked
-	overlay the host draws.
+	The Classic-engine host keeps its tab and page to itself, so they are found by shape: the page among its
+	window's children (MacroSpellbookFrame, built on the first click of the tab), carrying the geometry and
+	frame pools the page builder gives it; the tab among UIParent's, carrying the checked overlay the host
+	draws.
 ]]
 local function FindClassicFrames()
 	local page, tab
+	local window = _G.MacroSpellbookFrame
+	for _, child in ipairs(window and { window:GetChildren() } or {}) do
+		if child.geometry and child.buttons and child.headers then
+			page = child
+		end
+	end
 	for _, child in ipairs({ UIParent:GetChildren() }) do
 		if not child:IsForbidden() then
-			if child.geometry and child.buttons and child.headers then
-				page = child
-			elseif child.checked and child:IsObjectType("Button") and child:GetNumPoints() > 0 then
+			if child.checked and child:IsObjectType("Button") and child:GetNumPoints() > 0 then
 				local _, relativeTo = child:GetPoint(1)
 				if
 					relativeTo
@@ -109,6 +114,7 @@ function ns:BuildDisplayContextReport()
 		end
 		lines[#lines + 1] = string.format("Skill line tabs shown: %d of %d", shownTabs, index - 1)
 		lines[#lines + 1] = FrameLine("Tab", tab)
+		lines[#lines + 1] = FrameLine("Window", _G.MacroSpellbookFrame)
 		lines[#lines + 1] = FrameLine("Page", page)
 		PageLines(lines, page)
 	end

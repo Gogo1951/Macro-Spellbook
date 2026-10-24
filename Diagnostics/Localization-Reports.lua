@@ -166,13 +166,11 @@ end
 --[[
 	Every macro the page lists for this class, built through the add-on's own builder with every option it
 	offers turned on and every equipped Use: item ticked, the longest each can get, and its byte length
-	against the 255-byte macro limit. The builder reads the options through ns.IsOptionOn and
-	ns.UseItemSlots, so the report stands in for those two (and for ns.CustomMacroList, so a list not yet
-	seeded isn't seeded here) for one build, then puts them and the page's list back as they were. Nothing
-	is written to the saved settings or to any WoW macro.
+	against the macro limit. The builder reads the options through ns.IsOptionOn and ns.UseItemSlots, so the
+	report stands in for those two (and for ns.CustomMacroList, so a list not yet seeded isn't seeded here,
+	and ns.WarnOnce, so a custom macro the page skips prints nothing) for one build, then puts them and the
+	page's list back as they were. Nothing is written to the saved settings or to any WoW macro.
 ]]
-local MAX_MACRO_BODY = 255
-
 local function OfferedOption(macro, key)
 	return ns.OffersOption(macro, key)
 end
@@ -182,7 +180,8 @@ local function BuildLongestMacros()
 	for index, macro in ipairs(ns.macros) do
 		saved[index] = macro
 	end
-	local isOptionOn, useItemSlots, customMacroList = ns.IsOptionOn, ns.UseItemSlots, ns.CustomMacroList
+	local isOptionOn, useItemSlots, customMacroList, warnOnce =
+		ns.IsOptionOn, ns.UseItemSlots, ns.CustomMacroList, ns.WarnOnce
 	local slots = {}
 	for _, entry in ipairs(ns.UsableSlots()) do
 		slots[#slots + 1] = entry.slot
@@ -194,12 +193,14 @@ local function BuildLongestMacros()
 	ns.CustomMacroList = function()
 		return ns.db.profile.customMacros
 	end
+	ns.WarnOnce = function() end
 	local ok, problem = pcall(ns.CollectMacros)
 	local built = {}
 	for index, macro in ipairs(ns.macros) do
 		built[index] = macro
 	end
-	ns.IsOptionOn, ns.UseItemSlots, ns.CustomMacroList = isOptionOn, useItemSlots, customMacroList
+	ns.IsOptionOn, ns.UseItemSlots, ns.CustomMacroList, ns.WarnOnce =
+		isOptionOn, useItemSlots, customMacroList, warnOnce
 	wipe(ns.macros)
 	for index, macro in ipairs(saved) do
 		ns.macros[index] = macro
@@ -216,8 +217,9 @@ function ns:BuildMessageLengthReport()
 		lines[#lines + 1] = "(database not loaded)"
 		return table.concat(lines, "\n")
 	end
+	local maxBody = ns.MACRO_BODY_MAX_LENGTH
 	local built = BuildLongestMacros()
-	lines[#lines + 1] = string.format("Macro limit: %d bytes. %d macros built.", MAX_MACRO_BODY, #built)
+	lines[#lines + 1] = string.format("Macro limit: %d bytes. %d macros built.", maxBody, #built)
 	lines[#lines + 1] = ""
 	table.sort(built, function(a, b)
 		return #a.body > #b.body
@@ -225,7 +227,7 @@ function ns:BuildMessageLengthReport()
 	for _, macro in ipairs(built) do
 		lines[#lines + 1] = string.format(
 			"[%s] %s: %d bytes",
-			#macro.body > MAX_MACRO_BODY and "OVER" or "OK",
+			#macro.body > maxBody and "OVER" or "OK",
 			ShownText(macro.macroName),
 			#macro.body
 		)

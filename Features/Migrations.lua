@@ -13,9 +13,6 @@ local _, ns = ...
 local LEGACY_KEYS = {
 	"showUnlearned",
 	"countSpellsOnBars",
-	"petAttackDefault",
-	"stopCastDefault",
-	"startAttackDefault",
 	"mouseover",
 	"cursor",
 	"focus",

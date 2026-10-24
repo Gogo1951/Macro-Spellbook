@@ -1,5 +1,6 @@
 local _, ns = ...
 local L = ns.L
+local GetColor = ns.GetColor
 
 local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
@@ -7,16 +8,58 @@ local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 -- Custom Macros Panel
 --------------------------------------------------------------------------------
 
-local MAX_MACRO_NAME = 16 -- WoW's macro name limit
-
+-- Redraws the panel, then the open page, or rewrites the macros the add-on made when no page is open.
 local function Changed()
 	AceConfigRegistry:NotifyChange(ns.OPTIONS_REGISTRY.CustomMacros)
-	ns:RefreshOpenPages()
+	ns:RefreshMacros()
 end
 
 --[[
-	The player's custom macros, one inline group each: its name and its body, shown on the page under the
-	Custom section. A builder function, so the rows are the list itself and redraw on every change. Removing
+	A red line saying why the custom macro at index can't go on the page, or nil when it can. Shown only then,
+	so it is a status line, not helper text.
+]]
+local STATUS_KEYS = {
+	needs = "OPTIONS_CUSTOM_STATUS_NEEDS",
+	long = "OPTIONS_CUSTOM_STATUS_TOO_LONG",
+	taken = "OPTIONS_CUSTOM_STATUS_TAKEN",
+}
+
+local function StatusText(index, entry)
+	local problem, length = ns.CustomMacroProblem(entry, ns.CustomMacroTakenNames(index))
+	if not problem then
+		return nil
+	end
+	return GetColor("OFF") .. L[STATUS_KEYS[problem]]:format(length, ns.MACRO_BODY_MAX_LENGTH) .. "|r"
+end
+
+--[[
+	Where a custom macro can be listed: under Custom (""), or with the spells of one of the spellbook's tabs,
+	in the book's order, plus the entry's own section when it no longer names a tab, so it still shows. The
+	tab names are the client's own. Returns the select's values and their order.
+]]
+local function SectionChoices(entry)
+	if #ns.macros == 0 then
+		ns.CollectMacros()
+	end
+	local values, sorting, tabs = { [""] = L["SECTION_CUSTOM"] }, { "" }, {}
+	for name, rank in pairs(ns.ClassConfig().categoryRankByName) do
+		tabs[#tabs + 1] = { name = name, rank = rank }
+	end
+	table.sort(tabs, function(a, b)
+		return a.rank < b.rank
+	end)
+	for _, tab in ipairs(tabs) do
+		values[tab.name], sorting[#sorting + 1] = tab.name, tab.name
+	end
+	if entry.category and not values[entry.category] then
+		values[entry.category], sorting[#sorting + 1] = entry.category, entry.category
+	end
+	return values, sorting
+end
+
+--[[
+	The player's custom macros, one inline group each: its name, the page section it is listed in, its body
+	and, when it can't go on the page, why. A builder function, so the rows are the list itself and redraw on every change. Removing
 	one takes a click to put back, so it confirms; Restore Defaults puts back the class's starting set.
 ]]
 local function MacroRow(index, entry, order)
@@ -29,7 +72,7 @@ local function MacroRow(index, entry, order)
 			name = {
 				type = "input",
 				name = L["OPTIONS_CUSTOM_NAME"],
-				desc = L["OPTIONS_CUSTOM_NAME_DESCRIPTION"]:format(MAX_MACRO_NAME),
+				desc = L["OPTIONS_CUSTOM_NAME_DESCRIPTION"]:format(ns.MACRO_NAME_MAX_LENGTH),
 				width = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_REMOVE_ICON_WIDTH,
 				order = 1,
 				get = function()
@@ -56,13 +99,42 @@ local function MacroRow(index, entry, order)
 					Changed()
 				end,
 			},
+			section = {
+				type = "group",
+				name = "",
+				inline = true,
+				order = 3,
+				args = {
+					label = ns.OptionsRowLabel(L["OPTIONS_CUSTOM_SECTION"], 1),
+					select = {
+						type = "select",
+						name = "",
+						desc = L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"],
+						width = ns.OPTIONS_CONTROL_WIDTH,
+						order = 2,
+						values = function()
+							return (SectionChoices(entry))
+						end,
+						sorting = function()
+							return select(2, SectionChoices(entry))
+						end,
+						get = function()
+							return entry.category or ""
+						end,
+						set = function(_, value)
+							entry.category = value ~= "" and value or nil
+							Changed()
+						end,
+					},
+				},
+			},
 			body = {
 				type = "input",
 				name = L["OPTIONS_CUSTOM_BODY"],
 				desc = L["OPTIONS_CUSTOM_BODY_DESCRIPTION"],
 				multiline = 5,
 				width = "full",
-				order = 3,
+				order = 4,
 				get = function()
 					return entry.body
 				end,
@@ -70,6 +142,18 @@ local function MacroRow(index, entry, order)
 					entry.body = value
 					Changed()
 				end,
+			},
+			status = {
+				type = "description",
+				name = function()
+					return StatusText(index, entry) or ""
+				end,
+				hidden = function()
+					return StatusText(index, entry) == nil
+				end,
+				fontSize = "medium",
+				width = "full",
+				order = 5,
 			},
 		},
 	}
@@ -95,11 +179,20 @@ function ns.BuildCustomMacrosOptions()
 	for index, entry in ipairs(ns.CustomMacroList()) do
 		args["macro" .. index] = MacroRow(index, entry, 10 + index)
 	end
-	args.spacerRestore = ns.OptionsSpacer(900)
+	--[[
+		a class whose lists hold no default custom macros has nothing to restore, so Restore Defaults would only
+		delete the player's own; it stays while the defaults' names are still loading (nil)
+	]]
+	local function noDefaults()
+		local defaults = ns.DefaultCustomMacros()
+		return defaults ~= nil and #defaults == 0
+	end
+	args.spacerRestore = ns.OptionsSpacer(900, noDefaults)
 	args.restore = {
 		type = "execute",
 		name = L["OPTIONS_CUSTOM_RESTORE"],
 		desc = L["OPTIONS_CUSTOM_RESTORE_DESCRIPTION"],
+		hidden = noDefaults,
 		order = 901,
 		confirm = true,
 		confirmText = L["OPTIONS_CUSTOM_RESTORE_CONFIRM"],

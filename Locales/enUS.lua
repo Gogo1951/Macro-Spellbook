@@ -15,16 +15,20 @@ L["SECTION_EQUIPMENT"] = "Equipment"
 -- Page: Default Custom Macros
 L["CUSTOM_SPAM_WAND"] = "Spam Wand"
 L["CUSTOM_PET_ABILITY"] = "Pet Ability"
-L["CUSTOM_PET_ABILITY_MOUSEOVER"] = "Pet Ability (Mouseover)"
+L["CUSTOM_PET_ABILITY_MOUSEOVER"] = "Pet (Mouseover)"
 L["CUSTOM_SWIFT_JUDGE"] = "Swift Judge"
 
 -- Page: Macro Menu
 L["MENU_GROUP_COMBAT_CHECK"] = "Combat Check"
-L["MENU_GROUP_ABILITY_RANK"] = "Ability Rank"
+L["MENU_GROUP_ABILITY_RANK"] = "Spell Rank"
 L["MENU_GROUP_TARGETING"] = "Targeting"
-L["MENU_GROUP_ATTACK"] = "Attack"
-L["MENU_GROUP_UTILITY"] = "Utilities"
-L["MENU_GROUP_SCRIPTS"] = "Scripts"
+L["MENU_GROUP_BEFORE_CAST"] = "Before Casting"
+L["MENU_GROUP_AFTER_CAST"] = "After Casting"
+L["MENU_GROUP_CASTING_RULES"] = "Casting Rules"
+L["MENU_GROUP_ERRORS"] = "Error Messages"
+L["MENU_GROUP_USE_ITEMS_FIRST"] = "Use Items First"
+L["MENU_MACRO_TEXT"] = "Macro Text"
+L["MENU_MACRO_LENGTH"] = "%d / %d"
 L["MENU_GROUP_VALUE"] = "%s: %s"
 L["MENU_OPTIONS_COUNT"] = "%d Options"
 L["MENU_CAST_ON_MOUSEOVER"] = "Cast On Mouseover"
@@ -38,7 +42,8 @@ L["MENU_TARGET_NEAREST_ENEMY"] = "Target Nearest Enemy"
 L["MENU_CAST_IF_SUMMONED"] = "Cast %s If Summoned"
 L["MENU_DOWNRANK_IN_RAIDS"] = "Downrank In Raids"
 L["MENU_NEVER_TURN_OFF"] = "Never Turn Off"
-L["MENU_NEVER_TURN_OFF_NOTE"] = "Never Turn Off keeps it on when you press it again, instead of turning it off."
+L["MENU_NEVER_TURN_OFF_NOTE"] =
+	"Never Turn Off keeps the ability on when you press the macro again, instead of turning it off."
 L["MENU_LEAVE_FORM_BEFORE"] = "Leave Form Before Casting"
 L["MENU_RIGHT_CLICK_FOR"] = "Right-Click For %s"
 L["MENU_ONLY_IN_COMBAT"] = "Only In Combat"
@@ -57,18 +62,22 @@ L["MENU_STOP_ATTACK"] = "Stop Attack"
 L["MENU_START_AUTO_SHOT"] = "Start Auto Shot"
 L["MENU_START_WAND"] = "Start Wand"
 L["MENU_STOP_CASTING"] = "Stop Casting"
-L["MENU_STOP_CASTING_NOTE"] = "Use Stop Casting on important spells like Decurse or Counterspell."
-L["MENU_USE_BEFORE_CASTING"] = "Use Before Casting"
+L["MENU_STOP_CASTING_NOTE"] = "Use Stop Casting on spells that can't wait, like interrupts and dispels."
 
 -- Page: Settings Menu
-L["SETTINGS_SHOW_UNLEARNED"] = "Show Unlearned Abilities"
-L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "Count Abilities on Bars as Placed"
-L["SETTINGS_MARK_ALL_PLACED"] = "Mark All Abilities as Placed"
-L["SETTINGS_PET_ATTACK_DEFAULT"] = "Enable Pet attacks before spell cast"
-L["SETTINGS_START_ATTACK_DEFAULT"] = "Start auto attack"
-L["SETTINGS_STOP_CAST_DEFAULT"] = "Stop casting"
+L["SETTINGS_SHOW_UNLEARNED"] = "Show Unlearned Spells"
+L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "Count Spells On Bars As Placed"
+L["SETTINGS_MARK_ALL_PLACED"] = "Mark All Spells As Placed"
+L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
+	"Stops every macro on this page glowing, wherever it is. A spell you learn later still glows until you place it."
+L["SETTINGS_CLEAR_PLACED"] = "Clear Placed Marks"
+L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] = "Puts the glow back on every marked macro that isn't on your bars."
+L["SETTINGS_OPEN_OPTIONS"] = "Open Options"
+L["SETTINGS_OPEN_OPTIONS_DESCRIPTION"] =
+	"Opens Macro Spellbook in the Options Interface, where your custom macros live."
 
 -- Page: Macro Buttons
+-- TRANSLATORS: each note fills the small slot under a macro button, so keep it short.
 L["SUBTEXT_CUSTOM"] = "Custom"
 L["SUBTEXT_FOCUS"] = "Focus"
 L["SUBTEXT_PET"] = "Pet"
@@ -90,64 +99,100 @@ L["SUBTEXT_COMBAT_ONLY"] = "Combat Only"
 L["SUBTEXT_NO_COMBAT"] = "Out Of Combat"
 L["SUBTEXT_LEAVE_FORM"] = "Leave Form"
 L["SUBTEXT_NO_TOGGLE"] = "Stays On"
-L["SUBTEXT_AUTO_SHOT"] = "Auto Shot"
 L["SUBTEXT_WAND"] = "Wand"
 L["SUBTEXT_START_ATTACK"] = "Auto Attack"
 L["SUBTEXT_STOP_ATTACK"] = "Stop Attack"
 L["SUBTEXT_STOP_CASTING"] = "Stop Casting"
 L["SUBTEXT_HIDE_ERRORS"] = "Hide Errors"
 L["SUBTEXT_MUTE_ERRORS"] = "Mute Errors"
-L["SUBTEXT_MACRO"] = "Macro"
-L["SUBTEXT_SELF"] = "Self"
 L["SUBTEXT_OPTIONS_COUNT"] = "%d Options"
+L["SUBTEXT_TOO_LONG"] = "Too Long"
+L["SUBTEXT_NAME_TAKEN"] = "Name Taken"
+
+-- Page: Macro Tooltip
 L["TOOLTIP_NOT_LEARNED"] = "Not Learned Yet"
 L["TOOLTIP_NOT_ON_BARS"] = "Not On Your Action Bars"
-L["TOOLTIP_KEY_CLICK_DRAG"] = "Click & Drag"
+L["TOOLTIP_TOO_LONG"] = "Too long: %d / %d bytes. Turn an option off to shorten it."
+L["TOOLTIP_NAME_TAKEN"] = 'You already have a macro named "%s". Rename or delete it in /macro to use this one.'
+L["TOOLTIP_KEY_CLICK_DRAG"] = "Click or Drag"
 L["TOOLTIP_ACTION_PLACE_ON_BAR"] = "Place On Your Action Bars"
 L["TOOLTIP_KEY_RIGHT_CLICK"] = "Right-Click"
 L["TOOLTIP_ACTION_MACRO_OPTIONS"] = "Macro Options"
-L["PAGE_EMPTY"] = "No macros found."
+
+-- Spellbook Tab Tooltip
+L["SPELLBOOK_TAB_DESCRIPTION"] = "Your class's spells as one-click macros."
+L["TOOLTIP_KEY_CLICK"] = "Click"
+L["TOOLTIP_ACTION_OPEN_PAGE"] = "Open Macro Spellbook"
+
+-- Page: Layout
+L["PAGE_EMPTY"] =
+	"No macros yet. Visit your class trainer to learn your first spells, or add your own macros under Options > AddOns > Macro Spellbook > Custom Macros."
 L["PAGE_MACRO_SLOTS"] = "Macro Slots"
 L["PAGE_MACRO_GENERAL"] = "General"
 L["PAGE_MACRO_CHARACTER"] = "Character"
-L["PAGE_FOOTER"] = "Click or drag a macro onto your bars. Right-click it for options. The gear sets defaults."
+L["PAGE_FOOTER"] =
+	"Click or drag a macro onto your bars. A glowing macro isn't on your bars yet. Right-click a macro for its options."
 
 -- Options: General Panel
 L["OPTIONS_DESCRIPTION"] =
-	"Adds a spellbook tab of one-click macros for your class's spells, with mouseover and cursor options."
+	"Mouseover macros, cursor casting and self-cast macros for every class spell, built in one click from a new spellbook tab with no macro syntax. Right-click to add focus, spell rank, downrank, stopcasting, auto attack, pet attack or trinket use."
 L["OPTIONS_ENABLE_WELCOME"] = "Enable Welcome Message"
 L["OPTIONS_ENABLE_WELCOME_DESCRIPTION"] = "Prints a one-line welcome with the version in chat each time you log in."
+L["OPTIONS_KEY_BINDINGS_HEADER"] = "Key Bindings"
+L["OPTIONS_KEY_SET"] = "Set Key"
+L["OPTIONS_KEY_SET_DESCRIPTION"] = "Opens the game's key binding list, where Macro Spellbook has its own section."
+L["OPTIONS_KEY_BINDING_TOGGLE_DESCRIPTION"] =
+	"Opens and closes Macro Spellbook. It also has its own tab in your spellbook."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/msb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Opens the Options Interface for this add-on."
 
 -- Options: Spellbook Page Panel
 L["TAB_SPELLBOOK_PAGE"] = "Spellbook Page"
-L["OPTIONS_SPELLBOOK_PAGE_DESCRIPTION"] =
-	"How the Macro Spellbook page in your spellbook lists your spells, and the defaults its macros start from."
+L["OPTIONS_SPELLBOOK_PAGE_DESCRIPTION"] = "How the Macro Spellbook page in your spellbook lists your spells."
 L["OPTIONS_SHOW_UNLEARNED_DESCRIPTION"] =
 	"Lists the class spells you haven't learned yet in an Unlearned section, so you can place their macros early."
 L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 	"A spell placed on your bars as itself stops its macro glowing, even when the macro has options on."
-L["OPTIONS_PET_ATTACK_DEFAULT_DESCRIPTION"] =
-	"Every enemy spell macro you haven't set yourself sends your pet to attack before the cast."
-L["OPTIONS_START_ATTACK_DEFAULT_DESCRIPTION"] = "Every spell macro you haven't set yourself starts your auto attack."
-L["OPTIONS_STOP_CAST_DEFAULT_DESCRIPTION"] =
-	"Every spell macro you haven't set yourself stops your current cast before casting."
+
+-- Options: Macro Defaults Panel
+L["TAB_MACRO_DEFAULTS"] = "Macro Defaults"
+L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
+	"The options each kind of spell macro starts with. Whatever you set on a macro from its right-click menu keeps your choice. Each kind lists only the options its spells offer."
+L["OPTIONS_KIND_EXAMPLES"] = "Your spells: %s"
+L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s and %d more"
+L["KIND_ENEMY"] = "Enemy Spells"
+L["KIND_ENEMY_DESCRIPTION"] = "Spells you cast on an enemy, like your attacks and debuffs."
+L["KIND_FRIENDLY"] = "Friendly Spells"
+L["KIND_FRIENDLY_DESCRIPTION"] = "Spells you cast on a friend, like your heals and buffs."
+L["KIND_ANYONE"] = "Friend Or Foe Spells"
+L["KIND_ANYONE_DESCRIPTION"] = "Spells you can cast on a friend or an enemy."
+L["KIND_GROUND"] = "Ground-Targeted Spells"
+L["KIND_GROUND_DESCRIPTION"] = "Spells you place on the ground."
+L["KIND_FORM"] = "Forms, Stances And Aspects"
+L["KIND_FORM_DESCRIPTION"] = "Spells that stay on until you turn them off or switch to another."
+L["KIND_SELF"] = "Self And Area Spells"
+L["KIND_SELF_DESCRIPTION"] = "Spells with no target, cast on yourself or around you."
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "Custom Macros"
 L["OPTIONS_CUSTOM_MACROS_DESCRIPTION"] =
-	"Your own macros, listed on the page under Custom. Editing one updates its macro the next time the page opens; removing one leaves the macro in /macro for you to delete."
+	"Your own macros, listed on the page under Custom. Removing one here leaves its macro in /macro for you to delete."
 L["OPTIONS_CUSTOM_ADD"] = "Add Macro"
 L["OPTIONS_CUSTOM_ADD_DESCRIPTION"] = "Adds a new custom macro to the end of the list."
 L["OPTIONS_CUSTOM_NEW_NAME"] = "New Macro"
 L["OPTIONS_CUSTOM_NAME"] = "Name"
 L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "The macro's name, up to %d characters."
+L["OPTIONS_CUSTOM_SECTION"] = "Section"
+L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
+	"Where the macro is listed on the page: under Custom, or with the spells of one of your spellbook's tabs."
 L["OPTIONS_CUSTOM_BODY"] = "Macro Text"
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
-	"The macro's text, up to 255 characters. A first line of #showtooltip and a spell name shows that spell's icon."
-L["OPTIONS_CUSTOM_REMOVE"] = "Remove this macro from the list."
+	"The macro's text, up to 255 bytes. A first line of #showtooltip and a spell name shows that spell's icon."
+L["OPTIONS_CUSTOM_STATUS_NEEDS"] = "This macro needs a name and macro text before it shows on the page."
+L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] = "Too long: %d / %d bytes. It won't show on the page until it fits."
+L["OPTIONS_CUSTOM_STATUS_TAKEN"] = "Another macro on the page already has this name, so this one won't show."
+L["OPTIONS_CUSTOM_REMOVE"] = "Removes this macro from the list."
 L["OPTIONS_CUSTOM_REMOVE_CONFIRM"] = "Remove this custom macro?"
 L["OPTIONS_CUSTOM_RESTORE"] = "Restore Defaults"
 L["OPTIONS_CUSTOM_RESTORE_DESCRIPTION"] = "Replaces your custom macros with the ones your class starts with."
@@ -177,14 +222,23 @@ L["OPTIONS_WAGO"] = "Wago"
 L["OPTIONS_COPY_LINK"] = "To copy a link, click its box, then press Ctrl+A and Ctrl+C."
 L["OPTIONS_VERSION"] = "Version %s"
 
+-- Key Bindings
+L["BINDING_TOGGLE_PAGE"] = "Toggle Macro Spellbook"
+
 -- Messages
 L["CHAT_LOADED"] =
 	"Version %s. Settings (including the option to disable this message) are under Options > AddOns > Macro Spellbook. Enjoying this add-on? Tell a friend, Favorite it on CurseForge, or Star it on GitHub. (="
 L["CHAT_OPTIONS_IN_COMBAT"] = "As a safety precaution, the Options Interface cannot be opened during combat."
+L["CHAT_KEY_BINDINGS_IN_COMBAT"] = "As a safety precaution, the key binding list cannot be opened during combat."
+L["KEY_BINDINGS_LOCATION"] = "Open the game menu, then %s, then %s, and find the Macro Spellbook section."
 L["ERROR_NO_FREE_MACRO_SLOTS"] = "No free macro slots."
 L["ERROR_NO_FREE_GENERAL_MACRO_SLOTS"] = "No free general macro slots."
 L["CHAT_MACRO_NAME_TAKEN"] =
 	'You already have a macro named "%s", so it was left alone. Rename or delete it in /macro to use this one.'
-L["CHAT_CUSTOM_NEEDS_NAME_BODY"] = "Custom macro #%d needs a name and a body."
-L["CHAT_CUSTOM_TOO_LONG"] = 'Custom macro "%s" is %d characters; macros allow %d.'
-L["CHAT_CUSTOM_NAME_TAKEN"] = 'Custom macro "%s" has the same name (first %d characters) as another macro on the page.'
+L["CHAT_MACRO_TOO_LONG"] =
+	'The "%s" macro is %d bytes with its options on, over the %d a macro holds. Turn an option off to shorten it.'
+L["CHAT_CUSTOM_NEEDS_NAME_BODY"] = "Custom macro #%d needs a name and macro text before it shows on the page."
+L["CHAT_CUSTOM_TOO_LONG"] =
+	'Custom macro "%s" is %d bytes, over the %d a macro holds. Shorten its text to add it to the page.'
+L["CHAT_CUSTOM_NAME_TAKEN"] =
+	'Custom macro "%s" shares its name (first %d characters) with another macro on the page. Rename it to add it to the page.'

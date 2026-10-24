@@ -9,15 +9,14 @@ local _, ns = ...
 ns.DATABASE_DEFAULTS = {
 	global = {
 		showWelcome = true,
-		ownedMacros = {}, -- general (account-wide) macros the add-on created, by WoW macro name
+		ownedMacros = {}, -- general (account-wide) macros the add-on created, by WoW macro name: true for an equipment macro, else the creating character's key
 	},
 	profile = {
 		showUnlearned = false,
 		countSpellsOnBars = true,
 		markedPlaced = {}, -- macros marked placed from the page's settings menu, by WoW macro name
-		petAttackDefault = false,
-		stopCastDefault = false,
-		startAttackDefault = false,
+		-- the options each kind of spell macro starts with (see ns.MACRO_KINDS), as kind -> option -> true
+		kindDefaults = { enemy = {}, friendly = {}, anyone = {}, ground = {}, form = {}, self = {} },
 		mouseover = {},
 		cursor = {},
 		focus = {},
