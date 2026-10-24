@@ -15,6 +15,7 @@ ns.SAVED_VARIABLES_NAME = "MacroSpellbookDB"
 ns.MACRO_BODY_MAX_LENGTH = 255
 ns.MACRO_NAME_MAX_LENGTH = 16 -- longer names are truncated by CreateMacro, so a lookup by name would miss them
 ns.ICON_QUESTION_MARK = 134400 -- Interface\Icons\INV_Misc_QuestionMark
+ns.ICON_MACRO = "Interface\\MacroFrame\\MacroFrame-Icon" -- the "M" key shown on Blizzard's macro window
 
 --[[
 	The page's sections follow the spellbook's own tabs (General, then the class or each tree or spec),
@@ -74,3 +75,8 @@ ns.PALETTE = {
 	SEPARATOR = "AAAAAA", -- Gray: Separators, Dividers
 	MUTED = "808080", -- Dark Gray: Meta-data, Version Numbers
 }
+
+-- parchment ink, matching the native spell names and subtext on the spellbook page
+ns.INK_COLOR = { 0.18, 0.106, 0.059 }
+-- faded ink for hints, labels and a spell's rank or options note: the ink at 60% over the parchment, opaque so it also works as a |c code
+ns.FADED_INK_COLOR = { 0.44, 0.37, 0.28 }

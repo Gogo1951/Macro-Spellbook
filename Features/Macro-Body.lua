@@ -4,13 +4,13 @@ local _, ns = ...
 
 --[[
 	A macro conditional joining the given conditions (nil or "" ones are skipped) behind the always-present
-	spam condition (nil or ""), e.g. "[nochanneling:Drain Life,@mouseover,harm,nodead]". Returns "" when
-	there is nothing to check, so a plain cast stays "/cast Name".
+	condition (nil or "", the combat check's), e.g. "[combat,@mouseover,harm,nodead]". Returns "" when there
+	is nothing to check, so a plain cast stays "/cast Name".
 ]]
-local function Condition(spam, ...)
+local function Condition(always, ...)
 	local parts = {}
-	if spam and spam ~= "" then
-		parts[1] = spam
+	if always and always ~= "" then
+		parts[1] = always
 	end
 	for i = 1, select("#", ...) do
 		local c = select(i, ...)
@@ -23,13 +23,14 @@ end
 
 --[[
 	A /cast trying each clause in turn. A clause is { condition, unit, spell }: the condition ("" for none)
-	joins the always-present condition (nil or "", e.g. the spam option's), and the clause casts its spell,
+	joins the always-present condition (nil or "", e.g. the combat check's), and the clause casts its spell,
 	or spellFor(unit) without one. Neighbouring clauses that cast the same spell share it
 	("[@mouseover,help,nodead][] Name"), and a lone clause with nothing to check drops its brackets, so a plain
 	cast stays "/cast Name". With reset ("combat", "target" or both as "combat/target") the line is a
-	/castsequence of the spell then nothing, so it casts once until that reset.
+	/castsequence of the spell then nothing, so it casts once until that reset. command is the line's slash
+	command otherwise ("/cast ", or an equipment macro's "/use ").
 ]]
-local function CastLine(clauses, always, spellFor, reset)
+local function CastLine(clauses, always, spellFor, reset, command)
 	local groups = {}
 	for _, clause in ipairs(clauses) do
 		local condition = Condition(always, clause[1])
@@ -48,17 +49,7 @@ local function CastLine(clauses, always, spellFor, reset)
 			.. g.spell
 			.. (reset and ", NULL" or "")
 	end
-	return (reset and "/castsequence " or "/cast ") .. table.concat(parts, "; ")
-end
-
--- The clauses with each one preceded by a copy that also checks extra and casts spell instead.
-local function WithVariant(clauses, extra, spell)
-	local out = {}
-	for _, clause in ipairs(clauses) do
-		out[#out + 1] = { clause[1] ~= "" and clause[1] .. "," .. extra or extra, clause[2], spell }
-		out[#out + 1] = clause
-	end
-	return out
+	return (reset and "/castsequence " or command) .. table.concat(parts, "; ")
 end
 
 --[[
@@ -89,9 +80,85 @@ local function RankFor(ranks, unit)
 	return ranks[#ranks].text -- too low for any rank; the lowest fails with the game's own message
 end
 
--- The body MacroBody gives a spell macro with no options on, which does just what the plain spell does.
+--[[
+	The body MacroBody gives a spell macro with no options on, which does just what the plain spell does,
+	before its tag line (see ns.TaggedBody).
+]]
 function ns.BareBody(name)
 	return "#showtooltip\n/cast " .. name
+end
+
+--[[
+	The tag line that ends every macro the add-on writes, "#m 4K", kept as short as it can be since it costs
+	the player macro text. WoW runs only the "#" lines it knows (#showtooltip, #show), so the line does
+	nothing; it names the page macro the WoW macro is for, whatever the macro is called, so the page finds its
+	macros by tag rather than by name. The tag is two of the 62 digits
+	and letters, handed out in turn from an account-wide register (ns.db.global.macroTags), so no two macros
+	ever share one, which a hash this short couldn't promise; past 3,843 tags they run to three. A page macro
+	gets its tag only when a WoW macro is written for it (ns.AssignMacroTag); until then its body carries "00",
+	which is never handed out, so its length is already right. The register is keyed by what the macro is
+	for: an equipment macro's slot, which every character shares like the general macro itself, else this
+	character's key with the spell or custom macro's full name, so a character finds only its own.
+]]
+local TAG_PREFIX = "#m "
+local TAG_DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+local TAG_WIDTH = 2
+local UNASSIGNED_TAG = "00"
+
+ns.MACRO_TAG_LENGTH = #"\n" + #TAG_PREFIX + TAG_WIDTH -- the bytes the tag line adds to a body
+
+local function MacroIdentity(macro)
+	if macro.equipment then
+		return "slot:" .. macro.slot
+	end
+	local kind = macro.custom and "custom" or macro.focus and "focus" or macro.copy and "copy" .. macro.copy or "spell"
+	return ns.db.keys.char .. ":" .. kind .. ":" .. macro.name
+end
+
+-- The nth tag, n from 1: n in base 62, padded to TAG_WIDTH digits.
+local function TagNumber(n)
+	local base, digits = #TAG_DIGITS, ""
+	repeat
+		local digit = n % base
+		digits = TAG_DIGITS:sub(digit + 1, digit + 1) .. digits
+		n = math.floor(n / base)
+	until n == 0
+	return string.rep("0", TAG_WIDTH - #digits) .. digits
+end
+
+function ns.MacroTag(macro)
+	return ns.db.global.macroTags[MacroIdentity(macro)] or UNASSIGNED_TAG
+end
+
+-- The tag a WoW macro's body carries, or nil for a macro the add-on didn't tag.
+function ns.BodyTag(body)
+	local tag = body and ("\n" .. body .. "\n"):match("\n" .. TAG_PREFIX .. "(%w%w%w?)\n")
+	return tag ~= UNASSIGNED_TAG and tag or nil
+end
+
+-- body, less any trailing blank lines, with the macro's tag line added at its end.
+function ns.TaggedBody(macro, body)
+	return (body:gsub("\n+$", "")) .. "\n" .. TAG_PREFIX .. ns.MacroTag(macro)
+end
+
+-- body without its tag line, as the page shows macro text.
+function ns.UntaggedBody(body)
+	return (("\n" .. body):gsub("\n" .. TAG_PREFIX .. "%w+", ""):sub(2))
+end
+
+--[[
+	Hands the page macro the next tag, once, as a WoW macro is about to be written for it, and puts the tag in
+	its body. A macro that has one keeps it.
+]]
+function ns.AssignMacroTag(macro)
+	local global = ns.db.global
+	local identity = MacroIdentity(macro)
+	if global.macroTags[identity] then
+		return
+	end
+	global.macroTagCount = global.macroTagCount + 1
+	global.macroTags[identity] = TagNumber(global.macroTagCount)
+	macro.body = ns.TaggedBody(macro, ns.UntaggedBody(macro.body))
 end
 
 --[[
@@ -123,101 +190,43 @@ local function StanceLine(stances)
 	return "/cast [nostance:" .. table.concat(slots, "/") .. "] " .. stances[1] .. "\n"
 end
 
--- The stances a stance-using class can be in: the Warrior stances and whatever is on the stance bar.
-local function KnownStances()
-	local stanceSlots = ns.ClassConfig().stanceSlots
-	local names = {}
-	for name in pairs(stanceSlots) do
-		names[#names + 1] = name
-	end
-	for i = 1, GetNumShapeshiftForms() do
-		local spellID = select(4, GetShapeshiftFormInfo(i))
-		local name = spellID and C_Spell.GetSpellName(spellID)
-		if name and not stanceSlots[name] then
-			names[#names + 1] = name
-		end
-	end
-	return names
-end
-
 --[[
-	The client's "Requires %s" tooltip line (SPELL_REQUIRED_FORM) as a pattern capturing what it requires, so
-	the stance check reads the same line in every locale.
+	The stances a spell can be cast in, the one to switch to first, or nil for a spell that needs none. Only
+	the class lists' stances count: a spell's tooltip names the stances' form names, which some locales (esES)
+	name differently from the stance spells, so it can't be matched against them.
 ]]
-local REQUIRED_FORM_PATTERN = "^"
-	.. (SPELL_REQUIRED_FORM:gsub("[%^%$%(%)%.%[%]%*%+%-%?]", "%%%0"):gsub("%%s", "(.+)"))
-	.. "$"
-
--- The text of a spell's tooltip lines, left and right.
-local function TooltipLines(id)
-	return ns.ScanTooltipLines("GetSpellByID", "SetSpellByID", id)
-end
-
---[[
-	The stances a spell's tooltip says it requires ("Requires Battle Stance, Defensive Stance"), in the
-	tooltip's order, or nil when it names none or isn't loaded.
-]]
-local function TooltipStances(id)
-	for _, text in ipairs(TooltipLines(id)) do
-		local required = type(text) == "string" and text:match(REQUIRED_FORM_PATTERN)
-		if required then
-			local found = {}
-			for _, stance in ipairs(KnownStances()) do
-				local at = required:find(stance, 1, true)
-				if at then
-					found[#found + 1] = { stance = stance, at = at }
-				end
-			end
-			if #found > 0 then
-				table.sort(found, function(a, b)
-					return a.at < b.at
-				end)
-				local stances = {}
-				for i, f in ipairs(found) do
-					stances[i] = f.stance
-				end
-				return stances
-			end
-		end
-	end
-end
-
---[[
-	The stances a spell can be cast in, the one to switch to first, or nil for a spell that needs none. The
-	class lists' stances come first; the tooltip only covers a spell they leave out, since it prints the
-	stances' form names, which esES names differently from the stance spells on Classic Era and Forever.
-]]
-function ns.StancesOf(name, id)
+function ns.StancesOf(name)
 	local c = ns.ClassConfig()
 	if not c.hasStances then
 		return nil
 	end
-	return c.stances[name] or (id and TooltipStances(id))
+	return c.stances[name]
 end
 
 local function CastBody(macro)
 	--[[
-		The lines, in the order written: muteErrors' mute; stopCast's /stopcasting (held off during this
-		spell's own channel when spam is on); stopAttack's /stopattack; cancelForm's /cancelform;
-		targetEnemy's /targetenemy, for when there is no living hostile target; the useItems slots, in the
-		order ticked; petAttack's /petattack; the stance switch; then the cast. Spam adds
-		[nochanneling:<spell>] (or [nostealth]) to every cast clause, so a press can't restart a channel or
-		cancel stealth, and the combat check adds [combat] or [nocombat] the same way. oncePerCombat makes the
+		The lines, in the order written: one /stopmacro for stopIfChanneling's [channeling] and
+		stopIfStealthed's [stealth], so a press can't break a channel or stealth, ahead of the mute so a
+		stopped press never leaves the sounds muted; muteErrors' mute; stopAttack's /stopattack; stopCast's
+		/stopcasting; cancelForm's /cancelform; targetEnemy's /targetenemy, for when there is no living hostile
+		target, and targetFriend's /targetfriend, for when there is no living friendly one; the useItems slots, in the order ticked; the stance switch; then the cast. The combat check adds
+		[combat] or [nocombat] to every cast clause. oncePerCombat makes the
 		cast a /castsequence that casts once until combat ends or the target changes, oncePerTarget one that
 		casts once until the target changes. With items, a stance switch or a cast sequence, #showtooltip
 		names the spell so the button shows the spell.
 	]]
-	local spam = ns.IsOptionOn(macro, "spam") and macro.spam or nil
-	local always = spam
+	local always
 	local combatCheck = ns.CombatCheck(macro)
 	if combatCheck then
-		always = (spam and spam .. "," or "") .. (combatCheck == "combatOnly" and "combat" or "nocombat")
+		always = combatCheck == "combatOnly" and "combat" or "nocombat"
 	end
+	local stops = (ns.IsOptionOn(macro, "stopIfChanneling") and "[channeling]" or "")
+		.. (ns.IsOptionOn(macro, "stopIfStealthed") and "[stealth]" or "")
 	-- oncePerCombat also resets when the target changes, so a new pull mid-combat can take the cast again
 	local perCombat = ns.IsOptionOn(macro, "oncePerCombat")
 	local perTarget = perCombat or ns.IsOptionOn(macro, "oncePerTarget")
 	local reset = perCombat and "combat/target" or perTarget and "target" or nil
-	local stopCast = ns.IsOptionOn(macro, "stopCast") and "/stopcasting" .. (spam and " [" .. spam .. "]" or "") .. "\n"
+	local stopCast = ns.IsOptionOn(macro, "stopCast") and "/stopcasting\n"
 	local useLines = {}
 	for i, slot in ipairs(ns.UseItemSlots(macro)) do
 		useLines[i] = "/use " .. slot .. "\n"
@@ -229,13 +238,14 @@ local function CastBody(macro)
 	local header = "#showtooltip"
 		.. (namesSpell and " " .. macro.name or "")
 		.. "\n"
+		.. (stops ~= "" and "/stopmacro " .. stops .. "\n" or "")
 		.. (ns.IsOptionOn(macro, "muteErrors") and "/run MacroSpellbookMute(1)\n" or "")
-		.. (stopCast or "")
 		.. (ns.IsOptionOn(macro, "stopAttack") and "/stopattack\n" or "")
+		.. (stopCast or "")
 		.. (ns.IsOptionOn(macro, "cancelForm") and "/cancelform\n" or "")
 		.. (ns.IsOptionOn(macro, "targetEnemy") and "/targetenemy [noexists][dead][help]\n" or "")
+		.. (ns.IsOptionOn(macro, "targetFriend") and "/targetfriend [noexists][dead][harm]\n" or "")
 		.. use
-		.. (ns.IsOptionOn(macro, "petAttack") and "/petattack\n" or "")
 		.. stance
 	--[[
 		the noToggle option casts "!Name", which refreshes a form or aspect that is on instead of cancelling
@@ -243,9 +253,12 @@ local function CastBody(macro)
 	]]
 	local prefix = ns.IsOptionOn(macro, "noToggle") and "!" or ""
 	local targetRank, fixedRank = ns.IsOptionOn(macro, "targetRank"), ns.FixedRank(macro)
+	-- an equipment macro uses its slot ("/use 13"), whose item may go on a friend or an enemy
+	local name = macro.equipment and tostring(macro.slot) or macro.name
+	local target = macro.equipment and "exists" or macro.target
 	local function spellFor(unit)
 		local rank = fixedRank or (targetRank and RankFor(macro.ranks, unit))
-		return prefix .. macro.name .. (rank and "(" .. rank .. ")" or "")
+		return prefix .. name .. (rank and "(" .. rank .. ")" or "")
 	end
 	local spell = spellFor(nil)
 	--[[
@@ -255,28 +268,25 @@ local function CastBody(macro)
 	]]
 	local clauses
 	if macro.focus then
-		clauses = { { "@focus," .. macro.target .. ",nodead", "focus" }, { "", "target" } }
+		clauses = { { "@focus," .. target .. ",nodead", "focus" }, { "", "target" } }
 	else
 		clauses = {}
 		if ns.IsOptionOn(macro, "mouseover") then
-			clauses[1] = { "@mouseover," .. macro.target .. ",nodead", "mouseover" }
+			clauses[1] = { "@mouseover," .. target .. ",nodead", "mouseover" }
 		end
 		local castOnSelf, targetTarget = ns.IsOptionOn(macro, "castOnSelf"), ns.IsOptionOn(macro, "targetTarget")
 		if castOnSelf or targetTarget then
-			clauses[#clauses + 1] = { macro.target .. ",nodead", "target" }
+			clauses[#clauses + 1] = { target .. ",nodead", "target" }
 		end
 		if targetTarget then
-			clauses[#clauses + 1] = { "@targettarget," .. macro.target .. ",nodead", "targettarget" }
+			clauses[#clauses + 1] = { "@targettarget," .. target .. ",nodead", "targettarget" }
 		end
 		clauses[#clauses + 1] = castOnSelf and { "@player", "player" } or { "", "target" }
 	end
 	if ns.IsOptionOn(macro, "cursor") then
 		clauses = { { "@cursor" } }
 	end
-	-- a rank 1 cast in a raid group goes before each clause; a right-click's group version before them all
-	if ns.IsOptionOn(macro, "raidRank1") and macro.raidRank1Text then
-		clauses = WithVariant(clauses, "group:raid", macro.name .. "(" .. macro.raidRank1Text .. ")")
-	end
+	-- a right-click's group version goes before every clause
 	if ns.IsOptionOn(macro, "groupVersion") then
 		table.insert(clauses, 1, { "btn:2", nil, macro.groupSpell })
 	end
@@ -291,21 +301,26 @@ local function CastBody(macro)
 			.. (always and Condition(always) .. " " or "")
 			.. spell
 	end
-	return header .. CastLine(clauses, always, spellFor, reset)
+	return header .. CastLine(clauses, always, spellFor, reset, macro.equipment and "/use " or "/cast ")
 end
 
 --[[
 	After the cast: the autoShot option starts Auto Shot (or the wand's Shoot) with "!", which never stops
 	it; the startAttack option starts melee, never while stealthed (Stealth, Prowl, Shadowmeld), where Pick
-	Pocket, Sap or Distract would pull the player out of it; the hideErrors option clears the red error text
-	the macro's failed lines leave; the muteErrors option, last, puts back the sounds its first line muted.
+	Pocket, Sap or Distract would pull the player out of it; the petAttack option sends the pet in; the
+	hideErrors option clears the red error text the macro's failed lines leave; the muteErrors option, last,
+	puts back the sounds its first line muted. The tag line ends it.
 ]]
 function ns.MacroBody(macro)
-	return CastBody(macro)
-		.. (ns.IsOptionOn(macro, "autoShot") and "\n/cast !" .. ns.ClassConfig().autoShot or "")
-		.. (ns.IsOptionOn(macro, "startAttack") and "\n/startattack [nostealth]" or "")
-		.. (ns.IsOptionOn(macro, "hideErrors") and "\n/run UIErrorsFrame:Clear()" or "")
-		.. (ns.IsOptionOn(macro, "muteErrors") and "\n/run MacroSpellbookMute()" or "")
+	return ns.TaggedBody(
+		macro,
+		CastBody(macro)
+			.. (ns.IsOptionOn(macro, "autoShot") and "\n/cast !" .. ns.ClassConfig().autoShot or "")
+			.. (ns.IsOptionOn(macro, "startAttack") and "\n/startattack [nostealth]" or "")
+			.. (ns.IsOptionOn(macro, "petAttack") and "\n/petattack" or "")
+			.. (ns.IsOptionOn(macro, "hideErrors") and "\n/run UIErrorsFrame:Clear()" or "")
+			.. (ns.IsOptionOn(macro, "muteErrors") and "\n/run MacroSpellbookMute()" or "")
+	)
 end
 
 --[[

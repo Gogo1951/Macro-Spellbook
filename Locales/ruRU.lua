@@ -13,6 +13,7 @@ L["SECTION_CUSTOM"] = "Свои"
 L["SECTION_EQUIPMENT"] = "Экипировка"
 
 -- Page: Default Custom Macros
+-- TRANSLATORS: each name becomes a WoW macro name, cut to 16 bytes (about 5 Chinese or Korean characters), so keep it short.
 L["CUSTOM_SPAM_WAND"] = "Автожезл"
 L["CUSTOM_PET_ABILITY"] = "Пет: каст"
 L["CUSTOM_PET_ABILITY_MOUSEOVER"] = "Пет: мышь"
@@ -20,31 +21,30 @@ L["CUSTOM_SWIFT_JUDGE"] = "Блиц-суд"
 
 -- Page: Macro Menu
 L["MENU_GROUP_COMBAT_CHECK"] = "Условие боя"
-L["MENU_GROUP_ABILITY_RANK"] = "Уровень заклинания"
+L["MENU_GROUP_SPELL_RANK"] = "Уровень заклинания"
 L["MENU_GROUP_TARGETING"] = "Выбор цели"
 L["MENU_GROUP_BEFORE_CAST"] = "Перед применением"
-L["MENU_GROUP_AFTER_CAST"] = "После применения"
+L["MENU_GROUP_ADD_ATTACK"] = "Добавить атаку"
 L["MENU_GROUP_CASTING_RULES"] = "Правила применения"
 L["MENU_GROUP_ERRORS"] = "Сообщения об ошибках"
 L["MENU_GROUP_USE_ITEMS_FIRST"] = "Сначала предметы"
-L["MENU_MACRO_TEXT"] = "Текст макроса"
+L["MACRO_TEXT"] = "Текст макроса"
 L["MENU_MACRO_LENGTH"] = "%d / %d"
 L["MENU_GROUP_VALUE"] = "%s: %s"
 L["MENU_OPTIONS_COUNT"] = "Параметров: %d"
 L["MENU_CAST_ON_MOUSEOVER"] = "Применять при наведении"
 L["MENU_CAST_ON_SELF"] = "Применять на себя"
 L["MENU_CAST_ON_TARGETS_TARGET"] = "Применять на цель цели"
+L["MENU_RANK_LEARN_LEVEL"] = "%s (с %d ур.)"
 L["MENU_MAX_RANK"] = "Высший уровень"
 L["MENU_DYNAMIC_RANK"] = "Динамический уровень"
 L["MENU_DYNAMIC_RANK_NOTE"] =
 	"Динамический уровень зависит от уровня дружественного игрока и обновляется только вне боя."
 L["MENU_CAST_AT_CURSOR"] = "Применять у курсора"
 L["MENU_TARGET_NEAREST_ENEMY"] = "Выбрать ближайшего врага"
+L["MENU_TARGET_NEAREST_FRIEND"] = "Выбрать ближайшего союзника"
 L["MENU_CAST_IF_SUMMONED"] = "Применять %s, если питомец призван"
-L["MENU_DOWNRANK_IN_RAIDS"] = "Уровень 1 в рейдах"
 L["MENU_NEVER_TURN_OFF"] = "Не выключать"
-L["MENU_NEVER_TURN_OFF_NOTE"] =
-	"Не выключать: повторное нажатие макроса оставляет способность включенной, а не выключает ее."
 L["MENU_LEAVE_FORM_BEFORE"] = "Выходить из облика перед применением"
 L["MENU_RIGHT_CLICK_FOR"] = "Правый клик: %s"
 L["MENU_ONLY_IN_COMBAT"] = "Только в бою"
@@ -54,30 +54,39 @@ L["MENU_ONCE_PER_COMBAT"] = "Применять раз за бой"
 L["MENU_ONCE_PER_TARGET"] = "Применять раз на цель"
 L["MENU_HIDE_ERRORS"] = "Скрывать сообщения об ошибках"
 L["MENU_MUTE_ERRORS"] = "Отключать звуки ошибок"
-L["MENU_SPAMMABLE"] = "Для спама"
 L["MENU_SWITCH_TO"] = "Переходить в %s"
 L["MENU_CAST_ON_FOCUS"] = "Применять на фокус"
-L["MENU_ENABLE_PET_ATTACK"] = "Включить атаку питомца"
 L["MENU_START_AUTO_ATTACK"] = "Начинать автоатаку"
 L["MENU_STOP_ATTACK"] = "Прекращать атаку"
 L["MENU_START_AUTO_SHOT"] = "Начинать автоматическую стрельбу"
+L["MENU_START_PET_ATTACK"] = "Начинать атаку питомца"
 L["MENU_START_WAND"] = "Начинать стрельбу жезлом"
 L["MENU_STOP_CASTING"] = "Прерывать заклинание"
 L["MENU_STOP_CASTING_NOTE"] =
 	"Используйте Прерывать заклинание для заклинаний, которые не могут ждать, например прерываний и рассеиваний."
+L["MENU_STOP_IF_CHANNELING"] = "Останавливать макрос при поддержании"
+L["MENU_STOP_IF_STEALTHED"] = "Останавливать макрос в незаметности"
+L["MENU_SAFE_TO_SPAM_NOTE"] =
+	"Чтобы макрос можно было безопасно жать раз за разом, включите Останавливать макрос при поддержании для поддерживаемого заклинания или Останавливать макрос в незаметности для Незаметности или Крадущегося зверя. Тогда повторное нажатие не прервет поддержание и не выведет из незаметности."
+L["MENU_USE_FOR_KIND"] = "Применить эти параметры ко всей категории %s"
+L["MENU_DUPLICATE"] = "Дублировать"
+L["MENU_REMOVE_COPY"] = "Удалить эту копию"
+L["MENU_USE_FOR_KIND_DESCRIPTION"] =
+	"Каждый макрос из категории %s, который вы не настраивали сами, получает параметры этого макроса. Открывает Умолчания макросов, чтобы показать это."
 
 -- Page: Settings Menu
 L["SETTINGS_SHOW_UNLEARNED"] = "Показывать неизученные заклинания"
 L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "Считать заклинания на панелях размещенными"
 L["SETTINGS_MARK_ALL_PLACED"] = "Отметить все заклинания как размещенные"
 L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
-	"Ни один макрос на этой странице больше не светится, где бы он ни был. Заклинание, изученное позже, светится, пока вы его не разместите."
+	"Ни один макрос на этой странице больше не светится, есть он на ваших панелях или нет. Заклинание, изученное позже, светится, пока вы его не разместите."
 L["SETTINGS_CLEAR_PLACED"] = "Снять отметки о размещении"
 L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] =
 	"Снова включает свечение каждого отмеченного макроса, которого нет на ваших панелях."
-L["SETTINGS_OPEN_OPTIONS"] = "Открыть настройки"
-L["SETTINGS_OPEN_OPTIONS_DESCRIPTION"] =
-	"Открывает Macro Spellbook в окне настроек, где находятся ваши собственные макросы."
+L["SETTINGS_OPEN_MACRO_DEFAULTS_DESCRIPTION"] =
+	"Открывает окно настроек на разделе Умолчания макросов, где вы выбираете, с какими параметрами создается каждый вид макроса заклинания."
+L["SETTINGS_OPEN_CUSTOM_MACROS_DESCRIPTION"] =
+	"Открывает окно настроек на разделе Свои макросы, где вы пишете собственные макросы для этой страницы."
 
 -- Page: Macro Buttons
 -- TRANSLATORS: each note fills the small slot under a macro button, so keep it short.
@@ -90,11 +99,10 @@ L["SUBTEXT_CAST_ON_SELF"] = "На себя"
 L["SUBTEXT_STANCE"] = "Стойка"
 L["SUBTEXT_USE_ITEMS"] = "Предметы"
 L["SUBTEXT_PET_ATTACK"] = "Атака питомца"
-L["SUBTEXT_RAID_RANK_1"] = "Рейд: ур. 1"
-L["SUBTEXT_SPAMMABLE"] = "Для спама"
 L["SUBTEXT_DYNAMIC_RANK"] = "Дин. уровень"
 L["SUBTEXT_TARGETS_TARGET"] = "Цель цели"
 L["SUBTEXT_TARGET_ENEMY"] = "Ближ. враг"
+L["SUBTEXT_TARGET_FRIEND"] = "Ближ. союзник"
 L["SUBTEXT_GROUP_VERSION"] = "Для группы"
 L["SUBTEXT_ONCE_PER_COMBAT"] = "Раз за бой"
 L["SUBTEXT_ONCE_PER_TARGET"] = "Раз на цель"
@@ -106,19 +114,25 @@ L["SUBTEXT_WAND"] = "Жезл"
 L["SUBTEXT_START_ATTACK"] = "Автоатака"
 L["SUBTEXT_STOP_ATTACK"] = "Стоп атака"
 L["SUBTEXT_STOP_CASTING"] = "Стоп каст"
+L["SUBTEXT_STOP_IF_CHANNELING"] = "Не при поддержании"
+L["SUBTEXT_STOP_IF_STEALTHED"] = "Не в незаметности"
 L["SUBTEXT_HIDE_ERRORS"] = "Без ошибок"
 L["SUBTEXT_MUTE_ERRORS"] = "Без звука ошибок"
 L["SUBTEXT_OPTIONS_COUNT"] = "Параметров: %d"
 L["SUBTEXT_TOO_LONG"] = "Не умещается"
-L["SUBTEXT_NAME_TAKEN"] = "Имя занято"
+L["SUBTEXT_LEARN_LEVEL"] = "%d ур."
+L["SUBTEXT_TALENT"] = "Талант"
 
 -- Page: Macro Tooltip
 L["TOOLTIP_NOT_LEARNED"] = "Еще не изучено"
+L["TOOLTIP_LEARN_LEVEL"] = "Учитель вашего класса обучает этому на %d уровне."
+L["TOOLTIP_LEARN_TALENT"] = "Изучается через таланты."
 L["TOOLTIP_NOT_ON_BARS"] = "Нет на ваших панелях команд"
 L["TOOLTIP_TOO_LONG"] =
 	"Слишком длинный: %d / %d байт. Отключите параметр, чтобы сократить его."
-L["TOOLTIP_NAME_TAKEN"] =
-	'У вас уже есть макрос "%s". Переименуйте или удалите его в /macro, чтобы использовать этот.'
+L["TOOLTIP_OPTIONS_ON"] = "Включенные параметры: %s"
+L["TOOLTIP_EQUIPMENT_SLOT"] =
+	"Использует то, что надето в ячейке %s, поэтому продолжает работать после смены экипировки."
 L["TOOLTIP_KEY_CLICK_DRAG"] = "Клик или перетаскивание"
 L["TOOLTIP_ACTION_PLACE_ON_BAR"] = "Разместить на панелях команд"
 L["TOOLTIP_KEY_RIGHT_CLICK"] = "Правый клик"
@@ -134,6 +148,8 @@ L["TOOLTIP_ACTION_OPEN_PAGE"] = "Открыть Macro Spellbook"
 L["PAGE_EMPTY"] =
 	"Макросов пока нет. Посетите учителя своего класса, чтобы изучить первые заклинания, или добавьте свои макросы в разделе Настройки > Модификации > Macro Spellbook > Свои макросы."
 L["PAGE_MACRO_SLOTS"] = "Ячейки макросов"
+L["TOOLTIP_MACRO_SLOTS"] =
+	"Каждый размещенный макрос занимает ячейку макроса. Ячейки персонажа принадлежат этому персонажу и заполняются первыми. Общие ячейки делят все персонажи вашей учетной записи."
 L["PAGE_MACRO_GENERAL"] = "Общие"
 L["PAGE_MACRO_CHARACTER"] = "Персонаж"
 L["PAGE_FOOTER"] =
@@ -141,7 +157,7 @@ L["PAGE_FOOTER"] =
 
 -- Options: General Panel
 L["OPTIONS_DESCRIPTION"] =
-	"Макросы при наведении, применение у курсора и макросы на себя для каждого заклинания класса, создаются в один клик на новой вкладке книги заклинаний, без синтаксиса макросов. Правым кликом добавьте фокус, уровень заклинания, понижение уровня, прерывание заклинания, автоатаку, атаку питомца или использование аксессуаров."
+	"Макросы при наведении, у курсора и на себя для каждого заклинания класса, создаются в один клик на новой вкладке книги заклинаний, без синтаксиса макросов. Они обновляются, когда вы повышаете уровень, обучаетесь или меняете специализацию. Правым кликом добавьте фокус, прерывание заклинания, автоатаку, атаку питомца или использование аксессуаров."
 L["OPTIONS_ENABLE_WELCOME"] = "Включить приветствие"
 L["OPTIONS_ENABLE_WELCOME_DESCRIPTION"] =
 	"При каждом входе в игру выводит в чат однострочное приветствие с номером версии."
@@ -162,26 +178,76 @@ L["OPTIONS_SPELLBOOK_PAGE_DESCRIPTION"] =
 L["OPTIONS_SHOW_UNLEARNED_DESCRIPTION"] =
 	"Показывает еще не изученные заклинания класса в разделе Не изучено, чтобы вы могли заранее разместить их макросы."
 L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
-	"Заклинание, размещенное на панелях само по себе, гасит свечение своего макроса, даже если у макроса включены параметры."
+	"Макрос перестает светиться, если его заклинание уже есть на ваших панелях, даже если у макроса включены параметры."
 
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Умолчания макросов"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
 	"Параметры, с которыми создается каждый вид макроса заклинания. То, что вы задали для макроса в его меню правого клика, сохраняется. Для каждого вида показаны только параметры, доступные его заклинаниям."
+L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] =
+	"Применяется сначала к тому, кто под курсором мыши, затем к вашей цели."
+L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] =
+	"Применяется к вам, если на вашу цель это заклинание наложить нельзя."
+L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
+	"Пробует цель вашей цели, если на вашу цель это заклинание наложить нельзя, например на танка, которого атакует враг."
+L["OPTIONS_DEFAULT_CURSOR_DESCRIPTION"] =
+	"Размещает заклинание там, куда указывает курсор, без круга выбора цели."
+L["OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION"] =
+	"Применяет самый высокий уровень заклинания, доступный для уровня дружественного игрока."
+L["OPTIONS_DEFAULT_STOP_CASTING_DESCRIPTION"] =
+	"Сначала прерывает то, что вы применяете, чтобы это заклинание сработало сразу."
+L["OPTIONS_DEFAULT_STOP_ATTACK_DESCRIPTION"] =
+	"Сначала прекращает вашу автоатаку в ближнем бою."
+L["OPTIONS_DEFAULT_STOP_IF_CHANNELING_DESCRIPTION"] =
+	"Ничего не делает, пока вы поддерживаете заклинание, поэтому нажатие никогда не прервет поддержание."
+L["OPTIONS_DEFAULT_STOP_IF_STEALTHED_DESCRIPTION"] =
+	"Ничего не делает, пока вы в незаметности, поэтому нажатие никогда не прервет Незаметность или Крадущегося зверя."
+L["OPTIONS_DEFAULT_LEAVE_FORM_DESCRIPTION"] =
+	"Сначала выводит из текущего облика, чтобы заклинание можно было применить."
+L["OPTIONS_DEFAULT_TARGET_ENEMY_DESCRIPTION"] =
+	"Сначала выбирает ближайшего врага, если у вас в цели нет живого врага."
+L["OPTIONS_DEFAULT_TARGET_FRIEND_DESCRIPTION"] =
+	"Сначала выбирает ближайшего союзника, если у вас в цели нет живого союзника."
+L["OPTIONS_DEFAULT_PET_ATTACK_DESCRIPTION"] =
+	"Также отправляет питомца атаковать вашу цель."
+L["OPTIONS_DEFAULT_START_ATTACK_DESCRIPTION"] =
+	"Начинает автоатаку в ближнем бою после применения."
+L["OPTIONS_DEFAULT_AUTO_SHOT_DESCRIPTION"] =
+	"Начинает Автоматическую стрельбу или стрельбу жезлом после применения."
+L["OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION"] =
+	"Применяется один раз и больше не применяется, пока не сменится цель."
+L["OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION"] =
+	"Применяется один раз и больше не применяется, пока не закончится бой или не сменится цель."
+L["OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION"] =
+	"Повторное нажатие макроса оставляет облик или аспект включенным, а не выключает его."
+L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] =
+	"Убирает красный текст ошибки, который макрос оставляет на экране."
+L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] =
+	"Отключает звук ошибки, пока выполняется макрос."
+L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
+	"Позволяет этим макросам срабатывать только в бою, только вне боя или в любом случае."
 L["OPTIONS_KIND_EXAMPLES"] = "Ваши заклинания: %s"
 L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s и еще %d"
 L["KIND_ENEMY"] = "Заклинания против врагов"
-L["KIND_ENEMY_DESCRIPTION"] = "Заклинания, применяемые к врагу, например атаки и ослабления."
+L["KIND_ENEMY_DESCRIPTION"] =
+	"Заклинания, применяемые к врагу, например атаки и ослабления."
 L["KIND_FRIENDLY"] = "Дружественные заклинания"
-L["KIND_FRIENDLY_DESCRIPTION"] = "Заклинания, применяемые к союзнику, например исцеление и усиления."
+L["KIND_FRIENDLY_DESCRIPTION"] =
+	"Заклинания, применяемые к союзнику, например исцеление."
+L["KIND_BUFF"] = "Усиления"
+L["KIND_BUFF_DESCRIPTION"] =
+	"Заклинания, дающие союзнику длительное усиление."
 L["KIND_ANYONE"] = "Заклинания для союзника или врага"
-L["KIND_ANYONE_DESCRIPTION"] = "Заклинания, которые можно применить и к союзнику, и к врагу."
+L["KIND_ANYONE_DESCRIPTION"] =
+	"Заклинания, которые можно применить и к союзнику, и к врагу."
 L["KIND_GROUND"] = "Заклинания по земле"
 L["KIND_GROUND_DESCRIPTION"] = "Заклинания, которые вы размещаете на земле."
 L["KIND_FORM"] = "Облики, стойки и аспекты"
-L["KIND_FORM_DESCRIPTION"] = "Заклинания, которые действуют, пока вы их не отключите или не смените."
+L["KIND_FORM_DESCRIPTION"] =
+	"Заклинания, которые действуют, пока вы их не отключите или не смените."
 L["KIND_SELF"] = "Заклинания на себя и по области"
-L["KIND_SELF_DESCRIPTION"] = "Заклинания без цели, применяемые на себя или вокруг себя."
+L["KIND_SELF_DESCRIPTION"] =
+	"Заклинания без цели, применяемые на себя или вокруг себя."
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "Свои макросы"
@@ -196,7 +262,6 @@ L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "Название макроса, не д
 L["OPTIONS_CUSTOM_SECTION"] = "Раздел"
 L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
 	"Где макрос показан на странице: в разделе Свои или вместе с заклинаниями одной из вкладок вашей книги заклинаний."
-L["OPTIONS_CUSTOM_BODY"] = "Текст макроса"
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
 	"Текст макроса, не длиннее 255 байт. Первая строка с #showtooltip и названием заклинания показывает значок этого заклинания."
 L["OPTIONS_CUSTOM_STATUS_NEEDS"] =
@@ -205,7 +270,7 @@ L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] =
 	"Слишком длинный: %d / %d байт. Он не появится на странице, пока не уложится в лимит."
 L["OPTIONS_CUSTOM_STATUS_TAKEN"] =
 	"Другой макрос на странице уже носит это название, поэтому этот не появится."
-L["OPTIONS_CUSTOM_REMOVE"] = "Удаляет этот макрос из списка."
+L["OPTIONS_CUSTOM_REMOVE_DESCRIPTION"] = "Удаляет этот макрос из списка."
 L["OPTIONS_CUSTOM_REMOVE_CONFIRM"] = "Удалить этот собственный макрос?"
 L["OPTIONS_CUSTOM_RESTORE"] = "Восстановить стандартные"
 L["OPTIONS_CUSTOM_RESTORE_DESCRIPTION"] =
@@ -251,10 +316,10 @@ L["CHAT_KEY_BINDINGS_IN_COMBAT"] =
 	"В целях безопасности список назначения клавиш нельзя открыть во время боя."
 L["KEY_BINDINGS_LOCATION"] =
 	"Откройте меню игры, затем %s, затем %s, и найдите раздел Macro Spellbook."
-L["ERROR_NO_FREE_MACRO_SLOTS"] = "Нет свободных ячеек для макросов."
-L["ERROR_NO_FREE_GENERAL_MACRO_SLOTS"] = "Нет свободных ячеек для общих макросов."
-L["CHAT_MACRO_NAME_TAKEN"] =
-	'У вас уже есть макрос "%s", поэтому он не был изменен. Переименуйте или удалите его в /macro, чтобы использовать этот.'
+L["ERROR_MACRO_SLOTS_FULL"] =
+	"Нет свободных ячеек для макросов. Удалите макрос в /macro, чтобы освободить место."
+L["ERROR_GENERAL_MACRO_SLOTS_FULL"] =
+	"Нет свободных общих ячеек для макросов. Удалите общий макрос в /macro, чтобы освободить место."
 L["CHAT_MACRO_TOO_LONG"] =
 	'Макрос "%s" с включенными параметрами занимает %d байт, больше %d, которые вмещает макрос. Отключите параметр, чтобы сократить его.'
 L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =

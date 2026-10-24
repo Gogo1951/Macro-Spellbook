@@ -1,57 +1,31 @@
---[[ LibSpellBookTabs-1.0
-Shared tab bar for addon pages in the spellbook (Blizzard_PlayerSpells).
+local _, ns = ...
+local GetColor = ns.GetColor
+local HideTooltip = ns.HideTooltip
 
-Every addon that embeds this library shares one copy (LibStub keeps the newest), so their tabs are laid
-out together and only one addon page is open at a time.
+--[[
+	The page's tab on the Retail-engine spellbook (Blizzard_PlayerSpells), for Features/Spellbook-Host-Modern.lua.
 
-    local LSBT = LibStub("LibSpellBookTabs-1.0")
-    LSBT:RegisterTab("MyAddon", {
-        name = "My Addon",          -- tooltip
-        icon = 134400,              -- texture path or fileID
-        onCreate = function(page) end, -- build the page's contents; called once, on first open
-        onShow = function(page) end,   -- optional
-        onHide = function(page) end,   -- optional
-    })
-    LSBT:Open("MyAddon")   -- selects the tab; it shows once the spellbook is open
-    LSBT:Close()
-    LSBT:IsOpen("MyAddon")
+	Placement: tabs line up right of the native tabs and skip over tab-sized frames from other add-ons that sit
+	in that row. Tabs that don't fit before the search box stack down the book's right edge. Only frames that
+	overlap the next free slot push it along, so an add-on that places itself after these tabs can't make them
+	leapfrog each other.
 
-The page covers the book below its top 60px toolbar and clips its children. page.header (MINOR 2+) covers
-that toolbar, shows and hides with the page, and doesn't clip, so a page can put its own controls there,
-for example a settings dropdown over the native one at ("TOPRIGHT", -30, -27).
+	The page covers the book below its top 60px toolbar and clips its children. page.header covers that
+	toolbar, shows and hides with the page, and doesn't clip, so the page can put its own controls there.
 
-Placement: tabs line up right of the native tabs and skip over tab-sized frames from other addons that sit
-in that row. Tabs that don't fit before the search box stack down the book's right edge. Only frames that
-overlap the next free slot push it along, so an addon that places itself after these tabs can't make them
-leapfrog each other.
+	Pages from other add-ons: opening a tab here closes any other add-on's page (a shown frame the size of the
+	book, closed through its button over the native selected tab, else hidden), and clicking another add-on's
+	launcher (a tab-sized button by the native tabs or down the book's right edge) closes ours.
 
-Pages from other addons: opening a tab here closes any other addon's page, and clicking another addon's
-launcher closes ours, without either addon knowing the other. To work with this, lay your page over the book
-as one frame the size of PlayerSpellsFrame.SpellBookFrame (parented to PlayerSpellsFrame or UIParent), with
-a child button centered on the native selected tab that closes it (as this library's return tab does). If
-there's no such button, the page is just hidden. Launchers are the tab-sized buttons by the native tabs or
-down the book's right edge.
-
-Nothing Blizzard owns is written to: everything is layered over the book.
+	Every frame here is parented to UIParent and only anchored over the book: a frame parented to a Blizzard
+	panel stays protected, and in combat could no longer be shown, moved or scaled. Nothing Blizzard owns is
+	written to.
 ]]
 
-local MAJOR, MINOR = "LibSpellBookTabs-1.0", 4
-local lib = LibStub:NewLibrary(MAJOR, MINOR)
-if not lib then
-	return
-end
-
--- state survives library upgrades
-lib.tabs = lib.tabs or {}
-lib.byId = lib.byId or {}
-lib.owned = lib.owned or {}
-lib.hookedForeign = lib.hookedForeign or {}
-
 local TAB_WIDTH, TAB_HEIGHT, GAP = 44, 32, 8
--- the native tab row, search box and settings dropdown sit in the book's top 60px
-local HEADER_HEIGHT = 60
+local HEADER_HEIGHT = 60 -- the native tab row, search box and settings dropdown sit in the book's top 60px
 
-local skin = {
+local SKIN = {
 	tab = "spellbook-Tab-Frame-C60",
 	tabActive = "spellbook-Tab-Frame-Glow-C60",
 	tabGlow = "spellbook-Tab-Frame-glow-gradient-C60",
@@ -59,44 +33,47 @@ local skin = {
 	pageRight = "spellbook-Page-Right-C60",
 }
 
-local function own(frame)
-	lib.owned[frame] = true
+local SpellbookTabs = {
+	tabs = {},
+	byId = {},
+	owned = {}, -- every frame this file creates, so none is taken for another add-on's
+	hookedForeign = {},
+}
+
+ns.SpellbookTabs = SpellbookTabs
+
+local function Own(frame)
+	SpellbookTabs.owned[frame] = true
 	return frame
 end
 
-local function hideTooltip(owner)
-	if GameTooltip:IsOwned(owner) then
-		GameTooltip:Hide()
-	end
-end
-
-local function makeTab(parent, icon)
-	local button = own(CreateFrame("Button", nil, parent))
+local function MakeTab(parent, icon)
+	local button = Own(CreateFrame("Button", nil, parent))
 	button:SetSize(TAB_WIDTH, TAB_HEIGHT)
 	button.icon = button:CreateTexture(nil, "ARTWORK")
 	button.icon:SetSize(34, 33)
 	button.icon:SetPoint("BOTTOM", -1, 0)
 	button.icon:SetTexture(icon)
-	local function frameArt(atlas, y)
+	local function FrameArt(atlas, y)
 		local texture = button:CreateTexture(nil, "ARTWORK", nil, 1)
 		texture:SetAtlas(atlas, true)
 		texture:SetPoint("BOTTOM", 0, y)
 		return texture
 	end
-	button.normal = frameArt(skin.tab, 1)
-	button.active = frameArt(skin.tabActive, 1)
-	button.glow = frameArt(skin.tabGlow, 0)
+	button.normal = FrameArt(SKIN.tab, 1)
+	button.active = FrameArt(SKIN.tabActive, 1)
+	button.glow = FrameArt(SKIN.tabGlow, 0)
 	return button
 end
 
-local function selectTab(button, selected)
+local function SelectTab(button, selected)
 	button.normal:SetShown(not selected)
 	button.active:SetShown(selected)
 	button.glow:SetShown(selected)
 end
 
 -- left, bottom, right, top in screen pixels, so frames with different scales compare
-local function screenRect(frame)
+local function ScreenRect(frame)
 	local left, bottom, width, height = frame:GetRect()
 	if not left then
 		return
@@ -105,18 +82,18 @@ local function screenRect(frame)
 	return left * scale, bottom * scale, (left + width) * scale, (bottom + height) * scale
 end
 
--- shown, tab-sized frames we don't own: other addons' launchers
-local function collectObstacles(tabScreenWidth, tabScreenHeight)
+-- shown, tab-sized frames we don't own: other add-ons' launchers
+local function CollectObstacles(tabScreenWidth, tabScreenHeight)
 	local rects = {}
 	local seen = {}
-	local function scan(parent)
+	local function Scan(parent)
 		if not parent then
 			return
 		end
 		for _, child in ipairs({ parent:GetChildren() }) do
-			if not seen[child] and not lib.owned[child] and not child:IsForbidden() and child:IsVisible() then
+			if not seen[child] and not SpellbookTabs.owned[child] and not child:IsForbidden() and child:IsVisible() then
 				seen[child] = true
-				local left, bottom, right, top = screenRect(child)
+				local left, bottom, right, top = ScreenRect(child)
 				if left then
 					local width, height = right - left, top - bottom
 					if
@@ -131,17 +108,19 @@ local function collectObstacles(tabScreenWidth, tabScreenHeight)
 			end
 		end
 	end
-	scan(PlayerSpellsFrame)
-	scan(lib.book)
-	scan(UIParent)
+	Scan(PlayerSpellsFrame)
+	Scan(SpellbookTabs.book)
+	Scan(UIParent)
 	return rects
 end
 
--- frames Blizzard keeps under a key on the spells frame or the book (the book itself, the talents page, the
--- close, minimize and settings buttons), so they're never taken for another addon's page or launcher
-local function blizzardFrames()
+--[[
+	Frames Blizzard keeps under a key on the spells frame or the book (the book itself, the talents page, the
+	close, minimize and settings buttons), so they're never taken for another add-on's page or launcher.
+]]
+local function BlizzardFrames()
 	local set = {}
-	for _, parent in ipairs({ PlayerSpellsFrame, lib.book }) do
+	for _, parent in ipairs({ PlayerSpellsFrame, SpellbookTabs.book }) do
 		for _, value in pairs(parent) do
 			if type(value) == "table" then
 				set[value] = true
@@ -151,7 +130,7 @@ local function blizzardFrames()
 	return set
 end
 
-local function isAncestor(frame, child)
+local function IsAncestor(frame, child)
 	while child do
 		if child == frame then
 			return true
@@ -160,7 +139,7 @@ local function isAncestor(frame, child)
 	end
 end
 
-local function screenCenter(frame)
+local function ScreenCenter(frame)
 	local x, y = frame:GetCenter()
 	if not x then
 		return
@@ -169,29 +148,29 @@ local function screenCenter(frame)
 	return x * scale, y * scale
 end
 
--- shown frames we don't own that cover exactly the book: other addons' pages
-local function findForeignPages()
-	local book = lib.book
+-- shown frames we don't own that cover exactly the book: other add-ons' pages
+local function FindForeignPages()
+	local book = SpellbookTabs.book
 	local pages = {}
 	if not book:IsVisible() then
 		return pages
 	end
-	local bookLeft, bookBottom, bookRight, bookTop = screenRect(book)
+	local bookLeft, bookBottom, bookRight, bookTop = ScreenRect(book)
 	if not bookLeft then
 		return pages
 	end
 	local tolerance = 4 * book:GetEffectiveScale()
-	local blizzard = blizzardFrames()
+	local blizzard = BlizzardFrames()
 	for _, parent in ipairs({ PlayerSpellsFrame, UIParent }) do
 		for _, child in ipairs({ parent:GetChildren() }) do
 			if
-				not lib.owned[child]
+				not SpellbookTabs.owned[child]
 				and not blizzard[child]
 				and not child:IsForbidden()
 				and child:IsVisible()
-				and not isAncestor(child, book)
+				and not IsAncestor(child, book)
 			then
-				local left, bottom, right, top = screenRect(child)
+				local left, bottom, right, top = ScreenRect(child)
 				if
 					left
 					and math.abs(left - bookLeft) <= tolerance
@@ -207,20 +186,22 @@ local function findForeignPages()
 	return pages
 end
 
--- click the page's own return tab (a button over the native selected tab) so its addon knows it closed;
--- hiding the page would leave the addon thinking it's open
-local function closeForeignPage(page)
-	local nativeTabs = lib.book.CategoryTabSystem
+--[[
+	Clicks the page's own return tab (a button over the native selected tab) so its add-on knows it closed;
+	hiding the page would leave the add-on thinking it's open.
+]]
+local function CloseForeignPage(page)
+	local nativeTabs = SpellbookTabs.book.CategoryTabSystem
 	local native = nativeTabs.selectedTabID and nativeTabs:GetTabButton(nativeTabs.selectedTabID)
 	local nativeX, nativeY
 	if native then
-		nativeX, nativeY = screenCenter(native)
+		nativeX, nativeY = ScreenCenter(native)
 	end
 	if nativeX then
 		local tolerance = 4 * native:GetEffectiveScale()
 		for _, child in ipairs({ page:GetChildren() }) do
 			if not child:IsForbidden() and child:IsObjectType("Button") and child:IsVisible() then
-				local x, y = screenCenter(child)
+				local x, y = ScreenCenter(child)
 				if x and math.abs(x - nativeX) <= tolerance and math.abs(y - nativeY) <= tolerance then
 					child:Click()
 					return
@@ -232,7 +213,7 @@ local function closeForeignPage(page)
 end
 
 -- first free spot along one axis, pushed past every obstacle that overlaps the slot
-local function nextFreeRowSlot(obstacles, x, width, bottom, top, gap)
+local function NextFreeRowSlot(obstacles, x, width, bottom, top, gap)
 	local moved = true
 	while moved do
 		moved = false
@@ -246,7 +227,7 @@ local function nextFreeRowSlot(obstacles, x, width, bottom, top, gap)
 	return x
 end
 
-local function nextFreeColumnSlot(obstacles, y, height, left, right, gap)
+local function NextFreeColumnSlot(obstacles, y, height, left, right, gap)
 	local moved = true
 	while moved do
 		moved = false
@@ -260,24 +241,26 @@ local function nextFreeColumnSlot(obstacles, y, height, left, right, gap)
 	return y
 end
 
-function lib:Layout()
+function SpellbookTabs:Layout()
 	local book = self.book
 	local nativeTabs = book.CategoryTabSystem
 	local scale = book:GetEffectiveScale()
-	local tabsLeft, tabsBottom, tabsRight, tabsTop = screenRect(nativeTabs)
-	local bookLeft, bookBottom, bookRight, bookTop = screenRect(book)
+	local tabsLeft, tabsBottom, tabsRight, tabsTop = ScreenRect(nativeTabs)
+	local bookLeft, bookBottom, bookRight, bookTop = ScreenRect(book)
 	if not tabsLeft or not bookRight then
 		return
 	end
-	local searchLeft = screenRect(book.SearchBox)
+	local searchLeft = ScreenRect(book.SearchBox)
 	local width, height, gap = TAB_WIDTH * scale, TAB_HEIGHT * scale, GAP * scale
-	local obstacles = collectObstacles(width, height)
+	local obstacles = CollectObstacles(width, height)
 
 	local centerY = (tabsBottom + tabsTop) / 2
 	local rowBottom, rowTop = centerY - height / 2, centerY + height / 2
-	-- other addons' launchers sit where these tabs go: by the native tabs (or hanging below them), or down
-	-- the book's right edge
-	local blizzard = blizzardFrames()
+	--[[
+		other add-ons' launchers sit where these tabs go: by the native tabs (or hanging below them), or down the
+		book's right edge
+	]]
+	local blizzard = BlizzardFrames()
 	for _, rect in ipairs(obstacles) do
 		local byTabs = rect.bottom < rowTop + height
 			and rect.top > rowBottom - height
@@ -298,7 +281,7 @@ function lib:Layout()
 		local button = tab.button
 		button:ClearAllPoints()
 		if inRow then
-			x = nextFreeRowSlot(obstacles, x, width, rowBottom, rowTop, gap)
+			x = NextFreeRowSlot(obstacles, x, width, rowBottom, rowTop, gap)
 			if searchLeft and x + width > searchLeft - gap then
 				inRow = false
 			end
@@ -307,26 +290,27 @@ function lib:Layout()
 			button:SetPoint("LEFT", nativeTabs, "RIGHT", (x - tabsRight) / scale, 0)
 			x = x + width + gap
 		else
-			columnTop = nextFreeColumnSlot(obstacles, columnTop, height, bookRight, bookRight + width, gap)
+			columnTop = NextFreeColumnSlot(obstacles, columnTop, height, bookRight, bookRight + width, gap)
 			button:SetPoint("TOPLEFT", book, "TOPRIGHT", 0, (columnTop - bookTop) / scale)
 			columnTop = columnTop - height - gap
 		end
 	end
 end
 
-local function ensurePage(tab)
+local function EnsurePage(tab)
 	if tab.page then
 		return tab.page
 	end
-	local page = own(CreateFrame("Frame", nil, lib.root.content))
+	local root = SpellbookTabs.root
+	local page = Own(CreateFrame("Frame", nil, root.content))
 	page:SetAllPoints()
 	page:Hide()
 	tab.page = page
 	-- the page is clipped below the toolbar, so toolbar controls go on this unclipped frame instead
-	local header = own(CreateFrame("Frame", nil, lib.root))
+	local header = Own(CreateFrame("Frame", nil, root))
 	page.header = header
-	header:SetPoint("TOPLEFT", lib.root, "TOPLEFT")
-	header:SetPoint("BOTTOMRIGHT", lib.root.content, "TOPRIGHT")
+	header:SetPoint("TOPLEFT", root, "TOPLEFT")
+	header:SetPoint("BOTTOMRIGHT", root.content, "TOPRIGHT")
 	header:Hide()
 	if tab.onShow then
 		page:SetScript("OnShow", tab.onShow)
@@ -346,7 +330,7 @@ local function ensurePage(tab)
 	return page
 end
 
-function lib:Sync()
+function SpellbookTabs:Sync()
 	local book = self.book
 	if not book then
 		return
@@ -375,7 +359,8 @@ function lib:Sync()
 	end
 	self:HookForeign()
 
-	local scale = book:GetEffectiveScale() / PlayerSpellsFrame:GetEffectiveScale()
+	-- the frames hang off UIParent, so they take the book's scale and sit in its strata, under its border
+	local scale = book:GetEffectiveScale() / UIParent:GetEffectiveScale()
 	local strata, level = PlayerSpellsFrame:GetFrameStrata(), PlayerSpellsFrame.NineSlice:GetFrameLevel() - 10
 	root:SetScale(scale)
 	root:SetFrameStrata(strata)
@@ -386,7 +371,7 @@ function lib:Sync()
 		button:SetScale(scale)
 		button:SetFrameStrata(strata)
 		button:SetFrameLevel(level + 5)
-		selectTab(button, tab == self.active)
+		SelectTab(button, tab == self.active)
 		button:Show()
 		-- above the native search box and settings dropdown, so a control placed over them takes the clicks
 		if tab.page then
@@ -418,87 +403,93 @@ function lib:Sync()
 		returnTab:SetPoint("CENTER", native)
 		returnTab.icon:SetTexture(native.Icon:GetTexture())
 	end
-	ensurePage(active):Show()
+	EnsurePage(active):Show()
 	root:Show()
 end
 
-function lib:RequestSync()
+function SpellbookTabs:RequestSync()
 	if self.queued then
 		return
 	end
 	self.queued = true
 	RunNextFrame(function()
-		lib.queued = false
-		lib:Sync()
+		SpellbookTabs.queued = false
+		SpellbookTabs:Sync()
 	end)
 end
 
--- other addons lay out on the same show/resize events, so look again once they've settled
-local function relayout()
-	lib:RequestSync()
+-- other add-ons lay out on the same show/resize events, so look again once they've settled
+local function Relayout()
+	SpellbookTabs:RequestSync()
 	C_Timer.After(0.2, function()
-		lib:RequestSync()
+		SpellbookTabs:RequestSync()
 	end)
 end
 
--- another addon's launcher opens its page, so close ours
-function lib:HookLauncher(launcher)
+-- another add-on's launcher opens its page, so close ours
+function SpellbookTabs:HookLauncher(launcher)
 	if self.hookedForeign[launcher] or not launcher:HasScript("OnClick") then
 		return
 	end
 	self.hookedForeign[launcher] = true
 	launcher:HookScript("OnClick", function()
-		lib:Close()
+		SpellbookTabs:Close()
 	end)
-	launcher:HookScript("OnShow", relayout)
+	launcher:HookScript("OnShow", Relayout)
 end
 
--- another addon's page can open some other way too (a key binding, a slash command)
-function lib:HookForeign()
-	for _, page in ipairs(findForeignPages()) do
+-- another add-on's page can open some other way too (a key binding, a slash command)
+function SpellbookTabs:HookForeign()
+	for _, page in ipairs(FindForeignPages()) do
 		if not self.hookedForeign[page] then
 			self.hookedForeign[page] = true
 			page:HookScript("OnShow", function()
-				lib:Close()
+				SpellbookTabs:Close()
 			end)
 		end
 	end
 end
 
-function lib:CreateButton(tab)
-	local button = makeTab(PlayerSpellsFrame, tab.icon)
+function SpellbookTabs:CreateButton(tab)
+	local button = MakeTab(UIParent, tab.icon)
 	tab.button = button
 	button:Hide()
 	button:SetScript("OnClick", function()
-		if lib.active == tab then
-			lib:Close()
+		if SpellbookTabs.active == tab then
+			SpellbookTabs:Close()
 		else
-			lib:Open(tab.id)
+			SpellbookTabs:Open(tab.id)
 		end
 	end)
 	button:SetScript("OnEnter", function(tabButton)
 		GameTooltip:SetOwner(tabButton, "ANCHOR_RIGHT")
 		GameTooltip:SetText(tab.name)
+		if tab.description then
+			GameTooltip:AddLine(tab.description, 1, 1, 1, true)
+		end
+		if tab.hint then
+			GameTooltip:AddDoubleLine(GetColor("INFO") .. tab.hint[1] .. "|r", GetColor("INFO") .. tab.hint[2] .. "|r")
+		end
 		GameTooltip:Show()
 	end)
-	button:SetScript("OnLeave", hideTooltip)
-	button:SetScript("OnHide", hideTooltip)
+	button:SetScript("OnLeave", HideTooltip)
+	button:SetScript("OnHide", HideTooltip)
 end
 
-function lib:Attach()
+function SpellbookTabs:Attach()
 	if self.book then
 		return
 	end
 	local book = PlayerSpellsFrame.SpellBookFrame
 	self.book = book
 
-	local root = own(CreateFrame("Frame", nil, PlayerSpellsFrame))
+	local root = Own(CreateFrame("Frame", nil, UIParent))
 	self.root = root
 	root:Hide()
 	root:SetAllPoints(book)
 
-	-- parchment that eats the mouse over the native spell pages; addon pages are its children
-	local content = own(CreateFrame("Frame", nil, root))
+	-- parchment that eats the mouse over the native spell pages; the pages are its children
+	local content = Own(CreateFrame("Frame", nil, root))
 	root.content = content
 	content:SetPoint("TOPLEFT", root, "TOPLEFT", 0, -HEADER_HEIGHT)
 	content:SetPoint("BOTTOMRIGHT", root, "BOTTOMRIGHT")
@@ -507,54 +498,59 @@ function lib:Attach()
 	content:EnableMouseWheel(true)
 	local art = CreateFrame("Frame", nil, content)
 	art:SetAllPoints(root)
-	local function pageArt(atlas, from, to)
+	local function PageArt(atlas, from, to)
 		local texture = art:CreateTexture(nil, "BACKGROUND")
 		texture:SetAtlas(atlas)
 		texture:SetPoint("TOPLEFT", root, from)
 		texture:SetPoint("BOTTOMRIGHT", root, to)
 		return texture
 	end
-	content.whole = pageArt(skin.pageRight, "TOPLEFT", "BOTTOMRIGHT")
-	content.left = pageArt(skin.pageLeft, "TOPLEFT", "BOTTOM")
-	content.right = pageArt(skin.pageRight, "TOP", "BOTTOMRIGHT")
+	content.whole = PageArt(SKIN.pageRight, "TOPLEFT", "BOTTOMRIGHT")
+	content.left = PageArt(SKIN.pageLeft, "TOPLEFT", "BOTTOM")
+	content.right = PageArt(SKIN.pageRight, "TOP", "BOTTOMRIGHT")
 
-	local returnTab = makeTab(root)
+	local returnTab = MakeTab(root)
 	self.returnTab = returnTab
-	selectTab(returnTab, false)
+	SelectTab(returnTab, false)
 	returnTab:SetScript("OnClick", function()
-		lib:Close()
+		SpellbookTabs:Close()
 	end)
 
 	for _, tab in ipairs(self.tabs) do
 		self:CreateButton(tab)
 	end
 
-	local function request()
-		lib:RequestSync()
+	local function Request()
+		SpellbookTabs:RequestSync()
 	end
 	for _, event in ipairs({ "SpellBookFrame.Show", "SpellBookFrame.Hide", "SpellBookFrame.DisplayedSpellsChanged" }) do
-		EventRegistry:RegisterCallback("PlayerSpellsFrame." .. event, request, lib)
+		EventRegistry:RegisterCallback("PlayerSpellsFrame." .. event, Request, SpellbookTabs)
 	end
-	EventRegistry:RegisterCallback("SpellSearchBox.FocusedGained", request, lib)
-	EventRegistry:RegisterCallback("SpellSearchPreview.FocusedGained", request, lib)
-	book:HookScript("OnSizeChanged", relayout)
-	book:HookScript("OnShow", relayout)
+	EventRegistry:RegisterCallback("SpellSearchBox.FocusedGained", Request, SpellbookTabs)
+	EventRegistry:RegisterCallback("SpellSearchPreview.FocusedGained", Request, SpellbookTabs)
+	book:HookScript("OnSizeChanged", Relayout)
+	book:HookScript("OnShow", Relayout)
 	book:HookScript("OnHide", function()
-		lib:Sync()
+		SpellbookTabs:Sync()
 	end)
 	self:RequestSync()
 end
 
-function lib:RegisterTab(id, info)
-	assert(type(id) == "string", "RegisterTab: id must be a string")
-	assert(type(info) == "table" and info.name, "RegisterTab: info.name is required")
+--[[
+	info is { name (the tab's tooltip title), description (a white line under it), hint ({ key, action }, a
+	blue pair under that), icon (texture path or fileID), onCreate(page) (builds the page, once, on first
+	open), onShow(page), onHide(page) }; description, hint and the last three are optional.
+]]
+function SpellbookTabs:RegisterTab(id, info)
 	if self.byId[id] then
 		return self.byId[id]
 	end
 	local tab = {
 		id = id,
 		name = info.name,
-		icon = info.icon or 134400, -- Interface\Icons\INV_Misc_QuestionMark
+		description = info.description,
+		hint = info.hint,
+		icon = info.icon or ns.ICON_QUESTION_MARK,
 		onCreate = info.onCreate,
 		onShow = info.onShow,
 		onHide = info.onHide,
@@ -568,14 +564,15 @@ function lib:RegisterTab(id, info)
 	return tab
 end
 
-function lib:Open(id)
+-- Selects the tab; its page shows once the spellbook is open.
+function SpellbookTabs:Open(id)
 	local tab = self.byId[id]
 	if not tab or self.active == tab then
 		return
 	end
 	if self.book then
-		for _, page in ipairs(findForeignPages()) do
-			closeForeignPage(page)
+		for _, page in ipairs(FindForeignPages()) do
+			CloseForeignPage(page)
 		end
 	end
 	self.active = tab
@@ -584,7 +581,7 @@ function lib:Open(id)
 	self:Sync()
 end
 
-function lib:Close()
+function SpellbookTabs:Close()
 	if not self.active then
 		return
 	end
@@ -592,13 +589,10 @@ function lib:Close()
 	self:Sync()
 end
 
-function lib:IsOpen(id)
+function SpellbookTabs:IsOpen(id)
 	return self.active ~= nil and self.active.id == id
 end
 
-if not lib.attachRequested then
-	lib.attachRequested = true
-	EventUtil.ContinueOnAddOnLoaded("Blizzard_PlayerSpells", function()
-		lib:Attach()
-	end)
-end
+EventUtil.ContinueOnAddOnLoaded("Blizzard_PlayerSpells", function()
+	SpellbookTabs:Attach()
+end)

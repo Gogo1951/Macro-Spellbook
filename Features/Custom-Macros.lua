@@ -13,9 +13,9 @@ local function ShowtooltipIcon(body)
 	end
 end
 
--- A custom macro as a page macro. Its body is used as written, and it has no options menu.
+-- A custom macro as a page macro. Its body is used as written, then the tag line, and it has no options menu.
 local function MakeCustomMacro(entry, index, categoryRank)
-	return {
+	local macro = {
 		name = entry.name,
 		categoryRank = categoryRank,
 		priority = index,
@@ -25,8 +25,9 @@ local function MakeCustomMacro(entry, index, categoryRank)
 		macroName = ns.TrimMacroName(entry.name),
 		macroIcon = entry.icon or ns.ICON_QUESTION_MARK,
 		icon = entry.icon or ShowtooltipIcon(entry.body) or ns.ICON_QUESTION_MARK,
-		body = entry.body,
 	}
+	macro.body = ns.TaggedBody(macro, entry.body)
+	return macro
 end
 
 --[[
@@ -81,16 +82,17 @@ end
 
 --[[
 	Why a custom entry can't go on the page, or nil when it can: "needs" (no name or no text), "long" with the
-	text's length in bytes, or "taken" when taken already holds its trimmed name. The page's chat warnings and
-	the Custom Macros panel's status lines both read it.
+	text's length in bytes, the tag line included, or "taken" when taken already holds its trimmed name. The
+	page's chat warnings and the Custom Macros panel's status lines both read it.
 ]]
 function ns.CustomMacroProblem(entry, taken)
 	local name, body = type(entry) == "table" and entry.name, type(entry) == "table" and entry.body
 	if type(name) ~= "string" or name == "" or type(body) ~= "string" or body == "" then
 		return "needs"
 	end
-	if #body > ns.MACRO_BODY_MAX_LENGTH then
-		return "long", #body
+	local length = #(body:gsub("\n+$", "")) + ns.MACRO_TAG_LENGTH
+	if length > ns.MACRO_BODY_MAX_LENGTH then
+		return "long", length
 	end
 	if taken[ns.TrimMacroName(name)] then
 		return "taken"

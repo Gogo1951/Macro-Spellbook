@@ -1,6 +1,6 @@
 local _, ns = ...
 
--- [classToken] = { mouseoverEnemy, mouseoverFriend, cursor, raidRank1, channeled, stealth = { spellId }, noToggle = { spellId }, stanceSlots = { stanceSpellId }, stances = { [spellId] = { stanceSpellId } }, petAbilities = { [summonSpellId] = { abilityId, familyId } }, extraSpells = { spellId }, customMacros = { { name or nameKey, icon, body } } }
+-- [classToken] = { mouseoverEnemy, mouseoverFriend, buffs, cursor, channeled, stealth = { spellId }, noToggle = { spellId }, stanceSlots = { stanceSpellId }, stances = { [spellId] = { stanceSpellId } }, petAbilities = { [summonSpellId] = { abilityId, familyId } }, extraSpells = { spellId }, customMacros = { { name or nameKey, icon, body } }, autoShot = spellId }
 ns.CLASS_SPELL_LISTS = {
 	DEATHKNIGHT = {
 		mouseoverEnemy = {
@@ -30,7 +30,6 @@ ns.CLASS_SPELL_LISTS = {
 			43265, -- Death and Decay
 			51052, -- Anti-Magic Zone
 		},
-		raidRank1 = {},
 		channeled = {
 			42650, -- Army of the Dead
 		},
@@ -76,7 +75,6 @@ ns.CLASS_SPELL_LISTS = {
 			16914, -- Hurricane
 			102793, -- Ursol's Vortex
 		},
-		raidRank1 = {},
 		channeled = {
 			740, -- Tranquility
 			16914, -- Hurricane
@@ -125,7 +123,6 @@ ns.CLASS_SPELL_LISTS = {
 			1543, -- Flare
 			109248, -- Binding Shot
 		},
-		raidRank1 = {},
 		channeled = {
 			120360, -- Barrage
 			6197, -- Eagle Eye
@@ -175,7 +172,6 @@ ns.CLASS_SPELL_LISTS = {
 			113724, -- Ring of Frost
 			116011, -- Rune of Power
 		},
-		raidRank1 = {},
 		channeled = {
 			5143, -- Arcane Missiles
 			10, -- Blizzard
@@ -218,7 +214,6 @@ ns.CLASS_SPELL_LISTS = {
 			115315, -- Summon Black Ox Statue
 			115313, -- Summon Jade Serpent Statue
 		},
-		raidRank1 = {},
 		channeled = {
 			117952, -- Crackling Jade Lightning
 			113656, -- Fists of Fury
@@ -272,7 +267,6 @@ ns.CLASS_SPELL_LISTS = {
 		cursor = {
 			114158, -- Light's Hammer
 		},
-		raidRank1 = {},
 		channeled = {},
 		stealth = {},
 	},
@@ -329,7 +323,6 @@ ns.CLASS_SPELL_LISTS = {
 			121536, -- Angelic Feather
 			108921, -- Psyfiend
 		},
-		raidRank1 = {},
 		channeled = {
 			15407, -- Mind Flay
 			48045, -- Mind Sear
@@ -363,7 +356,6 @@ ns.CLASS_SPELL_LISTS = {
 		cursor = {
 			1725, -- Distract
 		},
-		raidRank1 = {},
 		channeled = {},
 		stealth = {
 			1784, -- Stealth
@@ -401,7 +393,6 @@ ns.CLASS_SPELL_LISTS = {
 			108287, -- Totemic Projection
 			6196, -- Far Sight
 		},
-		raidRank1 = {},
 		channeled = {
 			6196, -- Far Sight
 		},
@@ -448,7 +439,6 @@ ns.CLASS_SPELL_LISTS = {
 			1122, -- Summon Infernal
 			111771, -- Demonic Gateway
 		},
-		raidRank1 = {},
 		channeled = {
 			689, -- Drain Life
 			1120, -- Drain Soul
@@ -507,7 +497,6 @@ ns.CLASS_SPELL_LISTS = {
 			114203, -- Demoralizing Banner
 			114192, -- Mocking Banner
 		},
-		raidRank1 = {},
 		channeled = {},
 		stealth = {},
 	},
@@ -521,7 +510,7 @@ Last Validated
 
 Notes
 	- Each class's lists for the spellbook page: the spells whose macros get the mouseover, cursor and channeled options, stealth, the aspects that offer "!Name" casting, the ability each demon summon's macro can cast, and default custom macros. Features/Macro-Builder.lua reads them.
-	- One ID per spell: this client has no spell ranks, and spells are matched by the name this client gives them. raidRank1 is empty for the same reason.
+	- One ID per spell: this client has no spell ranks, and spells are matched by the name this client gives them.
 	- Built from this client's game tables after its Validate Data report, which found every table here empty, so the next Validate Data run is the first to check these rows.
 	- The class's spells are the ones on its class skill line, its specializations or its talents (SkillLineAbility, SpecializationSpells, Talent), leaving out passive and hidden spells and the effects other spells fire.
 	- mouseoverEnemy: spells cast on an enemy unit (SpellEffect target) from range, plus the melee-range interrupts, crowd control and taunts. Melee strikes are left out; any harmful spell with a range gets the mouseover option anyway (TargetsEnemy in Features/Macro-Builder.lua).

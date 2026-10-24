@@ -400,6 +400,7 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 25296, requires = { 14322 } }, -- Aspect of the Hawk
 		{ level = 61, id = 27025, requires = { 14317 } }, -- Explosive Trap
 		{ level = 62, id = 27015, requires = { 14273 } }, -- Disengage
+		{ level = 62, id = 34120 }, -- Steady Shot
 		{ level = 63, id = 27014, requires = { 14266 } }, -- Raptor Strike
 		{ level = 64, id = 34074 }, -- Aspect of the Viper
 		{ level = 65, id = 27023, requires = { 14305 } }, -- Immolation Trap
@@ -593,17 +594,20 @@ ns.TRAINER_SPELLS = {
 		{ level = 63, id = 27075, requires = { 25345 } }, -- Arcane Missiles
 		{ level = 63, id = 27130, requires = { 10170 } }, -- Amplify Magic
 		{ level = 64, id = 27086, requires = { 10216 } }, -- Flamestrike
+		{ level = 64, id = 30451 }, -- Arcane Blast
 		{ level = 65, id = 27073, requires = { 10207 } }, -- Scorch
 		{ level = 65, id = 27087, requires = { 10161 } }, -- Cone of Cold
 		{ level = 65, id = 33691, faction = "Alliance" }, -- Portal: Shattrath
 		{ level = 65, id = 35717, faction = "Horde" }, -- Portal: Shattrath
 		{ level = 65, id = 37420, requires = { 10140 } }, -- Conjure Water
 		{ level = 66, id = 27070, requires = { 25306 } }, -- Fireball
+		{ level = 66, id = 30455 }, -- Ice Lance
 		{ level = 67, id = 27088, requires = { 10230 } }, -- Frost Nova
 		{ level = 67, id = 33944, requires = { 10174 } }, -- Dampen Magic
 		{ level = 68, id = 27085, requires = { 10187 } }, -- Blizzard
 		{ level = 68, id = 27101 }, -- Conjure Mana Emerald
 		{ level = 68, id = 27131, requires = { 10193 } }, -- Mana Shield
+		{ level = 68, id = 66 }, -- Invisibility
 		{ level = 69, id = 27072, requires = { 27071 } }, -- Frostbolt
 		{ level = 69, id = 27124, requires = { 10220 } }, -- Ice Armor
 		{ level = 69, id = 27125, requires = { 22783 } }, -- Mage Armor
@@ -622,6 +626,7 @@ ns.TRAINER_SPELLS = {
 		{ level = 70, id = 38697, requires = { 27072 } }, -- Frostbolt
 		{ level = 70, id = 38704, requires = { 38699 } }, -- Arcane Missiles
 		{ level = 70, id = 43987 }, -- Ritual of Refreshment
+		{ level = 70, id = 30449 }, -- Spellsteal
 	},
 	PALADIN = {
 		{ level = 1, id = 465 }, -- Devotion Aura
@@ -1288,6 +1293,7 @@ ns.TRAINER_SPELLS = {
 		{ level = 50, id = 15207, requires = { 10392 } }, -- Lightning Bolt
 		{ level = 50, id = 10437, requires = { 6365 } }, -- Searing Totem
 		{ level = 50, id = 10486, requires = { 8235 } }, -- Windfury Weapon
+		{ level = 50, id = 25908 }, -- Tranquil Air Totem
 		{ level = 52, id = 10448, requires = { 10447 } }, -- Flame Shock
 		{ level = 52, id = 10467, requires = { 10466 } }, -- Lesser Healing Wave
 		{ level = 52, id = 10442, requires = { 8161 } }, -- Strength of Earth Totem
@@ -1350,6 +1356,7 @@ ns.TRAINER_SPELLS = {
 		{ level = 68, id = 25464, requires = { 10473 } }, -- Frost Shock
 		{ level = 68, id = 25505, requires = { 16362 } }, -- Windfury Weapon
 		{ level = 68, id = 25563, requires = { 10538 } }, -- Fire Resistance Totem
+		{ level = 68, id = 2894 }, -- Fire Elemental Totem
 		{ level = 69, id = 25454, requires = { 10414 } }, -- Earth Shock
 		{ level = 69, id = 25533, requires = { 10438 } }, -- Searing Totem
 		{ level = 69, id = 25567, requires = { 10463 } }, -- Healing Stream Totem
@@ -1677,12 +1684,14 @@ Last Validated
 Notes
 	- Every class spell this client's class trainers teach, one row per rank, so the spellbook page can list the spells a character hasn't learned yet. Features/Unlearned-Spells.lua shows only each spell's rank 1; the higher ranks keep the list in level order and let it tell rank 1 apart.
 	- level is the level the trainer offers the rank, which is the spell's learn level. A talent row is the exception (below).
+	- The client's own learn level (Validate Data's SPELL_LEVEL_LEARNED) reads 0 or 1 for spells with no level of their own: weapon and armor skills, Parry, Pick Lock, the hunter's pet skills and talents. Those rows keep the trainer's level.
 	- requires is the spell the trainer wants first, usually the previous rank. Rows added from the game tables take the rank the tables say it replaces, or else the same spell's previous rank in this table, which agrees with all but 3 of the 860 hand-made rows that follow an earlier rank.
 	- faction and race mark rows only one faction or race can learn. A spell several races of the class learn, but not all of them, gets one row per race (Desperate Prayer: Human and Dwarf).
 	- talent marks the rank 1 of a talent whose higher ranks the trainer teaches, listed at the level of its first trainer rank so it shows until learned. The talent's own trainer ranks are left out. Talents with no trainer ranks are in the class lists' extraSpells instead.
 	- Left out on purpose: starting spells, spells learned by quest or with a form (warrior stances, warlock pets, druid forms, Growl and Maul with Bear Form; the class lists' extraSpells list these), passive and hidden spells, effects other spells fire, pet family abilities learned by taming, rogue poison recipes and the Poisons skill.
 	- The rows began as What's Training's WoW Forever trainer lists (Data/LICENSE-Trainer-Data), made by tools/gen_trainer_data.py and copied from Data/Camelot/. Rows this client doesn't have were pruned, and this client's own trainer spells were added from its game tables: ranks 61 to 70, TBC's new spells, and the ones Forever changed or dropped.
 	- How the added rows were found: a spell on one of the class's own skill lines (or Pet - Generic, for hunters), learned at the trainer (SkillLineAbility), at level 1 to 70. This client has no teaching spells, so effects were removed instead: spells another spell fires (SpellEffect; only 2 hand-made rows are), names no row has ("... Effect", "... Bleed", "Judgement of ..."), and a second spell of the same name, rank and level. Passive and hidden spells, talents and their ranks, and extraSpells entries were removed too.
+	- A later check against the same tables added seven trainer spells the name test had dropped, since no hand-made row shares their name: Steady Shot, Arcane Blast, Ice Lance, Invisibility, Spellsteal, Fire Elemental Totem and Tranquil Air Totem.
 	- The Ahn'Qiraj book ranks of Classic (Heroic Strike rank 9 and the like) are in: this client has no book for them, so the trainer teaches them at 60.
 	- Ruled out by hand: Seal of Righteousness rank 1 and Summon Imp (starting spells), Summon Dreadsteed and Swift Flight Form (quests), Poisons and Mind-numbing Poison I to III (the rows hold no poison skill or recipes), pet Growl rank 1 (every pet starts with it), and effects the tests above let through: Execute 20647, Holy Vengeance, Blood Corruption, Lightwell Renew, Chilled, Create Soulwell, Enraged Defense.
 	- Likely unobtainable, so not added: Curse of Idiocy (1010), Black Arrow (3674, 14296) and Mass Resurrection (32841), IDs no trainer here teaches.

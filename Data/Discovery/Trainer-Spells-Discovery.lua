@@ -4,7 +4,7 @@ if not ns.IS_DISCOVERY then
 	return
 end
 
--- [classToken] = { { level, id, requires = { spellId }, faction, race = raceId, talent }, ... }, sorted by level
+-- [classToken] = { { level, id, requires = { spellId }, faction, race = raceId, talent, book }, ... }, sorted by level
 ns.TRAINER_SPELLS = {
 	DRUID = {
 		{ level = 1, id = 1126 }, -- Mark of the Wild
@@ -154,6 +154,7 @@ ns.TRAINER_SPELLS = {
 		{ level = 50, id = 9875, requires = { 8951 } }, -- Starfire
 		{ level = 50, id = 9862, requires = { 8918 } }, -- Tranquility
 		{ level = 50, id = 408120, talent = true }, -- Wild Growth
+		{ level = 50, id = 21849, book = true }, -- Gift of the Wild
 		{ level = 52, id = 9892, requires = { 9000 } }, -- Cower
 		{ level = 52, id = 9898, requires = { 9747 } }, -- Demoralizing Roar
 		{ level = 52, id = 9834, requires = { 9833 } }, -- Moonfire
@@ -188,6 +189,10 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 9896, requires = { 9894 } }, -- Rip
 		{ level = 60, id = 9863, requires = { 9862 } }, -- Tranquility
 		{ level = 60, id = 9846, requires = { 9845 } }, -- Tiger's Fury
+		{ level = 60, id = 21850, requires = { 21849 }, book = true }, -- Gift of the Wild
+		{ level = 60, id = 31018, requires = { 22829 }, book = true }, -- Ferocious Bite
+		{ level = 60, id = 25297, requires = { 9889 }, book = true }, -- Healing Touch
+		{ level = 60, id = 25299, requires = { 9841 }, book = true }, -- Rejuvenation
 	},
 	HUNTER = {
 		{ level = 1, id = 1494 }, -- Track Beasts
@@ -359,6 +364,10 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 5042, requires = { 5041 } }, -- Great Stamina
 		{ level = 60, id = 14921, requires = { 14920 } }, -- Growl
 		{ level = 60, id = 24630, requires = { 24629 } }, -- Natural Armor
+		{ level = 60, id = 25296, requires = { 14322 }, book = true }, -- Aspect of the Hawk
+		{ level = 60, id = 25294, requires = { 14290 }, book = true }, -- Multi-Shot
+		{ level = 60, id = 25295, requires = { 13555 }, book = true }, -- Serpent Sting
+		{ level = 60, id = 19801, book = true }, -- Tranquilizing Shot
 	},
 	MAGE = {
 		{ level = 1, id = 1459 }, -- Arcane Intellect
@@ -499,6 +508,7 @@ ns.TRAINER_SPELLS = {
 		{ level = 56, id = 10212, requires = { 10211 } }, -- Arcane Missiles
 		{ level = 56, id = 10216, requires = { 10215 } }, -- Flamestrike
 		{ level = 56, id = 10181, requires = { 10180 } }, -- Frostbolt
+		{ level = 56, id = 23028, book = true }, -- Arcane Brilliance
 		{ level = 58, id = 10161, requires = { 10160 } }, -- Cone of Cold
 		{ level = 58, id = 10054, requires = { 10053 } }, -- Conjure Mana Ruby
 		{ level = 58, id = 22783, requires = { 22782 } }, -- Mage Armor
@@ -511,6 +521,11 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 10193, requires = { 10192 } }, -- Mana Shield
 		{ level = 60, id = 12826, requires = { 12825 } }, -- Polymorph
 		{ level = 60, id = 10140, requires = { 10139 } }, -- Conjure Water
+		{ level = 60, id = 25345, requires = { 10212 }, book = true }, -- Arcane Missiles
+		{ level = 60, id = 28612, requires = { 10145 }, book = true }, -- Conjure Food
+		{ level = 60, id = 25306, requires = { 10151 }, book = true }, -- Fireball
+		{ level = 60, id = 28609, requires = { 10177 }, book = true }, -- Frost Ward
+		{ level = 60, id = 25304, requires = { 10181 }, book = true }, -- Frostbolt
 	},
 	PALADIN = {
 		{ level = 1, id = 465 }, -- Devotion Aura
@@ -642,6 +657,9 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 20773, requires = { 20772 } }, -- Redemption
 		{ level = 60, id = 20349, requires = { 20348 } }, -- Seal of Light
 		{ level = 60, id = 25899 }, -- Greater Blessing of Sanctuary
+		{ level = 60, id = 25291, requires = { 19838 }, book = true }, -- Blessing of Might
+		{ level = 60, id = 25290, requires = { 19854 }, book = true }, -- Blessing of Wisdom
+		{ level = 60, id = 25292, requires = { 10329 }, book = true }, -- Holy Light
 	},
 	PRIEST = {
 		{ level = 1, id = 1243 }, -- Power Word: Fortitude
@@ -782,6 +800,7 @@ ns.TRAINER_SPELLS = {
 		{ level = 48, id = 10875, requires = { 10874 } }, -- Mana Burn
 		{ level = 48, id = 10937, requires = { 2791 } }, -- Power Word: Fortitude
 		{ level = 48, id = 10899, requires = { 10898 } }, -- Power Word: Shield
+		{ level = 48, id = 21562, book = true }, -- Prayer of Fortitude
 		{ level = 50, id = 14819, requires = { 14818 } }, -- Divine Spirit
 		{ level = 50, id = 10941, requires = { 9592 } }, -- Fade
 		{ level = 50, id = 19274, requires = { 19273 }, race = 1 }, -- Feedback
@@ -834,6 +853,11 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 19285, requires = { 19284 }, race = 8 }, -- Hex of Weakness
 		{ level = 60, id = 19312, requires = { 19311 }, race = 8 }, -- Shadowguard
 		{ level = 60, id = 19293, requires = { 19292 }, race = 4 }, -- Elune's Grace
+		{ level = 60, id = 21564, requires = { 21562 }, book = true }, -- Prayer of Fortitude
+		{ level = 60, id = 25314, requires = { 10965 }, book = true }, -- Greater Heal
+		{ level = 60, id = 25316, requires = { 10961 }, book = true }, -- Prayer of Healing
+		{ level = 60, id = 27683, book = true }, -- Prayer of Shadow Protection
+		{ level = 60, id = 25315, requires = { 10929 }, book = true }, -- Renew
 	},
 	ROGUE = {
 		{ level = 1, id = 1784 }, -- Stealth
@@ -922,6 +946,9 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 11286, requires = { 11285 } }, -- Gouge
 		{ level = 60, id = 11275, requires = { 11274 } }, -- Rupture
 		{ level = 60, id = 1787, requires = { 1786 } }, -- Stealth
+		{ level = 60, id = 25300, requires = { 11281 }, book = true }, -- Backstab
+		{ level = 60, id = 31016, requires = { 11300 }, book = true }, -- Eviscerate
+		{ level = 60, id = 25302, requires = { 11303 }, book = true }, -- Feint
 	},
 	SHAMAN = {
 		{ level = 1, id = 8017 }, -- Rockbiter Weapon
@@ -1057,6 +1084,7 @@ ns.TRAINER_SPELLS = {
 		{ level = 50, id = 408521, talent = true }, -- Riptide
 		{ level = 50, id = 10437, requires = { 6365 } }, -- Searing Totem
 		{ level = 50, id = 10486, requires = { 8235 } }, -- Windfury Weapon
+		{ level = 50, id = 25908 }, -- Tranquil Air Totem
 		{ level = 52, id = 408345, requires = { 408344 } }, -- Fire Nova
 		{ level = 52, id = 10448, requires = { 10447 } }, -- Flame Shock
 		{ level = 52, id = 10467, requires = { 10466 } }, -- Lesser Healing Wave
@@ -1088,6 +1116,10 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 10601, requires = { 10600 } }, -- Nature Resistance Totem
 		{ level = 60, id = 10438, requires = { 10437 } }, -- Searing Totem
 		{ level = 60, id = 16362, requires = { 10486 } }, -- Windfury Weapon
+		{ level = 60, id = 29228, requires = { 10448 }, book = true }, -- Flame Shock
+		{ level = 60, id = 25359, requires = { 10627 }, book = true }, -- Grace of Air Totem
+		{ level = 60, id = 25357, requires = { 10396 }, book = true }, -- Healing Wave
+		{ level = 60, id = 25361, requires = { 10442 }, book = true }, -- Strength of Earth Totem
 	},
 	WARLOCK = {
 		{ level = 1, id = 348 }, -- Immolate
@@ -1230,6 +1262,10 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 11668, requires = { 11667 } }, -- Immolate
 		{ level = 60, id = 11661, requires = { 11660 } }, -- Shadow Bolt
 		{ level = 60, id = 11722, requires = { 11721 } }, -- Curse of the Elements
+		{ level = 60, id = 25311, requires = { 11672 }, book = true }, -- Corruption
+		{ level = 60, id = 25309, requires = { 11668 }, book = true }, -- Immolate
+		{ level = 60, id = 25307, requires = { 11661 }, book = true }, -- Shadow Bolt
+		{ level = 60, id = 28610, requires = { 11740 }, book = true }, -- Shadow Ward
 	},
 	WARRIOR = {
 		{ level = 1, id = 6673 }, -- Battle Shout
@@ -1325,6 +1361,9 @@ ns.TRAINER_SPELLS = {
 		{ level = 60, id = 20569, requires = { 11609 } }, -- Cleave
 		{ level = 60, id = 11585, requires = { 11584 } }, -- Overpower
 		{ level = 60, id = 11574, requires = { 11573 } }, -- Rend
+		{ level = 60, id = 25289, requires = { 11551 }, book = true }, -- Battle Shout
+		{ level = 60, id = 25286, requires = { 11567 }, book = true }, -- Heroic Strike
+		{ level = 60, id = 25288, requires = { 11601 }, book = true }, -- Revenge
 	},
 }
 
@@ -1335,16 +1374,19 @@ Last Validated
 	2026-10-24, Season of Discovery 1.15.9.70003
 
 Notes
-	- Every class spell this client's class trainers teach, one row per rank, so the spellbook page can list the spells a character hasn't learned yet. Features/Unlearned-Spells.lua shows only each spell's rank 1; the higher ranks keep the list in level order and let it tell rank 1 apart.
+	- Every class spell this client's class trainers teach, and the ranks only a book teaches, one row per rank, so the spellbook page can list the spells a character hasn't learned yet. Features/Unlearned-Spells.lua shows only each spell's rank 1; the higher ranks keep the list in level order and let it tell rank 1 apart.
 	- level is the level the trainer offers the rank, which is the spell's learn level. A talent row is the exception (below).
+	- The client's own learn level (Validate Data's SPELL_LEVEL_LEARNED) reads 0 or 1 for spells with no level of their own: weapon and armor skills, Parry, Pick Lock, the hunter's pet skills and talents, and Season of Discovery's runes. Those rows keep the trainer's level; a rune keeps the level WoW Forever's trainer teaches it at, which orders the list.
 	- requires is the spell the trainer wants first, usually the previous rank. Rows added from the game tables take the rank the tables say it replaces, or else the same spell's previous rank in this table, which agrees with all but 3 of the 852 hand-made rows that follow an earlier rank.
 	- faction and race mark rows only one faction or race can learn. A spell several races of the class learn, but not all of them, gets one row per race (Desperate Prayer: Human and Dwarf).
 	- talent marks the rank 1 of a talent whose higher ranks the trainer teaches, listed at the level of its first trainer rank so it shows until learned. The talent's own trainer ranks are left out. Talents with no trainer ranks are in the class lists' extraSpells instead.
 	- Left out on purpose: starting spells, spells learned by quest or with a form (warrior stances, warlock pets, druid forms, Growl and Maul with Bear Form; the class lists' extraSpells list these), passive and hidden spells, effects other spells fire, pet family abilities learned by taming, rogue poison recipes and the Poisons skill.
 	- The rows began as What's Training's WoW Forever trainer lists (Data/LICENSE-Trainer-Data), made by tools/gen_trainer_data.py and copied from Data/Camelot/. Rows this client doesn't have were pruned, and the trainer spells Forever changed or dropped were added back from this client's game tables.
 	- How the added rows were found: a spell on one of the class's own skill lines, learned at the trainer (SkillLineAbility), at level 1 to 60, taught by a teaching spell that no item uses (SpellEffect, ItemEffect). 1,191 of the 1,212 hand-made rows pass that test. Passive, hidden and fired-by-another-spell spells, talents and their ranks, and extraSpells entries were then removed.
-	- Ruled out by that test: the Ahn'Qiraj book ranks (Heroic Strike rank 9, Greater Heal rank 5 and the like), which only a book teaches on this client.
-	- Ruled out by hand: Seal of Righteousness rank 1 and Summon Imp (starting spells), Summon Dreadsteed (a quest), Poisons and Mind-numbing Poison I to III (the rows hold no poison skill or recipes), and pet Growl rank 1 (every pet starts with it).
+	- book marks a rank or spell only a book teaches on this client: the Ahn'Qiraj ranks (Heroic Strike rank 9, Greater Heal rank 5 and the like), the later raid ranks (Eviscerate rank 9, Ferocious Bite rank 5, Flame Shock rank 6, Conjure Food rank 7, Frost Ward rank 5, Shadow Ward rank 4), the Dire Maul group buffs (Arcane Brilliance, Gift of the Wild and Prayer of Fortitude ranks 1 and 2, Prayer of Shadow Protection) and Tranquilizing Shot. level is the book's required level; requires is the same spell's previous rank.
+	- How the book rows were found: a spell on one of the class's own skill lines (SkillLineAbility) taught by a teaching spell an item uses (SpellEffect, ItemEffect), not already a row or an extraSpells entry. Left out of those: Summon Imp (a starting spell), Deadly Poison V (a poison recipe), and the mage's Polymorph: Turtle and Polymorph: Cow (Turtle shares Polymorph's name, so the page can't tell it apart, and Cow's tome is likely unobtainable).
+	- A later check against the same tables added Tranquil Air Totem (25908), which passes that test but was missing from the rows.
+	- Ruled out by hand: Seal of Righteousness rank 1 and Summon Imp (starting spells), Summon Dreadsteed (a quest, so it's in the warlock's extraSpells), Poisons and Mind-numbing Poison I to III (the rows hold no poison skill or recipes), and pet Growl rank 1 (every pet starts with it).
 	- Likely unobtainable, so not added: Curse of Idiocy (1010) and Black Arrow (3674, 14296), pre-release spells no trainer here teaches, and Mangle (22570), the leftover of TBC's Maim.
 	- Some rows are WoW Forever talents that reuse Season of Discovery rune spells (Arcane Blast, Wild Growth, Lava Burst and others, marked talent). Here they are runes learned by engraving, and the page lists them until learned.
 
@@ -1356,6 +1398,8 @@ Wowhead
 	https://www.wowhead.com/classic/spell=3674
 	https://www.wowhead.com/classic/spell=22570
 	https://www.wowhead.com/classic/spell=2855
+	https://www.wowhead.com/classic/spell=25286
+	https://www.wowhead.com/classic/item=21297
 
 wago.tools
 	https://wago.tools/db2/SkillLineAbility?build=1.15.9.70003
@@ -1367,6 +1411,7 @@ wago.tools
 	https://wago.tools/db2/SpellEffect?build=1.15.9.70003
 	https://wago.tools/db2/ItemEffect?build=1.15.9.70003
 	https://wago.tools/db2/Talent?build=1.15.9.70003
+	https://wago.tools/db2/ItemSparse?build=1.15.9.70003
 
 QuestieDB
 	None.

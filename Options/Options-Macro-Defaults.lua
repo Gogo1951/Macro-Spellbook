@@ -7,31 +7,55 @@ local L = ns.L
 
 --[[
 	The options each kind of spell macro starts with (ns.MACRO_KINDS), a box per kind with the player's own
-	spells of that kind named at its top. A kind the class has no spells of is left out, and so is an option
-	none of its spells offers, so each box lists what that kind's right-click menus do. Each change rewrites
-	the macros that follow it, whether or not a page is open.
+	spells of that kind named at its top, then the combat check, then the options under the right-click menu's
+	group names. A kind the class has no spells of is left out, and so is an option none of its spells offers,
+	and a group caption with none left under it, so each box lists what that kind's right-click menus do. Each
+	change rewrites the macros that follow it, whether or not a page is open.
 ]]
 
--- The default options in the order the macro menu lists them, by their menu labels.
-local OPTION_LABELS = {
-	mouseover = "MENU_CAST_ON_MOUSEOVER",
-	castOnSelf = "MENU_CAST_ON_SELF",
-	targetTarget = "MENU_CAST_ON_TARGETS_TARGET",
-	cursor = "MENU_CAST_AT_CURSOR",
-	targetRank = "MENU_DYNAMIC_RANK",
-	stopCast = "MENU_STOP_CASTING",
-	stopAttack = "MENU_STOP_ATTACK",
-	cancelForm = "MENU_LEAVE_FORM_BEFORE",
-	targetEnemy = "MENU_TARGET_NEAREST_ENEMY",
-	petAttack = "MENU_ENABLE_PET_ATTACK",
-	startAttack = "MENU_START_AUTO_ATTACK",
-	spam = "MENU_SPAMMABLE",
-	raidRank1 = "MENU_DOWNRANK_IN_RAIDS",
-	oncePerTarget = "MENU_ONCE_PER_TARGET",
-	oncePerCombat = "MENU_ONCE_PER_COMBAT",
-	noToggle = "MENU_NEVER_TURN_OFF",
-	hideErrors = "MENU_HIDE_ERRORS",
-	muteErrors = "MENU_MUTE_ERRORS",
+-- The menu's groups after its combat check, in its order, as { label key, { options } }; mirrors Features/Macro-Menu.lua.
+local MENU_GROUPS = {
+	{ "MENU_GROUP_SPELL_RANK", { "targetRank" } },
+	{ "MENU_GROUP_TARGETING", { "mouseover", "castOnSelf", "targetTarget", "cursor" } },
+	{
+		"MENU_GROUP_BEFORE_CAST",
+		{
+			"stopAttack",
+			"stopCast",
+			"stopIfChanneling",
+			"stopIfStealthed",
+			"cancelForm",
+			"targetEnemy",
+			"targetFriend",
+		},
+	},
+	{ "MENU_GROUP_ADD_ATTACK", { "startAttack", "autoShot", "petAttack" } },
+	{ "MENU_GROUP_CASTING_RULES", { "oncePerTarget", "oncePerCombat", "noToggle" } },
+	{ "MENU_GROUP_ERRORS", { "hideErrors", "muteErrors" } },
+}
+
+-- Each default option's { menu label, tooltip }. autoShot's label is the class's own (OptionLabel).
+local OPTION_STRINGS = {
+	mouseover = { "MENU_CAST_ON_MOUSEOVER", "OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION" },
+	castOnSelf = { "MENU_CAST_ON_SELF", "OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION" },
+	targetTarget = { "MENU_CAST_ON_TARGETS_TARGET", "OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION" },
+	cursor = { "MENU_CAST_AT_CURSOR", "OPTIONS_DEFAULT_CURSOR_DESCRIPTION" },
+	targetRank = { "MENU_DYNAMIC_RANK", "OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION" },
+	stopAttack = { "MENU_STOP_ATTACK", "OPTIONS_DEFAULT_STOP_ATTACK_DESCRIPTION" },
+	stopCast = { "MENU_STOP_CASTING", "OPTIONS_DEFAULT_STOP_CASTING_DESCRIPTION" },
+	stopIfChanneling = { "MENU_STOP_IF_CHANNELING", "OPTIONS_DEFAULT_STOP_IF_CHANNELING_DESCRIPTION" },
+	stopIfStealthed = { "MENU_STOP_IF_STEALTHED", "OPTIONS_DEFAULT_STOP_IF_STEALTHED_DESCRIPTION" },
+	cancelForm = { "MENU_LEAVE_FORM_BEFORE", "OPTIONS_DEFAULT_LEAVE_FORM_DESCRIPTION" },
+	targetEnemy = { "MENU_TARGET_NEAREST_ENEMY", "OPTIONS_DEFAULT_TARGET_ENEMY_DESCRIPTION" },
+	targetFriend = { "MENU_TARGET_NEAREST_FRIEND", "OPTIONS_DEFAULT_TARGET_FRIEND_DESCRIPTION" },
+	startAttack = { "MENU_START_AUTO_ATTACK", "OPTIONS_DEFAULT_START_ATTACK_DESCRIPTION" },
+	autoShot = { nil, "OPTIONS_DEFAULT_AUTO_SHOT_DESCRIPTION" },
+	petAttack = { "MENU_START_PET_ATTACK", "OPTIONS_DEFAULT_PET_ATTACK_DESCRIPTION" },
+	oncePerTarget = { "MENU_ONCE_PER_TARGET", "OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION" },
+	oncePerCombat = { "MENU_ONCE_PER_COMBAT", "OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION" },
+	noToggle = { "MENU_NEVER_TURN_OFF", "OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION" },
+	hideErrors = { "MENU_HIDE_ERRORS", "OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION" },
+	muteErrors = { "MENU_MUTE_ERRORS", "OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION" },
 }
 
 local EXAMPLES_SHOWN = 6 -- spells named at the top of a kind's box before "and N more"
@@ -56,7 +80,7 @@ local function OptionLabel(key)
 	if key == "autoShot" then
 		return L[ns.AutoShotLabelKey() or "MENU_START_AUTO_SHOT"]
 	end
-	return L[OPTION_LABELS[key]]
+	return L[OPTION_STRINGS[key][1]]
 end
 
 -- The player's spells of a kind, the first few by name, in page order.
@@ -81,20 +105,38 @@ local function KindGroup(kind, order)
 			name = function()
 				return ns.GetColor("HELP") .. KindExamples(key) .. "|r"
 			end,
-			fontSize = "small",
+			fontSize = "medium",
 			order = 2,
 		},
 		spacer = ns.OptionsSpacer(3),
 	}
 	local position = 10
-	for _, option in ipairs(ns.DEFAULTABLE_OPTIONS) do
-		if option ~= "combatOnly" and option ~= "noCombat" then
+	for index, group in ipairs(MENU_GROUPS) do
+		local options = group[2]
+		position = position + 1
+		args["caption" .. index] = {
+			type = "description",
+			name = ns.GetColor("HELP") .. L[group[1]] .. "|r",
+			fontSize = "medium",
+			width = "full",
+			order = position,
+			hidden = function()
+				for _, option in ipairs(options) do
+					if KindOffers(key, option) then
+						return false
+					end
+				end
+				return true
+			end,
+		}
+		for _, option in ipairs(options) do
 			position = position + 1
 			args[option] = {
 				type = "toggle",
 				name = function()
 					return OptionLabel(option)
 				end,
+				desc = L[OPTION_STRINGS[option][2]],
 				width = 1.5,
 				order = position,
 				hidden = function()
@@ -110,27 +152,38 @@ local function KindGroup(kind, order)
 			}
 		end
 	end
-	-- the combat check is a choice of one, as on the macro menu
+	-- the combat check is a choice of one, as on the macro menu, and first, as there
 	args.combatCheck = {
-		type = "select",
-		name = L["MENU_GROUP_COMBAT_CHECK"],
-		values = COMBAT_CHECKS,
-		sorting = { "none", "combatOnly", "noCombat" },
-		order = position + 1,
+		type = "group",
+		name = "",
+		inline = true,
+		order = 4,
 		hidden = function()
 			return not KindOffers(key, "combatOnly")
 		end,
-		get = function()
-			if ns.KindDefault(key, "combatOnly") then
-				return "combatOnly"
-			end
-			return ns.KindDefault(key, "noCombat") and "noCombat" or "none"
-		end,
-		set = function(_, value)
-			ns.SetKindDefault(key, "combatOnly", value == "combatOnly")
-			ns.SetKindDefault(key, "noCombat", value == "noCombat")
-			ns:RefreshMacros()
-		end,
+		args = {
+			label = ns.OptionsRowLabel(L["MENU_GROUP_COMBAT_CHECK"], 1),
+			select = {
+				type = "select",
+				name = "",
+				desc = L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"],
+				width = ns.OPTIONS_CONTROL_WIDTH,
+				order = 2,
+				values = COMBAT_CHECKS,
+				sorting = { "none", "combatOnly", "noCombat" },
+				get = function()
+					if ns.KindDefault(key, "combatOnly") then
+						return "combatOnly"
+					end
+					return ns.KindDefault(key, "noCombat") and "noCombat" or "none"
+				end,
+				set = function(_, value)
+					ns.SetKindDefault(key, "combatOnly", value == "combatOnly")
+					ns.SetKindDefault(key, "noCombat", value == "noCombat")
+					ns:RefreshMacros()
+				end,
+			},
+		},
 	}
 	return {
 		type = "group",

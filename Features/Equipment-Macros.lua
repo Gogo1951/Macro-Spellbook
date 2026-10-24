@@ -53,12 +53,12 @@ local function HasUseEffect(slot, link)
 end
 
 --[[
-	A macro that uses whatever is in an equipment slot, so it keeps working when the item is swapped. It has
-	no options menu.
+	A macro that uses whatever is in an equipment slot, so it keeps working when the item is swapped. Its
+	options (a combat check, stop casting, mouseover or self, and the error options) stay with the slot.
 ]]
 local function MakeEquipmentMacro(slot, link, categoryRank)
 	local label = SlotName(slot)
-	return {
+	local macro = {
 		name = link:match("%[(.-)%]") or label,
 		equipment = true,
 		slot = slot,
@@ -70,8 +70,9 @@ local function MakeEquipmentMacro(slot, link, categoryRank)
 		macroName = ("Use " .. SLOTS[slot][2]):sub(1, ns.MACRO_NAME_MAX_LENGTH),
 		macroIcon = ns.ICON_QUESTION_MARK,
 		icon = GetInventoryItemTexture("player", slot) or ns.ICON_QUESTION_MARK,
-		body = "#showtooltip\n/use " .. slot,
 	}
+	macro.body = ns.MacroBody(macro) -- "#showtooltip\n/use 13" with no options on
+	return macro
 end
 
 --[[

@@ -1,6 +1,6 @@
 local _, ns = ...
 
--- [classToken] = { mouseoverEnemy, mouseoverFriend, cursor, raidRank1, channeled, stealth = { spellId }, noToggle = { spellId }, stanceSlots = { stanceSpellId }, stances = { [spellId] = { stanceSpellId } }, petAbilities = { [summonSpellId] = { abilityId, familyId } }, extraSpells = { spellId }, customMacros = { { name or nameKey, icon, body } } }
+-- [classToken] = { mouseoverEnemy, mouseoverFriend, buffs, cursor, channeled, stealth = { spellId }, noToggle = { spellId }, stanceSlots = { stanceSpellId }, stances = { [spellId] = { stanceSpellId } }, petAbilities = { [summonSpellId] = { abilityId, familyId } }, extraSpells = { spellId }, customMacros = { { name or nameKey, icon, body } }, autoShot = spellId }
 ns.CLASS_SPELL_LISTS = {
 	DRUID = {
 		mouseoverEnemy = {
@@ -29,10 +29,13 @@ ns.CLASS_SPELL_LISTS = {
 			{ 21849, 21850 }, -- Gift of the Wild
 			{ 467, 782, 1075, 8914, 9756, 9910 }, -- Thorns
 		},
+		buffs = {
+			{ 1126, 5232, 6756, 5234, 8907, 9884, 9885 }, -- Mark of the Wild
+			{ 467, 782, 1075, 8914, 9756, 9910 }, -- Thorns
+		},
 		cursor = {
 			{ 16914, 17401, 17402 }, -- Hurricane
 		},
-		raidRank1 = {},
 		channeled = {
 			{ 740, 8918, 9862, 9863 }, -- Tranquility
 			{ 16914, 17401, 17402 }, -- Hurricane
@@ -49,6 +52,7 @@ ns.CLASS_SPELL_LISTS = {
 		},
 	},
 	HUNTER = {
+		autoShot = 75, -- Auto Shot
 		mouseoverEnemy = {
 			{ 3044, 14281, 14282, 14283, 14284, 14285, 14286, 14287 }, -- Arcane Shot
 			{ 19434, 20900, 20901, 20902, 20903, 20904 }, -- Aimed Shot
@@ -89,7 +93,6 @@ ns.CLASS_SPELL_LISTS = {
 			{ 1510, 14294, 14295 }, -- Volley
 			1543, -- Flare
 		},
-		raidRank1 = {},
 		channeled = {
 			{ 1510, 14294, 14295 }, -- Volley
 			1002, -- Eyes of the Beast
@@ -117,6 +120,7 @@ ns.CLASS_SPELL_LISTS = {
 		},
 	},
 	MAGE = {
+		autoShot = 5019, -- Shoot
 		mouseoverEnemy = {
 			{ 116, 205, 837, 7322, 8406, 8407, 8408, 10179, 10180, 10181, 25304 }, -- Frostbolt
 			{ 143, 133, 145, 3140, 8400, 8401, 8402, 10148, 10149, 10150, 10151, 25306 }, -- Fireball
@@ -138,11 +142,15 @@ ns.CLASS_SPELL_LISTS = {
 			475, -- Remove Lesser Curse
 			130, -- Slow Fall
 		},
+		buffs = {
+			{ 1459, 1460, 1461, 10156, 10157 }, -- Arcane Intellect
+			{ 1008, 8455, 10169, 10170 }, -- Amplify Magic
+			{ 604, 8450, 8451, 10173, 10174 }, -- Dampen Magic
+		},
 		cursor = {
 			{ 2120, 2121, 8422, 8423, 10215, 10216 }, -- Flamestrike
 			{ 10, 6141, 8427, 10185, 10186, 10187 }, -- Blizzard
 		},
-		raidRank1 = {},
 		channeled = {
 			{ 5143, 5144, 5145, 8416, 8417, 10211, 10212, 25345 }, -- Arcane Missiles
 			{ 10, 6141, 8427, 10185, 10186, 10187 }, -- Blizzard
@@ -207,8 +215,14 @@ ns.CLASS_SPELL_LISTS = {
 			1038, -- Salvation
 			25895, -- Mass Salvation
 		},
+		buffs = {
+			20217, -- Blessing of Kings
+			{ 19742, 19850, 19852, 19853, 19854, 25290 }, -- Blessing of Wisdom
+			{ 19740, 19834, 19835, 19836, 19837, 19838, 25291 }, -- Blessing of Might
+			1038, -- Salvation
+			{ 19977, 19978, 19979 }, -- Blessing of Light
+		},
 		cursor = {},
-		raidRank1 = {},
 		channeled = {},
 		stealth = {},
 		extraSpells = {
@@ -229,6 +243,7 @@ ns.CLASS_SPELL_LISTS = {
 		},
 	},
 	PRIEST = {
+		autoShot = 5019, -- Shoot
 		mouseoverEnemy = {
 			{ 591, 585, 598, 984, 1004, 6060, 10933, 10934 }, -- Smite
 			{ 14914, 15261, 15262, 15263, 15264, 15265, 15266, 15267 }, -- Holy Fire
@@ -292,8 +307,13 @@ ns.CLASS_SPELL_LISTS = {
 			6346, -- Fear Ward
 			10060, -- Power Infusion
 		},
+		buffs = {
+			{ 1243, 1244, 1245, 2791, 10937, 10938 }, -- Power Word: Fortitude
+			{ 14752, 14818, 14819, 27841 }, -- Divine Spirit
+			{ 976, 10957, 10958 }, -- Shadow Protection
+			6346, -- Fear Ward
+		},
 		cursor = {},
-		raidRank1 = {},
 		channeled = {
 			{ 15407, 17311, 17312, 17313, 17314, 18807 }, -- Mind Flay
 			{ 605, 10911, 10912 }, -- Mind Control
@@ -313,7 +333,6 @@ ns.CLASS_SPELL_LISTS = {
 		cursor = {
 			1725, -- Distract
 		},
-		raidRank1 = {},
 		channeled = {},
 		stealth = {
 			{ 1784, 1785, 1786, 1787 }, -- Stealth
@@ -373,10 +392,13 @@ ns.CLASS_SPELL_LISTS = {
 			131, -- Water Breathing
 			546, -- Water Walking
 		},
+		buffs = {
+			131, -- Water Breathing
+			546, -- Water Walking
+		},
 		cursor = {
 			437009, -- Totemic Projection
 		},
-		raidRank1 = {},
 		channeled = {},
 		stealth = {},
 		extraSpells = {
@@ -386,6 +408,7 @@ ns.CLASS_SPELL_LISTS = {
 		},
 	},
 	WARLOCK = {
+		autoShot = 5019, -- Shoot
 		mouseoverEnemy = {
 			{ 695, 686, 705, 1088, 1106, 7641, 11659, 11660, 11661, 25307 }, -- Shadow Bolt
 			{ 348, 707, 1094, 2941, 11665, 11667, 11668, 25309 }, -- Immolate
@@ -418,17 +441,13 @@ ns.CLASS_SPELL_LISTS = {
 			5697, -- Unending Breath
 			{ 132, 2970, 11743 }, -- Detect Invisibility
 		},
+		buffs = {
+			5697, -- Unending Breath
+			{ 132, 2970, 11743 }, -- Detect Invisibility
+		},
 		cursor = {
 			{ 5740, 6219, 11677, 11678 }, -- Rain of Fire
 			1122, -- Inferno
-		},
-		raidRank1 = {
-			18223, -- Curse of Exhaustion
-			1010, -- Curse of Idiocy
-			{ 704, 7658, 7659, 11717 }, -- Curse of Recklessness
-			{ 1714, 11719 }, -- Curse of Tongues
-			{ 702, 1108, 6205, 7646, 11707, 11708 }, -- Curse of Weakness
-			{ 440892, 1311676, 1311677, 1311680 }, -- Curse of the Elements
 		},
 		channeled = {
 			{ 689, 699, 709, 7651, 11699, 11700, 403677, 403685, 403686, 403687, 403688, 403689 }, -- Drain Life
@@ -491,7 +510,6 @@ ns.CLASS_SPELL_LISTS = {
 		},
 		mouseoverFriend = {},
 		cursor = {},
-		raidRank1 = {},
 		channeled = {},
 		stealth = {},
 		stanceSlots = { 2457, 71, 2458 }, -- Battle, Defensive, Berserker Stance

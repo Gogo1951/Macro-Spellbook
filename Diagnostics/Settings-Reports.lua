@@ -90,11 +90,12 @@ function ns:BuildDisplayContextReport()
 	lines[#lines + 1] = string.format("uiScale CVar: %s", tostring(GetCVar("uiScale")))
 	lines[#lines + 1] = ""
 
-	local libSpellBookTabs = LibStub.libs["LibSpellBookTabs-1.0"]
-	if libSpellBookTabs then
-		local tab = libSpellBookTabs.byId and libSpellBookTabs.byId[ADDON_NAME]
+	local spellbookTabs = ns.SpellbookTabs
+	if spellbookTabs then
+		local tab = spellbookTabs.byId[ADDON_NAME]
 		lines[#lines + 1] = FrameLine("PlayerSpellsFrame", PlayerSpellsFrame)
-		lines[#lines + 1] = FrameLine("Spellbook", libSpellBookTabs.book)
+		lines[#lines + 1] = FrameLine("Spellbook", spellbookTabs.book)
+		lines[#lines + 1] = FrameLine("Page root", spellbookTabs.root)
 		lines[#lines + 1] = FrameLine("Tab", tab and tab.button)
 		lines[#lines + 1] = FrameLine("Page", tab and tab.page)
 		PageLines(lines, tab and tab.page)
@@ -167,12 +168,19 @@ end
 
 --[[
     Dumps the single AceDB-managed table (profiles, profileKeys, char, global)
-    so a player can paste their exact configuration: every setting in each
-    profile, and every Protect List and Erase List row in both scopes.
+    so a player can paste their exact configuration: every macro option and
+    custom macro in each profile, the equipment macros' options, and which
+    macros the add-on made, account-wide and per character.
 ]]
 function ns:BuildSavedVariablesReport()
 	local lines = { GetClientHeader(), "", ns.SAVED_VARIABLES_NAME .. " = {" }
 	DumpTable(_G[ns.SAVED_VARIABLES_NAME] or {}, "    ", 1, lines)
 	lines[#lines + 1] = "}"
+	-- MIGRATION (remove after 2026-11-23): the per-character table from before AceDB, until this character's import clears it
+	if type(MacroSpellbookCharDB) == "table" then
+		lines[#lines + 1] = "MacroSpellbookCharDB = {"
+		DumpTable(MacroSpellbookCharDB, "    ", 1, lines)
+		lines[#lines + 1] = "}"
+	end
 	return table.concat(lines, "\n")
 end
