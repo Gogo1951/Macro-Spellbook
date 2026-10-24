@@ -1,37 +1,93 @@
 std = "lua51"
-max_line_length = false
-exclude_files = { ".release/", "libs/LibStub/" }
-
-ignore = {
-	"212/self", -- unused self argument
-	"432/self", -- script handlers shadowing self
+max_line_length = false -- StyLua owns formatting
+ignore = { "212/self", "611", "612", "613", "614", "621" } -- implicit self (house ns: methods) + whitespace, StyLua owns the latter
+exclude_files = { "Includes/", ".claude/" } -- vendored or session-local, never linted
+read_globals = {
+	"BOOKTYPE_SPELL",
+	"C_AddOns",
+	"C_CreatureInfo",
+	"C_EventUtils",
+	"C_Item",
+	"C_QuestLog",
+	"C_Seasons",
+	"C_Spell",
+	"C_SpellBook",
+	"C_Texture",
+	"C_CVar",
+	"C_Timer",
+	"C_TooltipInfo",
+	"C_Trainer",
+	"C_XMLUtil",
+	"Constants",
+	"CreateFrame",
+	"CreateMacro",
+	"EditMacro",
+	"Enum",
+	"ERR_NOT_IN_COMBAT",
+	"GameTooltip",
+	"GetActionInfo",
+	"GetActionText",
+	"GetBuildInfo",
+	"GetCVar",
+	"GetInventoryItemLink",
+	"GetInventoryItemTexture",
+	"GetLocale",
+	"GetMacroIndexByName",
+	"GetMacroInfo",
+	"GetNumMacros",
+	"GetNumShapeshiftForms",
+	"GetNumSpellTabs",
+	"GetNumTrainerServices",
+	"GetPhysicalScreenSize",
+	"GetShapeshiftFormInfo",
+	"GetSpellBookItemInfo",
+	"GetSpellBookItemName",
+	"GetSpellBookItemTexture",
+	"GetSpellTabInfo",
+	"GetTime",
+	"GetTrainerServiceLevelReq",
+	"hooksecurefunc",
+	"InCombatLockdown",
+	"InputUtil",
+	"IsPassiveSpell",
+	"IsPlayerSpell",
+	"IsSpellKnown",
+	"IsTradeskillTrainer",
+	"ITEM_SPELL_TRIGGER_ONUSE",
+	"LibStub",
+	"MAX_ACCOUNT_MACROS",
+	"MAX_CHARACTER_MACROS",
+	"MenuUtil",
+	"PAGE_NUMBER",
+	"PickupMacro",
+	"PlayerSpellsFrame",
+	"PlaySound",
+	"RANK",
+	"SetCVar",
+	"SETTINGS",
+	"Settings",
+	"SOUNDKIT",
+	"SPELL_REQUIRED_FORM",
+	"SpellBookFrame",
+	"SpellBookSkillLineTab1",
+	"tContains",
+	"UIErrorsFrame",
+	"UIParent",
+	"UISpecialFrames",
+	"UnitCanAssist",
+	"UnitClass",
+	"UnitExists",
+	"UnitFactionGroup",
+	"UnitLevel",
+	"UnitRace",
+	"wipe",
+	"WorldFrame",
 }
-
 globals = {
 	"MacroSpellbookDB",
-	"MacroSpellbookCharDB",
-}
-
-read_globals = {
-	-- Lua / WoW utility
-	"tContains", "wipe",
-
-	-- Namespaces
-	"C_Item", "C_Spell", "C_SpellBook", "C_Texture", "C_Timer",
-	"C_TooltipInfo", "C_Trainer", "Enum", "EventRegistry", "EventUtil", "InputUtil", "MenuUtil",
-
-	-- Functions
-	"CreateFrame", "CreateMacro", "EditMacro", "GetActionInfo", "GetActionText",
-	"GetInventoryItemLink", "GetInventoryItemTexture", "GetItemSpell",
-	"GetMacroIndexByName", "GetMacroInfo", "GetNumMacros", "GetNumShapeshiftForms",
-	"GetNumSpellTabs", "GetNumTrainerServices", "GetShapeshiftFormInfo", "GetSpellBookItemInfo",
-	"GetSpellBookItemName", "GetSpellBookItemTexture", "GetSpellTabInfo", "GetSpellTexture",
-	"GetTrainerServiceLevelReq", "InCombatLockdown",
-	"IsHarmfulSpell", "IsPassiveSpell", "IsTradeskillTrainer", "LibStub", "PickupMacro", "PlaySound", "RunNextFrame",
-	"SpellHasRange",
-	"UnitClass", "UnitFactionGroup", "UnitRace",
-
-	-- Frames / objects / constants
-	"GameTooltip", "PlayerSpellsFrame", "UIErrorsFrame", "UIParent", "WorldFrame",
-	"BOOKTYPE_SPELL", "ERR_NOT_IN_COMBAT", "ITEM_SPELL_TRIGGER_ONUSE", "MAX_ACCOUNT_MACROS", "MAX_CHARACTER_MACROS", "SOUNDKIT",
+	"MacroSpellbookMute", -- called by muteErrors macros through /run
+	"MacroSpellbookCharDB", -- MIGRATION (remove after 2026-11-23)
+	"PAGE_NUMBER_WITH_MAX", -- lent to the paging controls template on clients that lack it
+	"SLASH_MACROSPELLBOOK1",
+	SlashCmdList = { fields = { "MACROSPELLBOOK" } },
 }
