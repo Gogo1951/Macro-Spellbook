@@ -179,7 +179,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Padrões das macros"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"As opções com que cada tipo de macro de feitiço começa. O que você definir em uma macro pelo menu do clique direito é mantido. Cada tipo mostra só as opções que seus feitiços oferecem."
+	"As opções com que cada tipo de macro de feitiço começa. Uma macro mantém o que você definir pelo menu do clique direito dela. Cada tipo mostra só as opções que seus feitiços oferecem."
 L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "Lança primeiro em quem estiver sob o mouse e depois no seu alvo."
 L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "Lança em você quando seu alvo não pode receber o feitiço."
 L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
@@ -205,7 +205,7 @@ L["OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION"] = "Lança uma vez e não de nov
 L["OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION"] =
 	"Lança uma vez e não de novo até o combate acabar ou seu alvo mudar."
 L["OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION"] =
-	"Apertar a macro de novo mantém a forma ou o aspecto ativo em vez de desativá-lo."
+	"Mantém a forma ou o aspecto ativo quando você aperta a macro de novo, em vez de desativá-lo."
 L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "Limpa o texto de erro vermelho que a macro deixa na tela."
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Silencia o som de erro enquanto a macro é executada."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
@@ -235,12 +235,13 @@ L["OPTIONS_CUSTOM_ADD"] = "Adicionar macro"
 L["OPTIONS_CUSTOM_ADD_DESCRIPTION"] = "Adiciona uma nova macro personalizada ao fim da lista."
 L["OPTIONS_CUSTOM_NEW_NAME"] = "Nova macro"
 L["OPTIONS_CUSTOM_NAME"] = "Nome"
-L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "O nome da macro, com até %d caracteres."
+L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] =
+	"O nome da macro. O WoW guarda os primeiros %d bytes, o que dá menos letras em idiomas como russo, chinês ou coreano."
 L["OPTIONS_CUSTOM_SECTION"] = "Seção"
 L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
 	"Onde a macro aparece na página: em Personalizadas ou com os feitiços de uma das abas do seu grimório."
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
-	"O texto da macro, com até 255 bytes. Uma primeira linha com #showtooltip e o nome de um feitiço mostra o ícone desse feitiço."
+	"O texto da macro, com até %d bytes. Uma primeira linha com #showtooltip e o nome de um feitiço mostra o ícone desse feitiço."
 L["OPTIONS_CUSTOM_STATUS_NEEDS"] = "Esta macro precisa de um nome e de um texto antes de aparecer na página."
 L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] = "Longa demais: %d / %d bytes. Ela não vai aparecer na página até caber."
 L["OPTIONS_CUSTOM_STATUS_TAKEN"] = "Outra macro da página já tem este nome, então esta não vai aparecer."
@@ -293,4 +294,4 @@ L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =
 L["CHAT_CUSTOM_TOO_LONG"] =
 	'A macro personalizada "%s" tem %d bytes, acima dos %d que cabem em uma macro. Encurte o texto dela para adicioná-la à página.'
 L["CHAT_CUSTOM_NAME_TAKEN"] =
-	'A macro personalizada "%s" tem o mesmo nome (os primeiros %d caracteres) de outra macro da página. Renomeie-a para adicioná-la à página.'
+	'A macro personalizada "%s" tem o mesmo nome (os primeiros %d bytes) de outra macro da página. Renomeie-a para adicioná-la à página.'

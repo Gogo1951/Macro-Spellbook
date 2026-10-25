@@ -180,7 +180,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Predefiniti delle macro"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"Le opzioni con cui parte ogni tipo di macro di incantesimo. Ciò che imposti su una macro dal suo menu del clic destro resta com'è. Ogni tipo elenca solo le opzioni offerte dai suoi incantesimi."
+	"Le opzioni con cui parte ogni tipo di macro di incantesimo. Una macro mantiene ciò che imposti dal suo menu del clic destro. Ogni tipo elenca solo le opzioni offerte dai suoi incantesimi."
 L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "Lancia prima su chi è sotto il mouse, poi sul tuo bersaglio."
 L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] =
 	"Lancia su di te quando il tuo bersaglio non può ricevere l'incantesimo."
@@ -208,7 +208,7 @@ L["OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION"] = "Lancia una volta, poi non pi
 L["OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION"] =
 	"Lancia una volta, poi non più finché il combattimento non finisce o il tuo bersaglio non cambia."
 L["OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION"] =
-	"Premere di nuovo la macro lascia attivi la forma o l'aspetto invece di disattivarli."
+	"Mantiene attivi la forma o l'aspetto quando premi di nuovo la macro, invece di disattivarli."
 L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "Cancella il testo di errore rosso che la macro lascia sullo schermo."
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Silenzia il suono di errore mentre la macro è in esecuzione."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
@@ -238,12 +238,13 @@ L["OPTIONS_CUSTOM_ADD"] = "Aggiungi macro"
 L["OPTIONS_CUSTOM_ADD_DESCRIPTION"] = "Aggiunge una nuova macro personalizzata in fondo all'elenco."
 L["OPTIONS_CUSTOM_NEW_NAME"] = "Nuova macro"
 L["OPTIONS_CUSTOM_NAME"] = "Nome"
-L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "Il nome della macro, fino a %d caratteri."
+L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] =
+	"Il nome della macro. WoW ne tiene i primi %d byte, cioè meno lettere in lingue come russo, cinese o coreano."
 L["OPTIONS_CUSTOM_SECTION"] = "Sezione"
 L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
 	"Dove la macro è elencata nella pagina: sotto Personalizzate, o con gli incantesimi di una delle schede del tuo libro degli incantesimi."
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
-	"Il testo della macro, fino a 255 byte. Una prima riga con #showtooltip e il nome di un incantesimo mostra l'icona di quell'incantesimo."
+	"Il testo della macro, fino a %d byte. Una prima riga con #showtooltip e il nome di un incantesimo mostra l'icona di quell'incantesimo."
 L["OPTIONS_CUSTOM_STATUS_NEEDS"] = "Questa macro ha bisogno di un nome e di un testo prima di apparire nella pagina."
 L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] = "Troppo lunga: %d / %d byte. Non apparirà nella pagina finché non ci sta."
 L["OPTIONS_CUSTOM_STATUS_TAKEN"] = "Un'altra macro della pagina ha già questo nome, quindi questa non apparirà."
@@ -300,4 +301,4 @@ L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =
 L["CHAT_CUSTOM_TOO_LONG"] =
 	'La macro personalizzata "%s" è di %d byte, oltre i %d che una macro può contenere. Accorcia il suo testo per aggiungerla alla pagina.'
 L["CHAT_CUSTOM_NAME_TAKEN"] =
-	'La macro personalizzata "%s" ha lo stesso nome (i primi %d caratteri) di un\'altra macro della pagina. Rinominala per aggiungerla alla pagina.'
+	'La macro personalizzata "%s" ha lo stesso nome (i primi %d byte) di un\'altra macro della pagina. Rinominala per aggiungerla alla pagina.'

@@ -180,7 +180,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Makro-Standards"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"Die Optionen, mit denen jede Art von Zaubermakro beginnt. Was du an einem Makro über sein Rechtsklickmenü einstellst, bleibt erhalten. Jede Art zeigt nur die Optionen, die ihre Zauber bieten."
+	"Die Optionen, mit denen jede Art von Zaubermakro beginnt. Ein Makro behält, was du über sein Rechtsklickmenü einstellst. Jede Art zeigt nur die Optionen, die ihre Zauber bieten."
 L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "Wirkt zuerst auf den, der unter deiner Maus ist, dann auf dein Ziel."
 L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "Wirkt auf dich, wenn dein Ziel den Zauber nicht erhalten kann."
 L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
@@ -208,7 +208,7 @@ L["OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION"] = "Wirkt einmal und dann erst w
 L["OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION"] =
 	"Wirkt einmal und dann erst wieder, wenn der Kampf endet oder dein Ziel wechselt."
 L["OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION"] =
-	"Erneutes Drücken des Makros lässt die Gestalt oder den Aspekt an, statt sie auszuschalten."
+	"Lässt Gestalt oder Aspekt an, wenn du das Makro erneut drückst, statt sie auszuschalten."
 L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] =
 	"Entfernt den roten Fehlertext, den das Makro auf dem Bildschirm hinterlässt."
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Schaltet das Fehlergeräusch stumm, während das Makro läuft."
@@ -239,12 +239,13 @@ L["OPTIONS_CUSTOM_ADD"] = "Makro hinzufügen"
 L["OPTIONS_CUSTOM_ADD_DESCRIPTION"] = "Fügt am Ende der Liste ein neues eigenes Makro hinzu."
 L["OPTIONS_CUSTOM_NEW_NAME"] = "Neues Makro"
 L["OPTIONS_CUSTOM_NAME"] = "Name"
-L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "Der Name des Makros, bis zu %d Zeichen."
+L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] =
+	"Der Name des Makros. WoW behält die ersten %d Bytes, das sind in Sprachen wie Russisch, Chinesisch oder Koreanisch weniger Buchstaben."
 L["OPTIONS_CUSTOM_SECTION"] = "Abschnitt"
 L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
 	"Wo das Makro auf der Seite aufgelistet wird: unter Eigene oder bei den Zaubern eines Reiters deines Zauberbuchs."
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
-	"Der Text des Makros, bis zu 255 Bytes. Eine erste Zeile mit #showtooltip und einem Zaubernamen zeigt das Symbol dieses Zaubers."
+	"Der Text des Makros, bis zu %d Bytes. Eine erste Zeile mit #showtooltip und einem Zaubernamen zeigt das Symbol dieses Zaubers."
 L["OPTIONS_CUSTOM_STATUS_NEEDS"] =
 	"Dieses Makro braucht einen Namen und einen Makrotext, bevor es auf der Seite erscheint."
 L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] = "Zu lang: %d / %d Bytes. Es erscheint erst auf der Seite, wenn es hineinpasst."
@@ -299,4 +300,4 @@ L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =
 L["CHAT_CUSTOM_TOO_LONG"] =
 	'Das eigene Makro "%s" ist %d Bytes lang, mehr als die %d, die ein Makro fasst. Kürze seinen Text, um es zur Seite hinzuzufügen.'
 L["CHAT_CUSTOM_NAME_TAKEN"] =
-	'Das eigene Makro "%s" hat denselben Namen (die ersten %d Zeichen) wie ein anderes Makro auf der Seite. Benenne es um, um es zur Seite hinzuzufügen.'
+	'Das eigene Makro "%s" hat denselben Namen (die ersten %d Bytes) wie ein anderes Makro auf der Seite. Benenne es um, um es zur Seite hinzuzufügen.'

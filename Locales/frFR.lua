@@ -179,7 +179,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Réglages par défaut des macros"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"Les options avec lesquelles commence chaque type de macro de sort. Ce que vous réglez sur une macro depuis son menu clic droit est conservé. Chaque type n'affiche que les options que ses sorts proposent."
+	"Les options avec lesquelles commence chaque type de macro de sort. Une macro conserve ce que vous réglez depuis son menu clic droit. Chaque type n'affiche que les options que ses sorts proposent."
 L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "Lance d'abord sur celui qui est sous votre souris, puis sur votre cible."
 L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "Lance sur vous quand votre cible ne peut pas recevoir le sort."
 L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
@@ -206,7 +206,7 @@ L["OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION"] = "Lance une fois, puis plus av
 L["OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION"] =
 	"Lance une fois, puis plus avant la fin du combat ou un changement de cible."
 L["OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION"] =
-	"Appuyer de nouveau sur la macro garde la forme ou l'aspect actif au lieu de le désactiver."
+	"Garde la forme ou l'aspect actif quand vous appuyez de nouveau sur la macro, au lieu de le désactiver."
 L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "Efface le texte d'erreur rouge que la macro laisse à l'écran."
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Coupe le son d'erreur pendant que la macro s'exécute."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
@@ -236,12 +236,13 @@ L["OPTIONS_CUSTOM_ADD"] = "Ajouter une macro"
 L["OPTIONS_CUSTOM_ADD_DESCRIPTION"] = "Ajoute une nouvelle macro personnalisée à la fin de la liste."
 L["OPTIONS_CUSTOM_NEW_NAME"] = "Nouvelle macro"
 L["OPTIONS_CUSTOM_NAME"] = "Nom"
-L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "Le nom de la macro, jusqu'à %d caractères."
+L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] =
+	"Le nom de la macro. WoW en garde les %d premiers octets, soit moins de lettres dans des langues comme le russe, le chinois ou le coréen."
 L["OPTIONS_CUSTOM_SECTION"] = "Rubrique"
 L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
 	"Où la macro est listée sur la page : sous Personnalisées, ou avec les sorts de l'un des onglets de votre grimoire."
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
-	"Le texte de la macro, jusqu'à 255 octets. Une première ligne avec #showtooltip et un nom de sort affiche l'icône de ce sort."
+	"Le texte de la macro, jusqu'à %d octets. Une première ligne avec #showtooltip et un nom de sort affiche l'icône de ce sort."
 L["OPTIONS_CUSTOM_STATUS_NEEDS"] = "Cette macro a besoin d'un nom et d'un texte avant d'apparaître sur la page."
 L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] =
 	"Trop longue : %d / %d octets. Elle n'apparaîtra pas sur la page tant qu'elle ne tiendra pas."
@@ -299,4 +300,4 @@ L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =
 L["CHAT_CUSTOM_TOO_LONG"] =
 	"La macro personnalisée \"%s\" fait %d octets, au-delà des %d qu'une macro peut contenir. Raccourcissez son texte pour l'ajouter à la page."
 L["CHAT_CUSTOM_NAME_TAKEN"] =
-	'La macro personnalisée "%s" partage son nom (les %d premiers caractères) avec une autre macro de la page. Renommez-la pour l\'ajouter à la page.'
+	'La macro personnalisée "%s" partage son nom (les %d premiers octets) avec une autre macro de la page. Renommez-la pour l\'ajouter à la page.'

@@ -180,7 +180,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "매크로 기본값"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"각 종류의 주문 매크로가 처음 가지는 옵션입니다. 매크로의 오른쪽 클릭 메뉴에서 직접 설정한 값은 그대로 유지됩니다. 각 종류에는 해당 주문이 제공하는 옵션만 표시됩니다."
+	"각 종류의 주문 매크로가 처음 가지는 옵션입니다. 매크로의 오른쪽 클릭 메뉴에서 설정한 값은 그 매크로에 그대로 유지됩니다. 각 종류에는 해당 주문이 제공하는 옵션만 표시됩니다."
 L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] =
 	"마우스 아래에 있는 대상에게 먼저 시전하고, 없으면 현재 대상에게 시전합니다."
 L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "대상이 주문을 받을 수 없으면 자신에게 시전합니다."
@@ -211,7 +211,7 @@ L["OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION"] =
 L["OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION"] =
 	"한 번 시전한 뒤에는 전투가 끝나거나 대상이 바뀔 때까지 다시 시전하지 않습니다."
 L["OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION"] =
-	"매크로를 다시 눌러도 변신이나 상이 꺼지지 않고 유지됩니다."
+	"매크로를 다시 눌러도 변신이나 상을 끄지 않고 계속 유지합니다."
 L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "매크로가 화면에 남기는 빨간 오류 문구를 지웁니다."
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "매크로가 실행되는 동안 오류 소리를 끕니다."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
@@ -241,12 +241,13 @@ L["OPTIONS_CUSTOM_ADD"] = "매크로 추가"
 L["OPTIONS_CUSTOM_ADD_DESCRIPTION"] = "목록 끝에 새 사용자 지정 매크로를 추가합니다."
 L["OPTIONS_CUSTOM_NEW_NAME"] = "새 매크로"
 L["OPTIONS_CUSTOM_NAME"] = "이름"
-L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "매크로 이름, 최대 %d자."
+L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] =
+	"매크로 이름. WoW는 앞의 %d바이트만 남기므로, 러시아어, 중국어, 한국어 같은 언어에서는 들어가는 글자 수가 더 적습니다."
 L["OPTIONS_CUSTOM_SECTION"] = "항목"
 L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
 	"페이지에서 매크로가 표시될 위치입니다. 사용자 지정 항목이나 마법책 탭 중 하나의 주문과 함께 표시됩니다."
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
-	"매크로 내용, 최대 255바이트. 첫 줄에 #showtooltip과 주문 이름을 쓰면 그 주문의 아이콘이 표시됩니다."
+	"매크로 내용, 최대 %d바이트. 첫 줄에 #showtooltip과 주문 이름을 쓰면 그 주문의 아이콘이 표시됩니다."
 L["OPTIONS_CUSTOM_STATUS_NEEDS"] =
 	"이 매크로가 페이지에 표시되려면 이름과 매크로 내용이 필요합니다."
 L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] =
@@ -305,4 +306,4 @@ L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =
 L["CHAT_CUSTOM_TOO_LONG"] =
 	'사용자 지정 매크로 "%s"은(는) %d바이트라서 매크로 최대 길이인 %d바이트를 넘습니다. 페이지에 추가하려면 내용을 줄이세요.'
 L["CHAT_CUSTOM_NAME_TAKEN"] =
-	'사용자 지정 매크로 "%s"의 이름(앞 %d자)이 페이지의 다른 매크로와 같습니다. 페이지에 추가하려면 이름을 바꾸세요.'
+	'사용자 지정 매크로 "%s"의 이름(앞 %d바이트)이 페이지의 다른 매크로와 같습니다. 페이지에 추가하려면 이름을 바꾸세요.'

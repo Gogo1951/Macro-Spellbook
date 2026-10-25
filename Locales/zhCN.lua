@@ -174,7 +174,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "宏默认设置"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"每种法术宏一开始使用的选项。你在宏的右键菜单中自行设置的内容会保留。每种类型只列出其法术提供的选项。"
+	"每种法术宏一开始使用的选项。宏会保留你在其右键菜单中设置的内容。每种类型只列出其法术提供的选项。"
 L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "先对鼠标指向的单位施放，其次是你的目标。"
 L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "你的目标无法接受该法术时，对你自己施放。"
 L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
@@ -197,7 +197,7 @@ L["OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION"] = "施放一次，直到你的�
 L["OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION"] =
 	"施放一次，直到战斗结束或你的目标改变前不再施放。"
 L["OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION"] =
-	"再次按下宏时会保持形态或守护开启，而不会将其关闭。"
+	"再次按下宏时保持形态或守护开启，而不是将其关闭。"
 L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "清除宏在屏幕上留下的红色错误文字。"
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "宏运行期间关闭错误音效。"
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
@@ -227,12 +227,13 @@ L["OPTIONS_CUSTOM_ADD"] = "添加宏"
 L["OPTIONS_CUSTOM_ADD_DESCRIPTION"] = "在列表末尾添加一个新的自定义宏。"
 L["OPTIONS_CUSTOM_NEW_NAME"] = "新宏"
 L["OPTIONS_CUSTOM_NAME"] = "名称"
-L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "宏的名称，最多 %d 个字符。"
+L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] =
+	"宏的名称。WoW 只保留前 %d 个字节，在俄语、中文或韩语等语言中能容纳的字数更少。"
 L["OPTIONS_CUSTOM_SECTION"] = "分类"
 L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
 	"宏在页面上列出的位置：自定义分类下，或与法术书某个标签页的法术放在一起。"
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
-	"宏的文本，最多 255 字节。第一行写 #showtooltip 加法术名称，即可显示该法术的图标。"
+	"宏的文本，最多 %d 字节。第一行写 #showtooltip 加法术名称，即可显示该法术的图标。"
 L["OPTIONS_CUSTOM_STATUS_NEEDS"] = "这个宏需要名称和宏文本才能显示在页面上。"
 L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] = "过长：%d / %d 字节。长度合适之前不会显示在页面上。"
 L["OPTIONS_CUSTOM_STATUS_TAKEN"] = "页面上已有其他宏使用这个名称，因此这个宏不会显示。"
@@ -284,4 +285,4 @@ L["CHAT_CUSTOM_NEEDS_NAME_BODY"] = "自定义宏 #%d 需要名称和宏文本才
 L["CHAT_CUSTOM_TOO_LONG"] =
 	'自定义宏"%s"为 %d 字节，超过了宏能容纳的 %d 字节。缩短它的文本即可将它加入页面。'
 L["CHAT_CUSTOM_NAME_TAKEN"] =
-	'自定义宏"%s"的名称（前 %d 个字符）与页面上的另一个宏相同。重命名它即可将它加入页面。'
+	'自定义宏"%s"的名称（前 %d 个字节）与页面上的另一个宏相同。重命名它即可将它加入页面。'

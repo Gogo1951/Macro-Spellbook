@@ -6,13 +6,13 @@ Macro Spellbook adds a tab to your spellbook that turns your class's spells into
 
 ## What's New
 
-1. Right-click a macro on the page and try each group: Combat Check, Spell Rank, Targeting, Before Casting, Add Attack, Casting Rules and Error Messages.
-2. Cast a buff macro on a low-level friend; it should pick a rank they can take.
+1. Right-click a macro on the page and try each group: Combat Check, Spell Rank, Targeting, Before Casting, Add Attack, Casting Rules, Error Messages and Use Items First.
+2. Set a buff's Spell Rank to Dynamic Rank, then target or mouse over a low-level friend; it should pick a rank they can take.
 3. Tick Right-Click For on a buff like Power Word: Fortitude or Arcane Intellect, then right-click it on your bar to cast the group buff.
 4. Duplicate a macro from its right-click menu, give the copy different options, then use Remove This Copy.
 5. Pick Use These Options For All from a macro's right-click menu; Macro Defaults should open showing them.
-6. Type /msb, add a macro under Custom Macros, and check it shows on the page under Custom.
-7. Use Set Key in the options to bind a key, then use it to open and close Macro Spellbook.
+6. Type /msb, add a macro under Custom Macros, and check it shows on the page under Custom, or tells you why not.
+7. Use Set Key in the options to bind Toggle Macro Spellbook, then use the key to open and close the page.
 8. In the page's settings menu, use Mark All Spells As Placed, then Clear Placed Marks; the glow should go away and come back.
 9. If you play in a language other than English, check the page and its menus read in your language.
 

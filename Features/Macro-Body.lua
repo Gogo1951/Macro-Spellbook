@@ -166,13 +166,15 @@ end
 	yet takes its slot from the class lists' stanceSlots, the order they are learned in.
 ]]
 local function StanceSlot(stance)
+	local c = ns.ClassConfig()
+	local stanceId = c.stanceIds[stance]
 	for i = 1, GetNumShapeshiftForms() do
 		local spellID = select(4, GetShapeshiftFormInfo(i))
-		if spellID and C_Spell.GetSpellName(spellID) == stance then
+		if spellID and spellID == stanceId then
 			return i
 		end
 	end
-	return ns.ClassConfig().stanceSlots[stance]
+	return c.stanceSlots[stance]
 end
 
 --[[
