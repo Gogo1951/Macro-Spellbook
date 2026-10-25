@@ -146,6 +146,9 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	Global("GetSpellBookItemTexture"),
 	Global("IsPassiveSpell"),
 	Global("BOOKTYPE_SPELL"),
+	-- MoP Classic's Call Pet flyout, which the Classic-engine read lists as one macro.
+	Global("GetFlyoutInfo"),
+	Global("GetFlyoutSlotInfo"),
 
 	-- Every spell the page names, sorts or builds a macro for.
 	Method("C_Spell", "GetSpellName"),
@@ -198,6 +201,9 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	Global("GetActionInfo"),
 	Global("GetActionText"),
 	Global("InCombatLockdown"),
+	-- The in-combat and slots-full errors, and the Hide Errors option's /run line.
+	Method("UIErrorsFrame", "AddMessage"),
+	Method("UIErrorsFrame", "Clear"),
 	-- The Mute Errors option's sound settings.
 	Method("C_CVar", "GetCVar"),
 	Method("C_CVar", "SetCVar"),
@@ -240,6 +246,14 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	Method("C_XMLUtil", "GetTemplateInfo"),
 	Method("C_Texture", "GetAtlasInfo"),
 	Method("MenuUtil", "CreateContextMenu"),
+	-- An open menu holds the button's tooltip back, and a radio keeps the menu open by answering Refresh.
+	Method("Menu", "GetManager", "Menu.GetManager (guarded)"),
+	{
+		"MenuResponse.Refresh",
+		function()
+			return type(MenuResponse) == "table" and MenuResponse.Refresh ~= nil
+		end,
+	},
 
 	Method("Settings", "OpenToCategory"),
 	--[[
@@ -591,6 +605,59 @@ local function SpellbookLines(lines)
 	end
 end
 
+--[[
+	The Call Pet flyout (flyout 9, as Features/Utilities.lua names it), which the Classic-engine read lists as
+	one macro under its book name, cast as the first of its spells the player knows, and leaves its spells
+	out; with none known, the flyout is left out too. MoP Classic's book holds it; Era and TBC have none.
+]]
+local CALL_PET_FLYOUT = 9
+
+local function CallPetFlyoutLines(lines)
+	if ns.SpellbookTabs or type(GetFlyoutInfo) ~= "function" then
+		return
+	end
+	local found = false
+	for line = 1, GetNumSpellTabs() do
+		local _, _, offset, numSlots = GetSpellTabInfo(line)
+		for slot = offset + 1, offset + numSlots do
+			local itemType, id = GetSpellBookItemInfo(slot, BOOKTYPE_SPELL)
+			if itemType == "FLYOUT" and id == CALL_PET_FLYOUT then
+				found = true
+			end
+		end
+	end
+	if not found then
+		lines[#lines + 1] = "Call Pet flyout: not in the book"
+		return
+	end
+	local _, _, numSlots, isKnown = GetFlyoutInfo(CALL_PET_FLYOUT)
+	local members, memberIds = {}, {}
+	for flyoutSlot = 1, numSlots or 0 do
+		local spellId, _, slotKnown = GetFlyoutSlotInfo(CALL_PET_FLYOUT, flyoutSlot)
+		if spellId then
+			memberIds[spellId] = true
+		end
+		members[#members + 1] = string.format(
+			"%s %s known %s",
+			tostring(spellId),
+			tostring(spellId and C_Spell.GetSpellName(spellId) or "NIL"),
+			YesNo(slotKnown)
+		)
+	end
+	lines[#lines + 1] = string.format(
+		"Call Pet flyout: in the book, flyout known %s, %s slots%s",
+		YesNo(isKnown),
+		tostring(numSlots),
+		#members > 0 and (" (" .. table.concat(members, "; ") .. ")") or ""
+	)
+	-- the macro the page last built for it, as the page writes it
+	for _, macro in ipairs(ns.macros or {}) do
+		if memberIds[macro.spellID] and not macro.focus and not macro.copy then
+			lines[#lines + 1] = string.format("  page macro %s: %s", Shown(macro.macroName), Shown(macro.body))
+		end
+	end
+end
+
 local function PageListLines(lines)
 	local byCategory, order = {}, {}
 	local kinds = { custom = 0, equipment = 0, unlearned = 0, focus = 0, copy = 0 }
@@ -655,9 +722,9 @@ end
 	and page exist and what shuts the Retail-engine page, how much of the class lists this client could name
 	(an ID it can't name never matches, so that spell loses its options), the spells, stance bar forms and
 	class and flavor gates the options depend on, the group versions on offer, what the spellbook holds by
-	skill line, every page setting and which class options apply, the unlearned-spells sources, the options
-	panel and key binding routes, and what the page last listed, with the rank choices it offers.
-	Existence/value reads only.
+	skill line and in its Call Pet flyout, every page setting and which class options apply, the
+	unlearned-spells sources, the options panel and key binding routes, and what the page last listed, with
+	the rank choices it offers. Existence/value reads only.
 ]]
 function ns:BuildPageContextReport()
 	local lines = { ns.GetDiagnosticClientHeader(), "" }
@@ -685,6 +752,7 @@ function ns:BuildPageContextReport()
 	ClassGateLines(lines)
 	GroupVersionLines(lines)
 	SpellbookLines(lines)
+	CallPetFlyoutLines(lines)
 
 	lines[#lines + 1] = ""
 	local profile = ns.db and ns.db.profile
@@ -721,10 +789,15 @@ function ns:BuildPageContextReport()
 		for _, key in ipairs(PER_SPELL_OPTIONS) do
 			counts[#counts + 1] = key .. "=" .. CountKeys(profile[key])
 		end
+		local copies = 0
+		for _, numbers in pairs(profile.macroCopies) do
+			copies = copies + #numbers
+		end
 		lines[#lines + 1] = "Per-spell settings saved: "
 			.. table.concat(counts, ", ")
 			.. "; equipment macros with options (account-wide) "
 			.. CountKeys(ns.db.global.equipmentOptions)
+			.. string.format("; Duplicate copies %d, of %d spells", copies, CountKeys(profile.macroCopies))
 		lines[#lines + 1] = string.format(
 			"Unlearned sources: bundled trainer rows %d (%d for your faction and race), recorded by this character %d, class list extra spells %d",
 			#((ns.TRAINER_SPELLS or {})[PlayerClass()] or {}),

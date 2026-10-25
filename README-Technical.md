@@ -30,7 +30,7 @@ Macro-Spellbook/
 │   ├── Default-Settings.lua               The AceDB defaults, ns.DATABASE_DEFAULTS
 │   ├── LICENSE-Trainer-Data               MIT notice that travels with the trainer tables
 │   ├── Vanilla/
-│   │   ├── Class-Spell-Lists-Vanilla.lua  Per class: which spells get which options, default custom macros
+│   │   ├── Class-Spell-Lists-Vanilla.lua  Per class: option lists, pets, stances, extra spells, default custom macros
 │   │   ├── Group-Versions-Vanilla.lua     Single-target spell to its group version
 │   │   └── Trainer-Spells-Vanilla.lua     Every class trainer rank, by level
 │   ├── Discovery/                         Same three tables; paired with Vanilla/ in the Vanilla TOC
@@ -44,24 +44,26 @@ Macro-Spellbook/
 │   ├── Manifests.lua                      This add-on's manifests and the Page Context and Macro Context probes
 │   ├── Event-Log.lua
 │   ├── Code-Reports.lua
-│   ├── Settings-Reports.lua               Display Context: screen scale and the Retail-engine tab and page frames
+│   ├── Settings-Reports.lua               Display Context: screen scale and where the book, tab and page sit
 │   ├── Validate-Data.lua
-│   ├── Localization-Reports.lua           Message Length: every page macro with every option on
+│   ├── Localization-Reports.lua           Message Length: every page macro with every offered option on
 │   ├── Report-Runner.lua
 │   └── Options-Diagnostics.lua
 ├── Features/
 │   ├── Core.lua                           Version, AceDB init at PLAYER_LOGIN, ns:ApplyProfile, the event dispatcher
 │   ├── Utilities.lua                      Colors, UTF-8-safe name trim, the spellbook walk, tooltip and trainer readers
 │   ├── Announcements.lua                  Chat prints: ns:PrintMessage and ns.WarnOnce
-│   ├── Migrations.lua                     MIGRATION (remove after 2026-11-23): pre-AceDB settings, Spammable, Buffs
-│   ├── Macro-Options.lua                  Which options a macro offers and has on, kind defaults, Duplicate copies
+│   ├── Migrations.lua                     MIGRATION (remove after 2026-11-23): pre-AceDB settings, Spammable, Buffs kind
+│   ├── Macro-Options.lua                  Which options a macro offers and has on, kind defaults, combat check, rank
+│   ├── Macro-Copies.lua                   Duplicate copies: numbering, copied settings, removal
 │   ├── Macro-Body.lua                     Option state to macro text, the tag line, MacroSpellbookMute
 │   ├── Custom-Macros.lua                  The player's custom macros: seeding, templates, problems
 │   ├── Equipment-Macros.lua               One /use macro per equipped on-use slot
-│   ├── Macro-Builder.lua                  Builds ns.macros from the spellbook and class lists; Dynamic Rank rewrites
+│   ├── Macro-Builder.lua                  Builds ns.macros from the spellbook and class lists: ranks, focus copies, order
 │   ├── Unlearned-Spells.lua               Show Unlearned Spells source; Vanilla, TBC and Camelot TOCs only
 │   ├── Trainer-Recording.lua              Records class trainer services; same TOCs as above
 │   ├── Macro-Sync.lua                     Finds, creates and rewrites the WoW macros; scans the action bars
+│   ├── Dynamic-Rank.lua                   Rewrites Dynamic Rank macros as the target and mouseover change
 │   ├── Macro-Menu.lua                     A macro's right-click options menu and its live preview
 │   ├── Spellbook-Paging.lua               The page arrows, built by hand
 │   ├── Macro-Button.lua                   One macro's cell: icon, note, glow, tooltip, click and drag
@@ -93,7 +95,7 @@ Macro-Spellbook/
 └── README-Testing.md
 ```
 
-**Gone on purpose; don't bring them back.** `Includes/Libraries/LibSpellBookTabs-1.0/` was replaced by `Features/Spellbook-Tabs.lua`, which is the add-on's own module on `ns.SpellbookTabs`, not a LibStub library: it has no packager external, and CI fails any `Includes/Libraries/` folder without one. `.github/workflows/lint.yml` and `release.yml` were replaced by Common-Core's `ci.yml` and `package.yml` callers. There is no shared `Data/Group-Versions.lua`; every flavor carries its own `Group-Versions-{Game}.lua`.
+**Gone on purpose; don't bring them back.** `Includes/Libraries/LibSpellBookTabs-1.0/` was replaced by `Features/Spellbook-Tabs.lua`, the add-on's own module on `ns.SpellbookTabs`, not a LibStub library: it has no packager external, and CI fails any `Includes/Libraries/` folder without one. `.github/workflows/lint.yml` and `release.yml` were replaced by the Common-Core `ci.yml` and `package.yml` callers. The unsuffixed `MacroSpellbook.toc` and the old `src/` tree are gone too: every flavor has its own TOC, and the code lives under `Data/`, `Features/` and `Options/`.
 
 **Flavor split.** The Classic engine (Vanilla, TBC, Mists) loads `Spellbook-Host-Classic.lua`; the Retail engine (Camelot, Mainline) loads `Spellbook-Tabs.lua` and `Spellbook-Host-Modern.lua` instead. `Unlearned-Spells.lua` and `Trainer-Recording.lua` load only on Vanilla, TBC and Camelot, where class trainers teach the ranks the bundled trainer data lists. Otherwise the five TOCs match line for line apart from `## Interface`, `## X-Flavor` and their data folder.
 
@@ -128,20 +130,20 @@ Every "once per burst" is the same pattern: a pending flag plus `C_Timer.After(0
 
 - **Refuses outright and says why.** `ns:OpenOptionsPanel` prints `CHAT_OPTIONS_IN_COMBAT` and returns; it never queues. `ns:OpenKeyBindings` prints `CHAT_KEY_BINDINGS_IN_COMBAT`. `ns.PickupMacro` (a click or drag on a cell) puts the client's own `ERR_NOT_IN_COMBAT` in red on `UIErrorsFrame`.
 - **Defers and replays.** Every write path checks first. A menu change (`ns.ToggleOption`, `ns.SetCombatCheck`, `ns.SetAbilityRank`, `ns.ToggleUseSlot`) recomputes `macro.body` in memory, so the cell, tooltip and preview show the new text at once, then calls `ns.QueueMacroSync` instead of `ns.SyncMacro`. `ns.SyncAllMacros` does the same, which covers a page refresh and `ns:RefreshMacros` (an options-panel change, a profile switch, reset or copy). `ns:OnPlayerRegenEnabled` replays the queued sync once through `ns:RefreshMacros`.
-- **Dynamic Rank rewrites** run out of combat only (`RanksRewritable`). `PLAYER_REGEN_DISABLED` rewrites them all one last time, so combat starts on the highest rank wherever no low-level unit is targeted or moused over. In combat a macro keeps the ranks it last had.
+- **Dynamic Rank rewrites** run out of combat only (`RanksRewritable`, `Features/Dynamic-Rank.lua`). `PLAYER_REGEN_DISABLED` rewrites them all one last time, so combat starts on the highest rank wherever no low-level unit is targeted or moused over. In combat a macro keeps the ranks it last had.
 - **Not guarded.** The Classic host's window (`MacroSpellbookFrame`) is an ordinary frame on `UIParent`, and the Retail page's frames are parented to `UIParent` too, so opening, closing and drawing the page need no combat check.
 
 ### Read → Build → Write → Draw
 
 The page is rebuilt from scratch every time it is shown (`ns.RefreshSpellbookPage`, the page's `OnShow`) and after any change that touches its list.
 
-1. **Read** (`Features/Utilities.lua`). `ns.ForEachClassSpell` walks every learned, castable, non-passive spell in skill line order, General included, and is chosen once at load. The Retail engine reads `C_SpellBook` skill lines, skipping hidden and off-spec lines and off-spec items; the Classic engine reads the spell tab globals. The name is always the spell's own by ID (`CastName`), because the book shows some spells under a name `/cast` can't use, such as Call Pet as "Call" plus the pet's name. On Classic Era outside Season of Discovery, IDs of 300000 and up are skipped: the client shares its book with SoD and can list rune abilities Era can't cast. On MoP Classic the Call Pet flyout (flyout 9) becomes one macro under its book name, casting its first known spell, and the flyout's own spells are left out.
+1. **Read** (`Features/Utilities.lua`). `ns.ForEachClassSpell` walks every learned, castable, non-passive spell in skill line order, General included, and is chosen once at load by whether `C_SpellBook.GetNumSpellBookSkillLines` exists. The Retail engine reads `C_SpellBook` skill lines, skipping hidden and off-spec lines and off-spec items; the Classic engine reads the spell tab globals. The name is always the spell's own by ID (`CastName`), because the book shows some spells under a name `/cast` can't use, such as Call Pet as "Call" plus the pet's name. On Classic Era outside Season of Discovery, IDs of 300000 and up are skipped: the client shares its book with SoD and can list rune abilities Era can't cast. On MoP Classic the Call Pet flyout (flyout 9) becomes one macro under its book name, using its first known spell for the icon and tooltip, and the flyout's own spells are left out.
 2. **Resolve** (`ResolveClassConfig`, `Features/Macro-Builder.lua`). The player's class entry in `ns.CLASS_SPELL_LISTS` is turned from spell IDs into this client's names: enemy, friend, buff, cursor, stealth and toggle sets, pet abilities with their creature family names, stances and stance slots, group versions, the ranged attack. The stance bar's forms are marked as never glowing and, except Warrior stances and stealth, as toggles.
-3. **Build** (`ns.CollectMacros`). `ReadSpellbook` collects each spell's ranks with their learn levels. Then one macro table per learned spell (`MakeMacro`), its focus copy when Focus is on, its Duplicate copies, then the custom macros, the equipment macros and, with Show Unlearned Spells, the unlearned spells. Each table carries its capabilities (`target`, `buff`, `cursor`, `stances`, `ranks`, `petAbility`, ...), its `kind` (`ns.MacroKind`) and its `body` from `ns.MacroBody`. The list is then sorted (Page Sections and Order, below).
+3. **Build** (`ns.CollectMacros`). `ReadSpellbook` collects each spell's ranks with their learn levels. Then one macro table per learned spell (`MakeMacro`), its focus copy when Focus is on, its Duplicate copies, then the custom macros, the equipment macros and, with Show Unlearned Spells, the unlearned spells. Each table carries its capabilities (`target`, `buff`, `cursor`, `stances`, `ranks`, `petAbility`, ...), its `kind` (`ns.MacroKind`) and its `body` from `ns.MacroBody`. The list is then sorted (Page Sections and Order, below). A build also marks the Dynamic Rank bodies stale, so the next rank rewrite writes every one.
 4. **Write** (`ns.SyncAllMacros`, `Features/Macro-Sync.lua`). Every page macro that already has a WoW macro gets `EditMacro` only when the stored body differs from the page's and fits in 255 bytes. Nothing is created here: creation waits for the player's first click or drag.
 5. **Draw** (`Layout`, `Features/Spellbook-Page.lua`). `Paginate` flows the sorted list into page halves; each visible cell is a pooled button pointed at its macro by `ns.SetMacroButton` (`Features/Macro-Button.lua`), which also works out its block reason, glow and note.
 
-A change made away from the page (options panel, profile change) goes through `ns:RefreshMacros`: refresh the open page if there is one, otherwise run steps 1 to 4 without drawing.
+A change made away from the page (options panel, profile change) goes through `ns:RefreshMacros`: refresh the open page if there is one, otherwise run steps 1 to 4 without drawing. Callers that need the list with no page open (`ns.MacrosOfKind`, `ns.CustomMacroTakenNames`, the Custom Macros section picker, the Dynamic Rank rewrite) build it first when `ns.macros` is empty.
 
 ### Spell and Item Data Caching
 
@@ -156,16 +158,16 @@ Every spell macro has a kind (`ns.MacroKind`, `Features/Macro-Options.lua`), dec
 
 Each kind has its own defaults, `ns.db.profile.kindDefaults[kind]`, for the options in `ns.DEFAULTABLE_OPTIONS`. A macro's own setting is stored only where it differs from its kind's default (`SetOption` writes `nil` otherwise), so changing a default moves every macro that never overrode it. `ns.SetKindDefault` stores `true` or `false`, never `nil`, so turning off a default the add-on ships on (Buffs start on Dynamic Rank) sticks against AceDB's defaults.
 
-The Macro Defaults panel (`Options/Options-Macro-Defaults.lua`) shows a box per kind the class has spells of, naming the first six, then the combat check and the options under the menu's group captions, hiding any option none of that kind's spells offers. A macro menu's **Use For <Kind>** entry reads every offered option's current value first, then writes them all as the kind's defaults and clears the macro's own settings, since changing a default moves everything that follows it.
+The Macro Defaults panel (`Options/Options-Macro-Defaults.lua`) shows a box per kind the class has spells of, naming the first six, then the combat check as a dropdown and the options under the menu's group captions, hiding any option none of that kind's spells offers and any caption left empty. A macro menu's **Use These Options For All <Kind>** entry reads every offered option's current value first, then writes them all as the kind's defaults and clears the macro's own settings, since changing a default moves everything that follows it. It then opens the Macro Defaults panel, closing the Classic window first.
 
 What a macro offers is `ns.OffersOption`: the `OFFERED` predicates, and for a key not listed there, any spell with a target. Highlights:
 
 - Start Pet Attack: every enemy spell, whatever the class (a Shadowfiend or a mind-controlled enemy counts).
 - Stop Casting: every spell and equipment macro. Start Auto Attack: every spell but a stealth spell's.
 - Focus: any spell with a target, except on the Vanilla TOC (the Classic Era client has no focus) and on a Duplicate copy.
-- Start Auto Shot or Start Wand: a ranged enemy spell, when the class lists carry an `autoShot` spell. Mists carries none, since Auto Shot is automatic and wands are gone there.
+- Start Auto Shot or Start Wand: a ranged enemy spell other than the ranged attack itself, when the class lists carry an `autoShot` spell. Mists carries none, since Auto Shot is automatic and wands are gone there.
 - Leave Form Before Casting: any spell but a form, a toggle or stealth.
-- Dynamic Rank: a spell that can go on a friend, with more than one known rank.
+- Spell Rank: any spell with more than one rank. Dynamic Rank only on a spell that can go on a friend, with more than one known rank.
 - Choices of one are two keys cleared together: the combat check (`combatOnly`, `noCombat`) and the rank (`targetRank`, `fixedRank`).
 - Use Items First stores a list of slots in tick order, not a flag.
 
@@ -204,7 +206,7 @@ That is a Warlock's Shadow Bolt with Mute Error Sounds, Stop Casting, Target Nea
 
 - **Spell Rank** is a choice of one: a fixed rank by its text, Max Rank (nil, the default, a plain cast), or Dynamic Rank (`targetRank`). The menu lists every rank from Rank 1 up, the unknown ones in red with their learn level and disabled. `ns.FixedRank` ignores a stored rank the player no longer knows.
 - **Dynamic Rank** names, per clause, the highest known rank the clause's unit can take: a rank lands on a player at most `RANK_LEVEL_GAP` (10) levels below its learn level. An absent, unassistable or level-unknown unit gets the plain cast; a unit below every rank gets the lowest, which then fails with the game's own message.
-- **Rewrites follow the units.** A target change rewrites every Dynamic Rank macro on the next frame (`QueueRankRewrite`), a mouseover change only those that also cast on the mouseover. The game says when a unit comes under the cursor but not when it leaves, so while a mouseover exists `PollMouseover` checks every 0.2 seconds and rewrites back to the highest rank once it's gone. After a rebuild (`rankBodiesSynced` false) the next rewrite writes every Dynamic Rank body once; after that only a body that changed is written, so most mouseovers never read the macro list.
+- **Rewrites follow the units** (`Features/Dynamic-Rank.lua`). A target change rewrites every Dynamic Rank macro on the next frame (`QueueRankRewrite`), a mouseover change only those that also cast on the mouseover. The game says when a unit comes under the cursor but not when it leaves, so while a mouseover exists `PollMouseover` checks every 0.2 seconds and rewrites back to the highest rank once it's gone. After a rebuild (`rankBodiesSynced` false, set by `ns.MarkRankBodiesStale`) the next rewrite writes every Dynamic Rank body once; after that only a body that changed is written, so most mouseovers never read the macro list. Nothing runs at all unless some macro or kind default has Dynamic Rank on (`ns.AnyTargetRank`).
 
 ### Stances
 
@@ -232,8 +234,8 @@ A WoW macro name holds 16 bytes, and `CreateMacro` truncates longer ones, so a l
 
 ### Focus and Duplicate Copies
 
-- **A focus copy** (`MakeFocusMacro`) is a separate page entry with its own WoW macro, casting `[@focus,<target>,nodead]` then the target. It shares its spell's settings, and its menu only removes it. Most options rewrite the copy too; the ones that only shape the spell's own clauses (Cast On Mouseover, Cast On Self, Cast On Target's Target, Cast At Cursor, Cast <ability> If Summoned) don't, which is why the menu only redraws the cell after those (`OWN_CLAUSES_ONLY`, `Features/Macro-Menu.lua`) and rebuilds the page after the rest.
-- **A Duplicate copy** (`ns.DuplicateMacro`) lists the spell again as "Drain Soul 2", with its own WoW macro and its own settings under the key `Drain Soul #2`, which no spell is called. It starts with a copy of the source macro's settings (`COPIED_SETTINGS`: every defaultable option plus pet, stance, group version, fixed rank and Use Items). `ns.db.profile.macroCopies` holds each spell's copy numbers in the order made; a number is never reused while a later one stands, so a copy keeps its name. Removing a copy drops its settings and leaves its WoW macro where it is, so nothing the player placed stops working; the add-on just stops rewriting it.
+- **A focus copy** (`MakeFocusMacro`, `Features/Macro-Builder.lua`) is a separate page entry with its own WoW macro, casting `[@focus,<target>,nodead]` then the target. It shares its spell's settings, and its menu only removes it. Most options rewrite the copy too; the ones that only shape the spell's own clauses (Cast On Mouseover, Cast On Self, Cast On Target's Target, Cast At Cursor, Cast <ability> If Summoned) don't, which is why the menu only redraws the cell after those (`OWN_CLAUSES_ONLY`, `Features/Macro-Menu.lua`) and rebuilds the page after the rest.
+- **A Duplicate copy** (`ns.DuplicateMacro`, `Features/Macro-Copies.lua`) lists the spell again as "Drain Soul 2", with its own WoW macro and its own settings under the key `Drain Soul #2`, which no spell is called. It starts with a copy of the source macro's settings (`COPIED_SETTINGS`: every defaultable option plus pet, stance, group version, fixed rank and Use Items). `ns.db.profile.macroCopies` holds each spell's copy numbers in the order made, starting at 2; a number is never reused while a later one stands, so a copy keeps its name. **Remove This Copy** drops its settings and leaves its WoW macro where it is, so nothing the player placed stops working; the add-on just stops rewriting it.
 
 ## Page Sections and Order
 
@@ -252,20 +254,20 @@ A cell glows, pulsing like the native page's unassigned spells, when its macro i
 
 ### Notes and Tooltips
 
-`OptionSubText` names the one option that is on, or `N Options` when several are, in the priority order of `OPTION_SUBTEXTS` (`Features/Macro-Button.lua`). With none on, the note is the spell's own subtext ("Rank 4", "Racial"), an equipment macro's slot, or an unlearned spell's learn level or "Talent". A focus copy's note is always Focus and a custom macro's Custom, and a blocked macro's says so in red. The tooltip shows the spell's or item's own tooltip first, then an "Options On:" line naming every option that is on by its menu label, the macro text, why it's blocked or unlearned or not on the bars, and the click hints.
+`OptionSubText` names the one option that is on, or `N Options` when several are, in the priority order of `OPTION_SUBTEXTS` (`Features/Macro-Button.lua`). With none on, the note is the spell's own subtext ("Rank 4", "Racial"), an equipment macro's slot, or an unlearned spell's learn level or "Talent". A focus copy's note is always Focus and a custom macro's Custom, and a blocked macro's says so in red. The tooltip shows the spell's or item's own tooltip first, then an "Options On:" line naming every option that is on by its menu label, the macro text, why it's blocked or unlearned or not on the bars, and the click hints. No tooltip opens over a cell while any menu is open.
 
 ### Options Menu
 
-`ns.ShowMacroMenu` (`Features/Macro-Menu.lua`) builds the right-click menu with `MenuUtil.CreateContextMenu`. Options are grouped into submenus (Combat Check, Spell Rank, Targeting, Before Casting, Add Attack, Casting Rules, Error Messages, Use Items First) that appear with their first offered option, so a group with nothing in it leaves no entry. Each group's label says what is on in it, redrawn whenever the menu redraws. The menu stays open while options change: checkboxes refresh it by default, and the radio choices return `MenuResponse.Refresh`. After the groups come Use For <Kind>, Duplicate and Remove Copy, then the macro text's byte count (red over 255) and a live preview sized to its lines. Use Items First also lists a slot already ticked whose item has lost its Use: effect, so it can be unticked after a gear swap. Custom macros have no menu.
+`ns.ShowMacroMenu` (`Features/Macro-Menu.lua`) builds the right-click menu with `MenuUtil.CreateContextMenu`. Options are grouped into submenus (Combat Check, Spell Rank, Targeting, Before Casting, Add Attack, Casting Rules, Error Messages, Use Items First) that appear with their first offered option, so a group with nothing in it leaves no entry. Each group's label says what is on in it (`MENU_GROUP_VALUE`), redrawn whenever the menu redraws. The menu stays open while options change: checkboxes refresh it by default, and the radio choices return `MenuResponse.Refresh`. After the groups come Use These Options For All <Kind>, Duplicate and Remove This Copy, then the macro text's byte count (red over 255) and a live preview sized to its lines. Use Items First also lists a slot already ticked whose item has lost its Use: effect, so it can be unticked after a gear swap. Custom macros have no menu.
 
 ## Spellbook Hosts
 
 The page (`ns.BuildSpellbookPage`) is host-agnostic: a host hands it a frame, optionally with its own `page.geometry`, and calls `ns.RefreshSpellbookPage` on show. Each host also defines `ns.ToggleSpellbookPage` for the key binding.
 
-- **Classic engine** (`Spellbook-Host-Classic.lua`). A tab under the last shown skill line tab of `SpellBookFrame`, shown only over the spell pages, toggles a window of its own (`MacroSpellbookFrame`, 1100 x 660, two two-column pages, scaled down to fit with a 40-point margin and never up). Laying the page over the book's spell pages lost to UI skins (ElvUI restyles and re-layers the book), so the window stays clear of it. Tab and window are parented to `UIParent`, only the tab is anchored to the book, and the book is watched with `HookScript` and `hooksecurefunc(book, "Update", ...)`, so nothing Blizzard owns is written to. The window is in `UISpecialFrames` for Escape and sits on the HIGH strata, which is why the page's links to the options panels close it first. Without a settings cog on these books, a gear button at the page's top right opens the page's settings menu.
+- **Classic engine** (`Spellbook-Host-Classic.lua`). A tab under the last shown skill line tab of `SpellBookFrame`, shown only over the spell pages, toggles a window of its own (`MacroSpellbookFrame`, 1100 x 660, two two-column pages, scaled down to fit with a 40-point margin and never up). Laying the page over the book's spell pages lost to UI skins (ElvUI restyles and re-layers the book), so the window stays clear of it. Tab and window are parented to `UIParent`, only the tab is anchored to the book, and the book is watched with `HookScript` and `hooksecurefunc(book, "Update", ...)`, so nothing Blizzard owns is written to. The window is in `UISpecialFrames` for Escape and sits on the HIGH strata, which is why the page's links to the options panels close it first (`ns.HideSpellbookWindow`). Without a settings cog on these books, a gear button at the page's top right opens the page's settings menu.
 - **Retail engine** (`Spellbook-Tabs.lua`, `Spellbook-Host-Modern.lua`). `ns.SpellbookTabs` attaches once `Blizzard_PlayerSpells` loads. It lays the tab out right of the native tabs, skipping other add-ons' tab-sized launchers and stacking down the book's right edge once the row reaches the search box. It owns a parchment page clipped below the book's 60-pixel toolbar, plus an unclipped `page.header` over the toolbar, where the page lays a `SpellBookSettingsDropdownTemplate` cog over the native one. Every frame is parented to `UIParent` and only anchored over the book, because a frame parented to a Blizzard panel stays protected. Opening our tab closes any other add-on's page (a shown frame exactly the size of the book, closed through its own return button where it has one), and clicking another add-on's launcher closes ours. The page hides under the gamepad UI and when a native tab or the spell search takes over.
 
-Templates and atlases the page uses (`SpellBookHeaderTemplate`, `SpellBookSettingsDropdownTemplate`, `PortraitFrameTemplate`, the `spellbook-item-*` and `spellbook-Page-*-C60` atlases) are checked with `C_XMLUtil.GetTemplateInfo` and `C_Texture.GetAtlasInfo` first, each with a fallback. The paging arrows (`Spellbook-Paging.lua`) are built by hand because Blizzard's paging template reads a format string the Classic engine's clients don't define.
+The page and cells check the templates and atlases they use (`SpellBookHeaderTemplate`, `SpellBookSettingsDropdownTemplate`, `PortraitFrameTemplate`, the `spellbook-item-*` and `spellbook-Page-*-C60` atlases) with `C_XMLUtil.GetTemplateInfo` and `C_Texture.GetAtlasInfo` first, each with a fallback, since the Classic engine's clients lack most of them. `Spellbook-Tabs.lua` uses its tab and parchment atlases directly: it loads only on the Retail engine, which ships them. The paging arrows (`Spellbook-Paging.lua`) are built by hand because Blizzard's paging template reads a format string the Classic engine's clients don't define.
 
 ## Unlearned Spells and Trainer Recording
 
@@ -285,11 +287,11 @@ One macro per equipped slot with a Use: effect, writing `/use <slot>` so it keep
 
 ## Key Binding
 
-`Bindings.xml` declares `MACROSPELLBOOK_TOGGLE`, which calls the global `MacroSpellbook_Toggle()`; the Key Bindings list labels it with `BINDING_NAME_MACROSPELLBOOK_TOGGLE`. The name attribute is what the client saves a player's key against, so it never changes: a renamed binding comes back unbound for everyone. The General panel can't set a key itself, so its row shows the bound key (or the client's `NOT_BOUND`) and a Set Key button. `ns:OpenKeyBindings` tries, at click time, `Settings.KEYBINDINGS_CATEGORY_ID`, then a protected search of the Settings category list for the Key Bindings title, then the standalone `KeyBindingFrame`, and finally prints where to find the list using the client's own menu labels. On the Retail engine the toggle closes the book when the page is showing, else opens the spellbook (`PlayerSpellsUtil.OpenToSpellBookTab`) and turns to the page.
+`Bindings.xml` declares `MACROSPELLBOOK_TOGGLE`, which calls the global `MacroSpellbook_Toggle()`; the Key Bindings list labels it with `BINDING_NAME_MACROSPELLBOOK_TOGGLE`. The name attribute is what the client saves a player's key against, so it never changes: a renamed binding comes back unbound for everyone. The General panel can't set a key itself, so its row shows the bound key (or the client's `NOT_BOUND`) and a Set Key button. `ns:OpenKeyBindings` tries, at click time, `Settings.KEYBINDINGS_CATEGORY_ID`, then a search of the Settings panel's category list for the Key Bindings title (`KEY_BINDINGS` or `SETTINGS_KEYBINDINGS_LABEL`), then the standalone `KeyBindingFrame`, and finally prints where to find the list using the client's own menu labels. On the Classic engine the toggle opens or closes the window like a click on the tab. On the Retail engine it closes the book when the page is showing, else opens the spellbook (`PlayerSpellsUtil.OpenToSpellBookTab`) and turns to the page.
 
 ## Saved Variables
 
-One SavedVariables table, `MacroSpellbookDB`, managed by AceDB-3.0 and created at `PLAYER_LOGIN`. Its scopes are `global` (the welcome toggle, the general-macro ownership record, the equipment macros' options and the tag register), `profile` (the page settings, the kind defaults, every per-spell option table, the Duplicate copies, the custom macros and their seeded flag, the Mark All Spells As Placed marks and the recorded trainer spells) and `char` (the character-macro ownership record). `Data/Default-Settings.lua` is the full shape.
+One SavedVariables table, `MacroSpellbookDB`, managed by AceDB-3.0 and created at `PLAYER_LOGIN`. Its scopes are `global` (the welcome toggle, the general-macro ownership record, the equipment macros' options and the tag register), `profile` (the page settings, the kind defaults, every per-spell option table, the Duplicate copies, the custom macros and their seeded flag, the Mark All Spells As Placed marks and the recorded trainer spells) and `char` (the character-macro ownership record). `Data/Default-Settings.lua` is the full shape; the migrations' done flags (`char.legacyImported`, `profile.buffKindCopied`) are written without a default.
 
 **Model: Per-Character.** Recorded trainer spells genuinely differ per character, and the macro options ride the profile with them because which spells a page lists is per class. `AceDB:New` omits the third argument, so each character gets its own `Name - Realm` profile. **Reset Profile clears that character's profile only:** every option, kind default, page setting, copy, custom macro, mark and recorded trainer spell. The welcome toggle, the equipment options, the tag register and both ownership records survive. Those last three describe the account's and the character's actual macro lists, which no profile switch, copy or reset changes, so they live outside the profile (`README-Notes.md` records the `char` scope as an exception). A new setting about how this character's page behaves goes in `profile`; presentation, and anything whose effect lands in a macro every character shares, goes in `global`.
 
@@ -302,7 +304,7 @@ The only seeded list is the custom macros: seeded once, tracked by `customMacros
 Everything below carries `MIGRATION (remove after 2026-11-23)`, as do the `Features/Migrations.lua` TOC line, the `SavedVariablesPerCharacter: MacroSpellbookCharDB` TOC line and the `MacroSpellbookCharDB` luacheck global.
 
 1. `ns:MigrateLegacySavedVariables` (before `AceDB:New`): on a pre-AceDB table, moves the old top-level setting keys under `legacySettings`, so AceDB doesn't read them as its own.
-2. `ns:ImportLegacySettings` (right after `AceDB:New`, once per character via `ns.db.char.legacyImported`): copies `legacySettings` onto this character's profile and its `MacroSpellbookCharDB.trainerSpells` into `trainerSpells`, then nils `MacroSpellbookCharDB`, which stops it being saved.
+2. `ns:ImportLegacySettings` (right after `AceDB:New`, once per character via `ns.db.char.legacyImported`): copies `legacySettings` onto this character's profile and its `MacroSpellbookCharDB.trainerSpells` into `trainerSpells`, then nils `MacroSpellbookCharDB`, which stops it being saved. A retired setting with no profile table (`raidRank1`) is dropped.
 3. `ns:MigrateSpammable` (at login and on every profile change): moves each spell's retired Spammable setting to Stop Macro If Stealthed for a stealth spell, else Stop Macro If Channeling, and a kind's Spammable default to Stop Macro If Channeling. A moved profile has no `spam` table left, so it runs once per profile.
 4. `ns:MigrateBuffKind` (at login and on every profile change, after Spammable): copies a profile's Friendly defaults to the Buffs kind where Buffs has no setting of its own, once per profile (`buffKindCopied`).
 5. Ownership claim (`ns.LegacyOwnership`): a general spell or custom macro recorded as `true` by a release before owners were recorded is claimed by the first character to find it.
@@ -313,7 +315,7 @@ Everything below carries `MIGRATION (remove after 2026-11-23)`, as do the `Featu
 ### A New Per-Spell Macro Option
 
 1. Add the key to `profile` in `Data/Default-Settings.lua` as an empty table.
-2. In `Features/Macro-Options.lua`, add its offer rule to `OFFERED` (or rely on the default: any spell with a target) and to the option lists in the comments above `SpellSettings` and `ns.OffersOption`. If a kind can turn it on, add it to `ns.DEFAULTABLE_OPTIONS`; if not, add it to `COPIED_SETTINGS`, or Duplicate drops it and removing a copy leaves it behind.
+2. In `Features/Macro-Options.lua`, add its offer rule to `OFFERED` (or rely on the default: any spell with a target) and to the option lists in the comments above `SpellSettings` and `ns.OffersOption`. If a kind can turn it on, add it to `ns.DEFAULTABLE_OPTIONS`, which also puts it in Duplicate's `COPIED_SETTINGS`; if not, add it to `COPIED_SETTINGS` in `Features/Macro-Copies.lua` by hand, or Duplicate drops it and removing a copy leaves it behind.
 3. In `Features/Macro-Body.lua`, write its line in `CastBody` or `ns.MacroBody` at the point in the fixed order where it must run, reading it through `ns.IsOptionOn`.
 4. In `ns.ShowMacroMenu` (`Features/Macro-Menu.lua`), add it with `addOption` under the group whose lines it writes. If it changes only the spell's own clauses, add it to `OWN_CLAUSES_ONLY`.
 5. Add it to `OPTION_SUBTEXTS` (`Features/Macro-Button.lua`) at its priority, with its `SUBTEXT_*` and `MENU_*` keys.
@@ -324,8 +326,9 @@ Everything below carries `MIGRATION (remove after 2026-11-23)`, as do the `Featu
 ### A Spell in a Class List
 
 1. Open `Data/{Game}/Class-Spell-Lists-{Game}.lua` for each flavor where it is true, and add the spell ID to the right list (`mouseoverEnemy`, `mouseoverFriend`, `buffs`, `cursor`, `stealth`, `noToggle`, ...). Use a table of every rank's ID wherever some locale names the ranks differently. The `channeled` lists still ship and Validate Data checks them, but no feature reads them: Stop Macro If Channeling is offered on every spell.
-2. Check the same ID in the other six folders, and say in the PR which copies changed and why the rest didn't.
-3. Never hand-edit the `How We Got the Data` block; the Data Review owns it.
+2. A new list key also goes in `LIST_KEYS` in `Diagnostics/Manifests.lua`, so Validate Data and the Game Names report cover it.
+3. Check the same ID in the other six folders, and say in the PR which copies changed and why the rest didn't.
+4. Never hand-edit the `How We Got the Data` block; the Data Review owns it.
 
 ### A Default Custom Macro
 
@@ -348,8 +351,8 @@ Add `[singleSpellId] = groupSpellId` to `Data/{Game}/Group-Versions-{Game}.lua` 
 WoW ships a fixed locale set and every supported locale file already exists, so localization here is maintenance, not expansion.
 
 - **`enUS.lua` is the source of truth** and the only file that passes `true` to `NewLocale("MacroSpellbook", ...)`. The other ten translate its key set. The Localization Review (`07 - Localization Review.md`) owns them; ordinary work edits `enUS.lua` only, and a retired key name is never reused.
-- **Placeholders** must match `enUS` per key in every locale, in count, type and order (`CHAT_MACRO_TOO_LONG` is `%s`, `%d`, `%d`), or the string throws when formatted. `StatusText` formats every `OPTIONS_CUSTOM_STATUS_*` key with the same `(length, max)` arguments and `length` is nil for all but the too-long case, so only `OPTIONS_CUSTOM_STATUS_TOO_LONG` may carry a `%d`. `MENU_GROUP_VALUE` (`%s: %s`) carries its own separator so a locale can use a full-width colon.
-- **Game names never go in `Locales/`.** Spells are stored as IDs in `ns.CLASS_SPELL_LISTS` (its `autoShot` included), `ns.TRAINER_SPELLS` and `ns.GROUP_VERSIONS`, and named by `C_Spell.GetSpellName` (rank text by `C_Spell.GetSpellSubtext`); pet families by ID through `C_CreatureInfo.GetCreatureFamilyInfo`; section names are the client's own spellbook tab names. Slot names and client labels (`ITEM_SPELL_TRIGGER_ONUSE`, `ERR_NOT_IN_COMBAT`, `SETTINGS`, `PAGE_NUMBER`, `NOT_BOUND`, `KEY_BINDINGS`, `SETTINGS_KEYBINDINGS_LABEL`, `GAMEMENU_OPTIONS`) are GlobalStrings read directly. The class-list, ranged-attack, trainer and group-version spells, the pet families, the slot names and those labels each have a row in `ns.DIAGNOSTIC_NAME_LOOKUPS`, so the Game Names report checks them.
+- **Placeholders** must match `enUS` per key in every locale, in count, type and order (`CHAT_MACRO_TOO_LONG` is `%s`, `%d`, `%d`), or the string throws when formatted. `StatusText` formats only `OPTIONS_CUSTOM_STATUS_TOO_LONG` (`%d`, `%d`); the other `OPTIONS_CUSTOM_STATUS_*` keys are shown as written, so a placeholder in them would print literally. `MENU_GROUP_VALUE` (`%s: %s`) carries its own separator so a locale can use a full-width colon.
+- **Game names never go in `Locales/`.** Spells are stored as IDs in `ns.CLASS_SPELL_LISTS` (its `autoShot` included), `ns.TRAINER_SPELLS` and `ns.GROUP_VERSIONS`, and named by `C_Spell.GetSpellName` (rank text by `C_Spell.GetSpellSubtext`); pet families by ID through `C_CreatureInfo.GetCreatureFamilyInfo`; section names are the client's own spellbook tab names. Slot names and client labels (`ITEM_SPELL_TRIGGER_ONUSE`, `ERR_NOT_IN_COMBAT`, `SETTINGS`, `PAGE_NUMBER`, `NOT_BOUND`, `KEY_BINDINGS`, `SETTINGS_KEYBINDINGS_LABEL`, `GAMEMENU_OPTIONS`) are GlobalStrings read directly. The class-list, ranged-attack, trainer, group-version and custom-macro template spells, the pet families, the slot names and those labels each have a row in `ns.DIAGNOSTIC_NAME_LOOKUPS`, so the Game Names report checks them.
 - **Not localized on purpose:** the equipment macros' WoW names (`Use Head`), which are identifiers on players' bars, the ` @F` focus suffix and the `#m` tag line.
 
 Everything else (the Spanish file pairing, the overflow canary, the output ceilings) follows the Style Guide's LOCALIZATION and MESSAGES → Message Length.
@@ -362,13 +365,14 @@ Everything else (the Spanish file pairing, the overflow canary, the output ceili
 - **Macro names over 16 bytes**: `CreateMacro` truncates them, and a full-name lookup then misses. Always compare `macro.macroName` (`ns.TrimMacroName`, UTF-8 safe), never `macro.name`.
 - **Over 255 bytes**: a longer body would be cut off mid-line, so it is never written (`Fits`, `ns.MacroBlockReason`) and the player is warned once. Count the 6-byte tag line, and test option combinations under ruRU with the Message Length report, not enUS.
 - **Seeding before names load**: a default custom macro filled while a spell name is nil would save a blank. `ns.DefaultCustomMacros` returns nil until every name resolves, and seeding waits.
-- **Storing an option equal to its kind's default**: that pins the macro against later default changes. `SetOption` stores only differences, and Use For <Kind> reads every value before it changes any default.
+- **Storing an option equal to its kind's default**: that pins the macro against later default changes. `SetOption` stores only differences, and Use These Options For All <Kind> reads every value before it changes any default.
 - **Adding an option in one place**: the Macro Defaults panel's `MENU_GROUPS` mirrors the menu by hand, and `COPIED_SETTINGS` decides what Duplicate carries. Miss either and the option silently drops off the panel or out of copies.
 - **Matching stances by tooltip**: the tooltip prints form names, which esES names differently from the stance spells. Stances come from the class lists only.
 - **Trusting the book's spell name**: the book shows some spells under a name `/cast` can't use (Call Pet as "Call" plus the pet's name), and on Classic Era it can list Season of Discovery rune abilities. `ns.ForEachClassSpell` names every spell by ID and drops IDs of 300000 and up outside SoD.
 - **Assuming the mouseover leaving fires an event**: it doesn't. `PollMouseover` watches for it, or a Dynamic Rank macro would keep a low rank after the cursor moved on.
 - **Picking an engine's code path by flavor**: the engines differ in APIs, not flavors. Each branch checks for the API (`C_SpellBook.GetNumSpellBookSkillLines`, `C_TooltipInfo`, `Constants.MacroConsts`) or the template it needs, resolved once at load, and the TOC chooses the host file.
 - **Parenting page frames to Blizzard's book**: they would stay protected, taint the book and lose to UI skins. Both hosts keep every frame on `UIParent`, anchored to the book, and only hook it.
+- **Opening an options panel over the Classic window**: the window sits on the HIGH strata and would cover the Options Interface. Every page link to a panel calls `ns.HideSpellbookWindow` first.
 
 ## Contributing
 

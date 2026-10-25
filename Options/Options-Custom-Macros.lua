@@ -29,7 +29,11 @@ local function StatusText(index, entry)
 	if not problem then
 		return nil
 	end
-	return GetColor("OFF") .. L[STATUS_KEYS[problem]]:format(length, ns.MACRO_BODY_MAX_LENGTH) .. "|r"
+	local text = L[STATUS_KEYS[problem]]
+	if length then
+		text = text:format(length - ns.MACRO_TAG_LENGTH, ns.MACRO_BODY_MAX_LENGTH - ns.MACRO_TAG_LENGTH)
+	end
+	return GetColor("OFF") .. text .. "|r"
 end
 
 --[[
@@ -132,7 +136,7 @@ local function MacroRow(index, entry, order)
 			body = {
 				type = "input",
 				name = L["MACRO_TEXT"],
-				desc = L["OPTIONS_CUSTOM_BODY_DESCRIPTION"],
+				desc = L["OPTIONS_CUSTOM_BODY_DESCRIPTION"]:format(ns.MACRO_BODY_MAX_LENGTH - ns.MACRO_TAG_LENGTH),
 				multiline = 5,
 				width = "full",
 				order = 5,

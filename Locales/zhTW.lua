@@ -174,7 +174,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "巨集預設設定"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"每種法術巨集一開始使用的選項。你在巨集的右鍵選單中自行設定的內容會保留。每種類型只列出其法術提供的選項。"
+	"每種法術巨集一開始使用的選項。巨集會保留你在其右鍵選單中設定的內容。每種類型只列出其法術提供的選項。"
 L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "先對滑鼠指向的單位施放，其次是你的目標。"
 L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "你的目標無法接受該法術時，對你自己施放。"
 L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
@@ -197,7 +197,7 @@ L["OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION"] = "施放一次，直到你的�
 L["OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION"] =
 	"施放一次，直到戰鬥結束或你的目標改變前不再施放。"
 L["OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION"] =
-	"再次按下巨集時會保持形態或守護開啟，而不會將其關閉。"
+	"再次按下巨集時保持形態或守護開啟，而不是將其關閉。"
 L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "清除巨集在畫面上留下的紅色錯誤文字。"
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "巨集執行期間關閉錯誤音效。"
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
@@ -227,12 +227,13 @@ L["OPTIONS_CUSTOM_ADD"] = "新增巨集"
 L["OPTIONS_CUSTOM_ADD_DESCRIPTION"] = "在清單末尾新增一個自訂巨集。"
 L["OPTIONS_CUSTOM_NEW_NAME"] = "新巨集"
 L["OPTIONS_CUSTOM_NAME"] = "名稱"
-L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "巨集的名稱，最多 %d 個字元。"
+L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] =
+	"巨集的名稱。WoW 只保留前 %d 個位元組，在俄文、中文或韓文等語言中能容納的字數更少。"
 L["OPTIONS_CUSTOM_SECTION"] = "分類"
 L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
 	"巨集在頁面上列出的位置：自訂分類下，或與法術書某個分頁的法術放在一起。"
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
-	"巨集的內容，最多 255 位元組。第一行寫 #showtooltip 加法術名稱，即可顯示該法術的圖示。"
+	"巨集的內容，最多 %d 位元組。第一行寫 #showtooltip 加法術名稱，即可顯示該法術的圖示。"
 L["OPTIONS_CUSTOM_STATUS_NEEDS"] = "這個巨集需要名稱和巨集內容才能顯示在頁面上。"
 L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] = "過長：%d / %d 位元組。長度合適之前不會顯示在頁面上。"
 L["OPTIONS_CUSTOM_STATUS_TAKEN"] = "頁面上已有其他巨集使用這個名稱，因此這個巨集不會顯示。"
@@ -284,4 +285,4 @@ L["CHAT_CUSTOM_NEEDS_NAME_BODY"] = "自訂巨集 #%d 需要名稱和巨集內容
 L["CHAT_CUSTOM_TOO_LONG"] =
 	'自訂巨集"%s"為 %d 位元組，超過了巨集能容納的 %d 位元組。縮短它的內容即可將它加入頁面。'
 L["CHAT_CUSTOM_NAME_TAKEN"] =
-	'自訂巨集"%s"的名稱（前 %d 個字元）與頁面上的另一個巨集相同。重新命名它即可將它加入頁面。'
+	'自訂巨集"%s"的名稱（前 %d 個位元組）與頁面上的另一個巨集相同。重新命名它即可將它加入頁面。'

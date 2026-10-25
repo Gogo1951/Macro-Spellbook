@@ -143,7 +143,10 @@ end
 -- The key binding's toggle (Features/Key-Bindings.lua), the same as a click on the tab.
 ns.ToggleSpellbookPage = ToggleWindow
 
--- Closes the window, so the page's Open Options entry isn't left covering the Options Interface.
+--[[
+	Closes the window, so it isn't left covering the Options Interface that the page's menus open (Macro
+	Defaults, Custom Macros, Use These Options For All).
+]]
 function ns.HideSpellbookWindow()
 	if window then
 		window:Hide()

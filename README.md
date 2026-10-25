@@ -21,7 +21,7 @@ Mouseover, cursor and self-cast macros for every class spell, built in one click
 
 🔄 **Always Up to Date** // Level up, visit your trainer or swap specs, and your macros rewrite themselves with your newest spells and ranks. Buffs can even pick the highest rank a lower-level friend can take.
 
-⚙️ **Options With a Right-Click** // Add stopcasting, auto attack, pet attack, focus or your trinkets with a tick. The macro rewrites itself, and warns you before it gets too long.
+⚙️ **Options With a Right-Click** // Add stopcasting, auto attack, pet attack, focus or your trinkets with a tick, or duplicate a spell to keep two versions. Each macro rewrites itself, and warns you before it gets too long.
 
 📚 **Your Whole Kit in One Place** // Macros glow until they're on your bars, and the page also holds your on-use gear, your own custom macros, and spells you haven't trained yet.
 
@@ -71,8 +71,8 @@ Mute Error Sounds turns off your Sound Effects and Error Speech settings for a s
 * nevcairiel's [Bartender4](https://www.curseforge.com/wow/addons/bartender4)
 * Tuller's [Dominos](https://www.curseforge.com/wow/addons/dominos)
 * oishii1992's [Myslot](https://www.curseforge.com/wow/addons/myslot)
+* foxlit's [OPie](https://www.curseforge.com/wow/addons/opie)
 * Fusionpit's [What's Training?](https://www.curseforge.com/wow/addons/whats-training)
-* Zerkaa's [What's Training ? (Forever)](https://www.curseforge.com/wow/addons/whats-training-forever)
 
 ### 🟡 Overlaps
 
@@ -86,6 +86,6 @@ Mute Error Sounds turns off your Sound Effects and Error Speech settings for a s
 
 * DabbnGrandpa's [ClassMacros](https://www.curseforge.com/wow/addons/classmacros)
 * ASadSin's [Forever Macro Creator](https://www.curseforge.com/wow/addons/forever-macro-creator)
-* barisgarnlesh's [Garry Macro Creator](https://www.curseforge.com/wow/addons/garry-macro-creator)
-* Sru's [HoverCraft](https://www.curseforge.com/wow/addons/hovercraft)
+* Megathium's [Macro Wow Builder](https://www.curseforge.com/wow/addons/macro-wow-builder)
+* kriffin's [MacroForge](https://www.curseforge.com/wow/addons/macroforge)
 * mesmart's [MacroForge by mesmart](https://www.curseforge.com/wow/addons/macroforge-by-mesmart)

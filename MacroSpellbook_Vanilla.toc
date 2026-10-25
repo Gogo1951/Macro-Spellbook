@@ -2,7 +2,7 @@
 ## Notes: Mouseover, cursor and self-cast macros for every class spell, built in one click from a new spellbook tab with no macro syntax. They update as you level, train and swap specs. Right-click to add focus, stopcasting, auto attack, pet attack or trinkets.
 ## Author: Gogo1951
 
-## IconTexture: Interface/AddOns/MacroSpellbook/Includes/Images/Icon.tga
+## IconTexture: Interface/MacroFrame/MacroFrame-Icon
 ## X-License: MIT
 
 ## Category-enUS: Action Bars
@@ -70,6 +70,7 @@ Features/Announcements.lua
 # MIGRATION (remove after 2026-11-23)
 Features/Migrations.lua
 Features/Macro-Options.lua
+Features/Macro-Copies.lua
 Features/Macro-Body.lua
 Features/Custom-Macros.lua
 Features/Equipment-Macros.lua
@@ -77,6 +78,7 @@ Features/Macro-Builder.lua
 Features/Unlearned-Spells.lua
 Features/Trainer-Recording.lua
 Features/Macro-Sync.lua
+Features/Dynamic-Rank.lua
 Features/Macro-Menu.lua
 Features/Spellbook-Paging.lua
 Features/Macro-Button.lua

@@ -131,7 +131,13 @@ function ns.AddCustomMacros(taken)
 		if problem == "needs" then
 			ns.WarnOnce(L["CHAT_CUSTOM_NEEDS_NAME_BODY"]:format(i))
 		elseif problem == "long" then
-			ns.WarnOnce(L["CHAT_CUSTOM_TOO_LONG"]:format(entry.name, length, ns.MACRO_BODY_MAX_LENGTH))
+			ns.WarnOnce(
+				L["CHAT_CUSTOM_TOO_LONG"]:format(
+					entry.name,
+					length - ns.MACRO_TAG_LENGTH,
+					ns.MACRO_BODY_MAX_LENGTH - ns.MACRO_TAG_LENGTH
+				)
+			)
 		elseif problem == "taken" then
 			ns.WarnOnce(L["CHAT_CUSTOM_NAME_TAKEN"]:format(entry.name, ns.MACRO_NAME_MAX_LENGTH))
 		else

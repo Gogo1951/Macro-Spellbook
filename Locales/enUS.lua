@@ -174,7 +174,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Macro Defaults"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"The options each kind of spell macro starts with. Whatever you set on a macro from its right-click menu keeps your choice. Each kind lists only the options its spells offer."
+	"The options each kind of spell macro starts with. A macro keeps whatever you set from its right-click menu. Each kind lists only the options its spells offer."
 L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "Casts on whoever is under your mouse first, then your target."
 L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "Casts on you when your target can't take the spell."
 L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
@@ -199,7 +199,7 @@ L["OPTIONS_DEFAULT_ONCE_PER_TARGET_DESCRIPTION"] = "Casts once, then not again u
 L["OPTIONS_DEFAULT_ONCE_PER_COMBAT_DESCRIPTION"] =
 	"Casts once, then not again until combat ends or your target changes."
 L["OPTIONS_DEFAULT_NEVER_TURN_OFF_DESCRIPTION"] =
-	"Pressing the macro again keeps the form or aspect on instead of turning it off."
+	"Keeps the form or aspect on when you press the macro again, instead of turning it off."
 L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "Clears the red error text the macro leaves on screen."
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Mutes the error sound while the macro runs."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] = "Lets these macros cast only in combat, only out of combat, or either."
@@ -228,12 +228,13 @@ L["OPTIONS_CUSTOM_ADD"] = "Add Macro"
 L["OPTIONS_CUSTOM_ADD_DESCRIPTION"] = "Adds a new custom macro to the end of the list."
 L["OPTIONS_CUSTOM_NEW_NAME"] = "New Macro"
 L["OPTIONS_CUSTOM_NAME"] = "Name"
-L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] = "The macro's name, up to %d characters."
+L["OPTIONS_CUSTOM_NAME_DESCRIPTION"] =
+	"The macro's name. WoW keeps its first %d bytes, which is fewer letters in languages like Russian, Chinese or Korean."
 L["OPTIONS_CUSTOM_SECTION"] = "Section"
 L["OPTIONS_CUSTOM_SECTION_DESCRIPTION"] =
 	"Where the macro is listed on the page: under Custom, or with the spells of one of your spellbook's tabs."
 L["OPTIONS_CUSTOM_BODY_DESCRIPTION"] =
-	"The macro's text, up to 255 bytes. A first line of #showtooltip and a spell name shows that spell's icon."
+	"The macro's text, up to %d bytes. A first line of #showtooltip and a spell name shows that spell's icon."
 L["OPTIONS_CUSTOM_STATUS_NEEDS"] = "This macro needs a name and macro text before it shows on the page."
 L["OPTIONS_CUSTOM_STATUS_TOO_LONG"] = "Too long: %d / %d bytes. It won't show on the page until it fits."
 L["OPTIONS_CUSTOM_STATUS_TAKEN"] = "Another macro on the page already has this name, so this one won't show."
@@ -284,4 +285,4 @@ L["CHAT_CUSTOM_NEEDS_NAME_BODY"] = "Custom macro #%d needs a name and macro text
 L["CHAT_CUSTOM_TOO_LONG"] =
 	'Custom macro "%s" is %d bytes, over the %d a macro holds. Shorten its text to add it to the page.'
 L["CHAT_CUSTOM_NAME_TAKEN"] =
-	'Custom macro "%s" shares its name (first %d characters) with another macro on the page. Rename it to add it to the page.'
+	'Custom macro "%s" shares its name (first %d bytes) with another macro on the page. Rename it to add it to the page.'

@@ -37,7 +37,7 @@ ns.MESSAGE_ID_FILTERED_EVENTS = {}
     before acting on a firing. A firing the handler would ignore folds into the
     counters under id 0 with the reason; one it acts on logs in full.
     UPDATE_MOUSEOVER_UNIT fires for every unit the cursor crosses, and
-    Features/Macro-Builder.lua queues a rewrite only out of combat while any
+    Features/Dynamic-Rank.lua queues a rewrite only out of combat while any
     macro has Dynamic Rank on, by its own setting or its kind's default (its
     RanksRewritable), so the test makes that same call.
 ]]
