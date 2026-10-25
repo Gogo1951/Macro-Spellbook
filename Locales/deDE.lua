@@ -30,11 +30,7 @@ L["MENU_GROUP_ERRORS"] = "Fehlermeldungen"
 L["MENU_GROUP_USE_ITEMS_FIRST"] = "Erst Gegenstände benutzen"
 L["MACRO_TEXT"] = "Makrotext"
 L["MENU_MACRO_LENGTH"] = "%d / %d"
-L["MENU_GROUP_VALUE"] = "%s: %s"
 L["MENU_OPTIONS_COUNT"] = "%d Optionen"
-L["MENU_CAST_ON_MOUSEOVER"] = "Per Mouseover wirken"
-L["MENU_CAST_ON_SELF"] = "Auf dich selbst wirken"
-L["MENU_CAST_ON_TARGETS_TARGET"] = "Auf das Ziel des Ziels wirken"
 L["MENU_RANK_LEARN_LEVEL"] = "%s (Stufe %d)"
 L["MENU_MAX_RANK"] = "Höchster Rang"
 L["MENU_DYNAMIC_RANK"] = "Dynamischer Rang"
@@ -70,7 +66,6 @@ L["MENU_SAFE_TO_SPAM_NOTE"] =
 	"Damit du ein Makro gefahrlos spammen kannst, schalte bei einem kanalisierten Zauber Makro beim Kanalisieren stoppen ein, bei Verstohlenheit oder Schleichen Makro in Verstohlenheit stoppen. Erneutes Drücken unterbricht dann weder das Kanalisieren noch deine Verstohlenheit."
 L["MENU_USE_FOR_KIND"] = "Diese Optionen für die Kategorie %s verwenden"
 L["MENU_DUPLICATE"] = "Duplizieren"
-L["MENU_REMOVE_COPY"] = "Diese Kopie entfernen"
 L["MENU_USE_FOR_KIND_DESCRIPTION"] =
 	"Jedes Makro in der Kategorie %s, das du nicht selbst eingestellt hast, beginnt mit den Optionen dieses Makros. Öffnet Makro-Standards, um es dir zu zeigen."
 
@@ -80,9 +75,6 @@ L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "Zauber auf Leisten als platziert zählen"
 L["SETTINGS_MARK_ALL_PLACED"] = "Alle Zauber als platziert markieren"
 L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
 	"Kein Makro auf dieser Seite leuchtet mehr, ob es auf deinen Leisten liegt oder nicht. Ein Zauber, den du später erlernst, leuchtet weiter, bis du ihn platzierst."
-L["SETTINGS_CLEAR_PLACED"] = "Platziert-Markierungen löschen"
-L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] =
-	"Lässt jedes markierte Makro, das nicht auf deinen Leisten liegt, wieder leuchten."
 L["SETTINGS_OPEN_MACRO_DEFAULTS_DESCRIPTION"] =
 	"Öffnet die Optionen bei Makro-Standards, wo du festlegst, mit welchen Optionen jede Art von Zaubermakro beginnt."
 L["SETTINGS_OPEN_CUSTOM_MACROS_DESCRIPTION"] =
@@ -94,13 +86,10 @@ L["SUBTEXT_CUSTOM"] = "Eigenes"
 L["SUBTEXT_FOCUS"] = "Fokus"
 L["SUBTEXT_PET"] = "Begleiter"
 L["SUBTEXT_CURSOR"] = "Am Cursor"
-L["SUBTEXT_MOUSEOVER"] = "Maus"
-L["SUBTEXT_CAST_ON_SELF"] = "Auf dich"
 L["SUBTEXT_STANCE"] = "Haltung"
 L["SUBTEXT_USE_ITEMS"] = "Gegenstände"
 L["SUBTEXT_PET_ATTACK"] = "Begleiterangriff"
 L["SUBTEXT_DYNAMIC_RANK"] = "Dyn. Rang"
-L["SUBTEXT_TARGETS_TARGET"] = "Ziel des Ziels"
 L["SUBTEXT_TARGET_ENEMY"] = "Nächster Feind"
 L["SUBTEXT_TARGET_FRIEND"] = "Nächster Verbündeter"
 L["SUBTEXT_GROUP_VERSION"] = "Gruppenversion"
@@ -165,6 +154,19 @@ L["OPTIONS_KEY_SET_DESCRIPTION"] =
 	"Öffnet die Tastenbelegung des Spiels, in der Macro Spellbook einen eigenen Abschnitt hat."
 L["OPTIONS_KEY_BINDING_TOGGLE_DESCRIPTION"] =
 	"Öffnet und schließt Macro Spellbook. Es hat außerdem einen eigenen Reiter in deinem Zauberbuch."
+L["OPTIONS_DELETE_MACROS_HEADER"] = "Makros löschen"
+L["OPTIONS_DELETE_MACROS_DESCRIPTION"] =
+	"Löscht die Makros, die Macro Spellbook erstellt hat, und nimmt sie damit auch von deinen Aktionsleisten. Deine eigenen Makros bleiben unberührt, und die Seite erstellt jedes davon neu, wenn du es anklickst oder ziehst."
+L["OPTIONS_DELETE_CHARACTER_MACROS"] = "Charaktermakros löschen"
+L["OPTIONS_DELETE_CHARACTER_MACROS_DESCRIPTION"] =
+	"Löscht die Makros von Macro Spellbook aus dem Makro-Reiter dieses Charakters. Deine anderen Charaktere behalten ihre, bis du dort dasselbe tust."
+L["OPTIONS_DELETE_CHARACTER_MACROS_CONFIRM"] =
+	"Alle Makros von Macro Spellbook auf diesem Charakter löschen? Sie verschwinden auch von deinen Aktionsleisten."
+L["OPTIONS_DELETE_GENERAL_MACROS"] = "Allgemeine Makros löschen"
+L["OPTIONS_DELETE_GENERAL_MACROS_DESCRIPTION"] =
+	"Löscht die Makros von Macro Spellbook aus dem Reiter Allgemeine Makros, den alle Charaktere deines Accounts teilen, sodass auch deine anderen Charaktere ihre dort verlieren."
+L["OPTIONS_DELETE_GENERAL_MACROS_CONFIRM"] =
+	"Alle allgemeinen Makros von Macro Spellbook löschen? Alle Charaktere deines Accounts verlieren sie, und sie verschwinden auch von deinen Aktionsleisten."
 L["OPTIONS_COMMANDS_HEADER"] = "/Befehle"
 L["OPTIONS_COMMAND"] = "/msb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Öffnet die Optionen dieses Add-ons."
@@ -180,11 +182,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Makro-Standards"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"Die Optionen, mit denen jede Art von Zaubermakro beginnt. Ein Makro behält, was du über sein Rechtsklickmenü einstellst. Jede Art zeigt nur die Optionen, die ihre Zauber bieten."
-L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "Wirkt zuerst auf den, der unter deiner Maus ist, dann auf dein Ziel."
-L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "Wirkt auf dich, wenn dein Ziel den Zauber nicht erhalten kann."
-L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
-	"Versucht es beim Ziel deines Ziels, wenn dein Ziel den Zauber nicht erhalten kann, etwa beim Tank, den ein Feind angreift."
+	"Die Optionen, mit denen jede Art von Makro beginnt: deine Gegenstandsmakros hier und jede Art von Zaubermakro auf ihrer eigenen Seite darunter. Was du an einem Makro über sein Rechtsklickmenü einstellst, bleibt erhalten."
 L["OPTIONS_DEFAULT_CURSOR_DESCRIPTION"] = "Setzt den Zauber dorthin, wo dein Cursor hinzeigt, ohne Zielkreis."
 L["OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION"] =
 	"Wirkt den höchsten Rang, den die Stufe des freundlichen Spielers zulässt."
@@ -214,8 +212,11 @@ L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] =
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Schaltet das Fehlergeräusch stumm, während das Makro läuft."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
 	"Lässt diese Makros nur im Kampf, nur außerhalb des Kampfes oder immer wirken."
-L["OPTIONS_KIND_EXAMPLES"] = "Deine Zauber: %s"
-L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s und %d weitere"
+L["OPTIONS_KIND_YOUR_SPELLS"] = "Deine Zauber"
+L["OPTIONS_KIND_YOUR_ITEMS"] = "Deine Gegenstände"
+L["OPTIONS_KIND_MORE"] = "Und %d weitere."
+L["OPTIONS_KIND_NO_SPELLS"] = "Keiner deiner Zauber gehört zu dieser Art."
+L["OPTIONS_KIND_NO_ITEMS"] = "Keiner deiner angelegten Gegenstände hat einen Benutzen-Effekt."
 L["KIND_ENEMY"] = "Zauber gegen Feinde"
 L["KIND_ENEMY_DESCRIPTION"] = "Zauber, die du auf einen Feind wirkst, etwa Angriffe und Schwächungen."
 L["KIND_FRIENDLY"] = "Freundliche Zauber"
@@ -230,6 +231,8 @@ L["KIND_FORM"] = "Gestalten, Haltungen und Aspekte"
 L["KIND_FORM_DESCRIPTION"] = "Zauber, die aktiv bleiben, bis du sie ausschaltest oder wechselst."
 L["KIND_SELF"] = "Selbst- und Flächenzauber"
 L["KIND_SELF_DESCRIPTION"] = "Zauber ohne Ziel, die auf dich oder um dich herum wirken."
+L["KIND_ITEM"] = "Gegenstandsmakros"
+L["KIND_ITEM_DESCRIPTION"] = "Makros, die deine angelegten Gegenstände benutzen, etwa Schmuckstücke."
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "Eigene Makros"
@@ -293,6 +296,7 @@ L["KEY_BINDINGS_LOCATION"] = "Öffne das Spielmenü, dann %s, dann %s, und suche
 L["ERROR_MACRO_SLOTS_FULL"] = "Keine freien Makroplätze. Lösche ein Makro in /macro, um Platz zu schaffen."
 L["ERROR_GENERAL_MACRO_SLOTS_FULL"] =
 	"Keine freien allgemeinen Makroplätze. Lösche ein allgemeines Makro in /macro, um Platz zu schaffen."
+L["CHAT_MACROS_DELETED"] = "Gelöschte Makros: %d"
 L["CHAT_MACRO_TOO_LONG"] =
 	'Das Makro "%s" ist mit seinen Optionen %d Bytes lang, mehr als die %d, die ein Makro fasst. Schalte eine Option ab, um es zu kürzen.'
 L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =

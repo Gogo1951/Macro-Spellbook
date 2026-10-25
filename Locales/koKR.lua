@@ -30,11 +30,7 @@ L["MENU_GROUP_ERRORS"] = "오류 메시지"
 L["MENU_GROUP_USE_ITEMS_FIRST"] = "아이템 먼저 사용"
 L["MACRO_TEXT"] = "매크로 내용"
 L["MENU_MACRO_LENGTH"] = "%d / %d"
-L["MENU_GROUP_VALUE"] = "%s: %s"
 L["MENU_OPTIONS_COUNT"] = "옵션 %d개"
-L["MENU_CAST_ON_MOUSEOVER"] = "마우스오버 대상에게 시전"
-L["MENU_CAST_ON_SELF"] = "자신에게 시전"
-L["MENU_CAST_ON_TARGETS_TARGET"] = "대상의 대상에게 시전"
 L["MENU_RANK_LEARN_LEVEL"] = "%s (%d레벨에 습득)"
 L["MENU_MAX_RANK"] = "최고 레벨"
 L["MENU_DYNAMIC_RANK"] = "동적 레벨"
@@ -70,7 +66,6 @@ L["MENU_SAFE_TO_SPAM_NOTE"] =
 	"매크로를 연타해도 안전하게 하려면, 정신 집중 주문에는 정신 집중 중이면 매크로 중지를, 은신이나 숨기에는 은신 중이면 매크로 중지를 켜세요. 그러면 다시 눌러도 정신 집중이나 은신이 풀리지 않습니다."
 L["MENU_USE_FOR_KIND"] = "모든 %s에 이 옵션 사용"
 L["MENU_DUPLICATE"] = "복제"
-L["MENU_REMOVE_COPY"] = "이 사본 제거"
 L["MENU_USE_FOR_KIND_DESCRIPTION"] =
 	"%s에서 직접 설정하지 않은 모든 매크로가 이 매크로의 옵션으로 시작합니다. 확인할 수 있도록 매크로 기본값을 엽니다."
 
@@ -80,8 +75,6 @@ L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "단축바의 주문을 배치된 것으로
 L["SETTINGS_MARK_ALL_PLACED"] = "모든 주문을 배치됨으로 표시"
 L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
 	"단축바에 있든 없든 이 페이지의 모든 매크로가 더 이상 빛나지 않습니다. 나중에 배우는 주문은 배치할 때까지 계속 빛납니다."
-L["SETTINGS_CLEAR_PLACED"] = "배치 표시 지우기"
-L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] = "단축바에 없는 표시된 매크로가 모두 다시 빛나게 합니다."
 L["SETTINGS_OPEN_MACRO_DEFAULTS_DESCRIPTION"] =
 	"설정 화면의 매크로 기본값을 엽니다. 여기서 각 종류의 주문 매크로가 처음 가질 옵션을 고릅니다."
 L["SETTINGS_OPEN_CUSTOM_MACROS_DESCRIPTION"] =
@@ -93,13 +86,10 @@ L["SUBTEXT_CUSTOM"] = "사용자"
 L["SUBTEXT_FOCUS"] = "주시 대상"
 L["SUBTEXT_PET"] = "소환수"
 L["SUBTEXT_CURSOR"] = "커서"
-L["SUBTEXT_MOUSEOVER"] = "마우스오버"
-L["SUBTEXT_CAST_ON_SELF"] = "자신"
 L["SUBTEXT_STANCE"] = "태세"
 L["SUBTEXT_USE_ITEMS"] = "아이템 사용"
 L["SUBTEXT_PET_ATTACK"] = "소환수 공격"
 L["SUBTEXT_DYNAMIC_RANK"] = "동적 레벨"
-L["SUBTEXT_TARGETS_TARGET"] = "대상의 대상"
 L["SUBTEXT_TARGET_ENEMY"] = "가까운 적"
 L["SUBTEXT_TARGET_FRIEND"] = "가까운 아군"
 L["SUBTEXT_GROUP_VERSION"] = "파티용"
@@ -164,6 +154,19 @@ L["OPTIONS_KEY_SET_DESCRIPTION"] =
 	"Macro Spellbook 전용 항목이 있는 게임의 단축키 설정 목록을 엽니다."
 L["OPTIONS_KEY_BINDING_TOGGLE_DESCRIPTION"] =
 	"Macro Spellbook을 열고 닫습니다. 마법책에도 전용 탭이 있습니다."
+L["OPTIONS_DELETE_MACROS_HEADER"] = "매크로 삭제"
+L["OPTIONS_DELETE_MACROS_DESCRIPTION"] =
+	"Macro Spellbook이 만든 매크로를 삭제하며, 행동 단축바에서도 사라집니다. 직접 만든 매크로는 절대 건드리지 않으며, 페이지에서 클릭하거나 끌어 놓으면 다시 만들어집니다."
+L["OPTIONS_DELETE_CHARACTER_MACROS"] = "캐릭터 매크로 삭제"
+L["OPTIONS_DELETE_CHARACTER_MACROS_DESCRIPTION"] =
+	"이 캐릭터의 매크로 탭에서 Macro Spellbook의 매크로를 삭제합니다. 다른 캐릭터는 그 캐릭터에서 같은 작업을 할 때까지 매크로를 유지합니다."
+L["OPTIONS_DELETE_CHARACTER_MACROS_CONFIRM"] =
+	"이 캐릭터의 Macro Spellbook 매크로를 모두 삭제할까요? 행동 단축바에서도 사라집니다."
+L["OPTIONS_DELETE_GENERAL_MACROS"] = "일반 매크로 삭제"
+L["OPTIONS_DELETE_GENERAL_MACROS_DESCRIPTION"] =
+	"계정의 모든 캐릭터가 공유하는 일반 매크로 탭에서 Macro Spellbook의 매크로를 삭제하므로, 다른 캐릭터도 그곳의 매크로를 잃습니다."
+L["OPTIONS_DELETE_GENERAL_MACROS_CONFIRM"] =
+	"Macro Spellbook의 일반 매크로를 모두 삭제할까요? 계정의 모든 캐릭터가 잃게 되며, 행동 단축바에서도 사라집니다."
 L["OPTIONS_COMMANDS_HEADER"] = "/명령어"
 L["OPTIONS_COMMAND"] = "/msb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 화면을 엽니다."
@@ -180,12 +183,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "매크로 기본값"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"각 종류의 주문 매크로가 처음 가지는 옵션입니다. 매크로의 오른쪽 클릭 메뉴에서 설정한 값은 그 매크로에 그대로 유지됩니다. 각 종류에는 해당 주문이 제공하는 옵션만 표시됩니다."
-L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] =
-	"마우스 아래에 있는 대상에게 먼저 시전하고, 없으면 현재 대상에게 시전합니다."
-L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "대상이 주문을 받을 수 없으면 자신에게 시전합니다."
-L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
-	"대상이 주문을 받을 수 없으면, 적이 공격 중인 탱커처럼 대상의 대상에게 시전을 시도합니다."
+	"각 종류의 매크로가 처음 가지는 옵션입니다. 아이템 매크로는 여기에서, 각 종류의 주문 매크로는 아래의 각 페이지에서 설정합니다. 매크로의 오른쪽 클릭 메뉴에서 직접 설정한 값은 그대로 유지됩니다."
 L["OPTIONS_DEFAULT_CURSOR_DESCRIPTION"] =
 	"대상 지정 원 없이 커서가 가리키는 곳에 주문을 놓습니다."
 L["OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION"] =
@@ -216,8 +214,11 @@ L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "매크로가 화면에 남기는
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "매크로가 실행되는 동안 오류 소리를 끕니다."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
 	"이 매크로를 전투 중에만, 전투 중이 아닐 때만, 또는 언제든 시전하게 합니다."
-L["OPTIONS_KIND_EXAMPLES"] = "내 주문: %s"
-L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s 외 %d개"
+L["OPTIONS_KIND_YOUR_SPELLS"] = "내 주문"
+L["OPTIONS_KIND_YOUR_ITEMS"] = "내 아이템"
+L["OPTIONS_KIND_MORE"] = "외 %d개."
+L["OPTIONS_KIND_NO_SPELLS"] = "이 종류에 해당하는 주문이 없습니다."
+L["OPTIONS_KIND_NO_ITEMS"] = "착용한 아이템 중 사용 효과가 있는 것이 없습니다."
 L["KIND_ENEMY"] = "적 대상 주문"
 L["KIND_ENEMY_DESCRIPTION"] = "공격이나 약화 효과처럼 적에게 시전하는 주문입니다."
 L["KIND_FRIENDLY"] = "아군 대상 주문"
@@ -232,6 +233,8 @@ L["KIND_FORM"] = "변신, 태세 및 상"
 L["KIND_FORM_DESCRIPTION"] = "끄거나 다른 것으로 바꿀 때까지 유지되는 주문입니다."
 L["KIND_SELF"] = "자신 및 광역 주문"
 L["KIND_SELF_DESCRIPTION"] = "대상 없이 자신이나 주변에 시전하는 주문입니다."
+L["KIND_ITEM"] = "아이템 매크로"
+L["KIND_ITEM_DESCRIPTION"] = "장신구처럼 착용한 아이템을 사용하는 매크로입니다."
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "사용자 지정 매크로"
@@ -299,6 +302,7 @@ L["ERROR_MACRO_SLOTS_FULL"] =
 	"빈 매크로 칸이 없습니다. /macro에서 매크로를 삭제해 자리를 만드세요."
 L["ERROR_GENERAL_MACRO_SLOTS_FULL"] =
 	"빈 일반 매크로 칸이 없습니다. /macro에서 일반 매크로를 삭제해 자리를 만드세요."
+L["CHAT_MACROS_DELETED"] = "삭제한 매크로: %d"
 L["CHAT_MACRO_TOO_LONG"] =
 	'"%s" 매크로는 옵션을 켠 상태로 %d바이트라서 매크로 최대 길이인 %d바이트를 넘습니다. 옵션을 하나 꺼서 줄이세요.'
 L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =

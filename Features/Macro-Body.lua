@@ -3,15 +3,11 @@ local _, ns = ...
 -- Writes a page macro's text from its spell and the options the player turned on (Features/Macro-Options.lua).
 
 --[[
-	A macro conditional joining the given conditions (nil or "" ones are skipped) behind the always-present
-	condition (nil or "", the combat check's), e.g. "[combat,@mouseover,harm,nodead]". Returns "" when there
-	is nothing to check, so a plain cast stays "/cast Name".
+	A macro conditional joining the given conditions (nil or "" ones are skipped), e.g.
+	"[@mouseover,harm,nodead]". Returns "" when there is nothing to check, so a plain cast stays "/cast Name".
 ]]
-local function Condition(always, ...)
+local function Condition(...)
 	local parts = {}
-	if always and always ~= "" then
-		parts[1] = always
-	end
 	for i = 1, select("#", ...) do
 		local c = select(i, ...)
 		if c and c ~= "" then
@@ -22,18 +18,17 @@ local function Condition(always, ...)
 end
 
 --[[
-	A /cast trying each clause in turn. A clause is { condition, unit, spell }: the condition ("" for none)
-	joins the always-present condition (nil or "", e.g. the combat check's), and the clause casts its spell,
-	or spellFor(unit) without one. Neighbouring clauses that cast the same spell share it
+	A /cast trying each clause in turn. A clause is { condition, unit, spell }: the condition ("" for none),
+	and the spell the clause casts, or spellFor(unit) without one. Neighbouring clauses that cast the same spell share it
 	("[@mouseover,help,nodead][] Name"), and a lone clause with nothing to check drops its brackets, so a plain
 	cast stays "/cast Name". With reset ("combat", "target" or both as "combat/target") the line is a
 	/castsequence of the spell then nothing, so it casts once until that reset. command is the line's slash
 	command otherwise ("/cast ", or an equipment macro's "/use ").
 ]]
-local function CastLine(clauses, always, spellFor, reset, command)
+local function CastLine(clauses, spellFor, reset, command)
 	local groups = {}
 	for _, clause in ipairs(clauses) do
-		local condition = Condition(always, clause[1])
+		local condition = Condition(clause[1])
 		local spell = clause[3] or spellFor(clause[2])
 		local last = groups[#groups]
 		if last and last.spell == spell then
@@ -89,10 +84,11 @@ function ns.BareBody(name)
 end
 
 --[[
-	The tag line that ends every macro the add-on writes, "#m 4K", kept as short as it can be since it costs
+	The tag line that ends every macro the add-on writes, "#4K", kept as short as it can be since it costs
 	the player macro text. WoW runs only the "#" lines it knows (#showtooltip, #show), so the line does
 	nothing; it names the page macro the WoW macro is for, whatever the macro is called, so the page finds its
-	macros by tag rather than by name. The tag is two of the 62 digits
+	macros by tag rather than by name. Only the body's last line is read as a tag, so a short "#" line a
+	player writes higher up in a custom macro is never taken for one. The tag is two of the 62 digits
 	and letters, handed out in turn from an account-wide register (ns.db.global.macroTags), so no two macros
 	ever share one, which a hash this short couldn't promise; past 3,843 tags they run to three. A page macro
 	gets its tag only when a WoW macro is written for it (ns.AssignMacroTag); until then its body carries "00",
@@ -100,7 +96,7 @@ end
 	for: an equipment macro's slot, which every character shares like the general macro itself, else this
 	character's key with the spell or custom macro's full name, so a character finds only its own.
 ]]
-local TAG_PREFIX = "#m "
+local TAG_PREFIX = "#"
 local TAG_DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 local TAG_WIDTH = 2
 local UNASSIGNED_TAG = "00"
@@ -113,6 +109,30 @@ local function MacroIdentity(macro)
 	end
 	local kind = macro.custom and "custom" or macro.focus and "focus" or macro.copy and "copy" .. macro.copy or "spell"
 	return ns.db.keys.char .. ":" .. kind .. ":" .. macro.name
+end
+
+-- The register key of this character's own macro for a spell, by the spell's name.
+local function SpellIdentity(name)
+	return MacroIdentity({ name = name })
+end
+
+-- Whether a WoW macro was ever written for this character's own macro for a spell.
+function ns.HasSpellMacroTag(name)
+	return ns.db.global.macroTags[SpellIdentity(name)] ~= nil
+end
+
+--[[
+	Moves the tag of one spell's macro to another spell's, when that spell has no tag of its own yet, so the
+	WoW macro written for the first is found, rewritten and renamed as the second's (see ns.HandOverMacro).
+	Returns whether it moved.
+]]
+function ns.HandOverMacroTag(from, to)
+	local tags, fromIdentity, toIdentity = ns.db.global.macroTags, SpellIdentity(from), SpellIdentity(to)
+	if not tags[fromIdentity] or tags[toIdentity] then
+		return false
+	end
+	tags[toIdentity], tags[fromIdentity] = tags[fromIdentity], nil
+	return true
 end
 
 -- The nth tag, n from 1: n in base 62, padded to TAG_WIDTH digits.
@@ -132,7 +152,7 @@ end
 
 -- The tag a WoW macro's body carries, or nil for a macro the add-on didn't tag.
 function ns.BodyTag(body)
-	local tag = body and ("\n" .. body .. "\n"):match("\n" .. TAG_PREFIX .. "(%w%w%w?)\n")
+	local tag = body and ("\n" .. body):match("\n" .. TAG_PREFIX .. "(%w%w%w?)\n*$")
 	return tag ~= UNASSIGNED_TAG and tag or nil
 end
 
@@ -143,7 +163,7 @@ end
 
 -- body without its tag line, as the page shows macro text.
 function ns.UntaggedBody(body)
-	return (("\n" .. body):gsub("\n" .. TAG_PREFIX .. "%w+", ""):sub(2))
+	return (("\n" .. body):gsub("\n" .. TAG_PREFIX .. "%w%w%w?\n*$", ""):sub(2))
 end
 
 --[[
@@ -205,25 +225,46 @@ function ns.StancesOf(name)
 	return c.stances[name]
 end
 
+--[[
+	A target priority's clauses (see ns.TargetPriority), target being the spell's help, harm or exists: each
+	unit only when it can take the spell, then a plain cast. The target last is that plain cast, and the
+	player always takes it, so nothing after the player is ever tried.
+]]
+local function TargetClauses(list, target)
+	local clauses = {}
+	for i, unit in ipairs(list) do
+		if unit == "player" then
+			clauses[#clauses + 1] = { "@player", "player" }
+			return clauses
+		elseif unit == "target" then
+			if i == #list then
+				break
+			end
+			clauses[#clauses + 1] = { target .. ",nodead", "target" }
+		else
+			clauses[#clauses + 1] = { "@" .. unit .. "," .. target .. ",nodead", unit }
+		end
+	end
+	clauses[#clauses + 1] = { "", "target" }
+	return clauses
+end
+
 local function CastBody(macro)
 	--[[
-		The lines, in the order written: one /stopmacro for stopIfChanneling's [channeling] and
-		stopIfStealthed's [stealth], so a press can't break a channel or stealth, ahead of the mute so a
-		stopped press never leaves the sounds muted; muteErrors' mute; stopAttack's /stopattack; stopCast's
+		The lines, in the order written: one /stopmacro for stopIfChanneling's [channeling],
+		stopIfStealthed's [stealth] and the combat check's [nocombat] or [combat], so a press can't break a
+		channel or stealth, and on the wrong side of the combat check does nothing at all, not even its item
+		or attack lines, ahead of the mute so a stopped press never leaves the sounds muted; muteErrors' mute; stopAttack's /stopattack; stopCast's
 		/stopcasting; cancelForm's /cancelform; targetEnemy's /targetenemy, for when there is no living hostile
-		target, and targetFriend's /targetfriend, for when there is no living friendly one; the useItems slots, in the order ticked; the stance switch; then the cast. The combat check adds
-		[combat] or [nocombat] to every cast clause. oncePerCombat makes the
+		target, and targetFriend's /targetfriend, for when there is no living friendly one; the useItems slots, in the order ticked; the stance switch; then the cast. oncePerCombat makes the
 		cast a /castsequence that casts once until combat ends or the target changes, oncePerTarget one that
 		casts once until the target changes. With items, a stance switch or a cast sequence, #showtooltip
 		names the spell so the button shows the spell.
 	]]
-	local always
 	local combatCheck = ns.CombatCheck(macro)
-	if combatCheck then
-		always = combatCheck == "combatOnly" and "combat" or "nocombat"
-	end
 	local stops = (ns.IsOptionOn(macro, "stopIfChanneling") and "[channeling]" or "")
 		.. (ns.IsOptionOn(macro, "stopIfStealthed") and "[stealth]" or "")
+		.. (combatCheck == "combatOnly" and "[nocombat]" or combatCheck == "noCombat" and "[combat]" or "")
 	-- oncePerCombat also resets when the target changes, so a new pull mid-combat can take the cast again
 	local perCombat = ns.IsOptionOn(macro, "oncePerCombat")
 	local perTarget = perCombat or ns.IsOptionOn(macro, "oncePerTarget")
@@ -235,10 +276,20 @@ local function CastBody(macro)
 	end
 	local use = table.concat(useLines)
 	local stance = ns.IsOptionOn(macro, "stance") and StanceLine(macro.stances) or ""
-	-- a /castsequence's button would show the step after the cast, so it names the spell too
+	--[[
+		a /castsequence's button would show the step after the cast, so it names the spell too. An equipment
+		macro names its slot, and a summon macro casting its pet's ability names the ability while the pet is
+		out, as its cast line does.
+	]]
 	local namesSpell = stance ~= "" or use ~= "" or reset ~= nil
+	-- the spell cast: the spell's own, or the one its Grouped Spells picks
+	local cast = macro.equipment and tostring(macro.slot) or ns.CastSpellName(macro)
+	local shown = cast
+	if ns.IsOptionOn(macro, "pet") then
+		shown = "[pet:" .. macro.petFamily .. "] " .. macro.petAbility .. "; " .. shown
+	end
 	local header = "#showtooltip"
-		.. (namesSpell and " " .. macro.name or "")
+		.. (namesSpell and " " .. shown or "")
 		.. "\n"
 		.. (stops ~= "" and "/stopmacro " .. stops .. "\n" or "")
 		.. (ns.IsOptionOn(macro, "muteErrors") and "/run MacroSpellbookMute(1)\n" or "")
@@ -254,56 +305,55 @@ local function CastBody(macro)
 		it; the targetRank option names the highest rank each clause's unit can take, by its level now
 	]]
 	local prefix = ns.IsOptionOn(macro, "noToggle") and "!" or ""
-	local targetRank, fixedRank = ns.IsOptionOn(macro, "targetRank"), ns.FixedRank(macro)
+	-- the ranks are the spell's own, so a grouped spell cast in its place takes its highest
+	local ownSpell = cast == macro.name
+	local targetRank = ownSpell and ns.IsOptionOn(macro, "targetRank")
+	local fixedRank = ownSpell and ns.FixedRank(macro)
 	-- an equipment macro uses its slot ("/use 13"), whose item may go on a friend or an enemy
-	local name = macro.equipment and tostring(macro.slot) or macro.name
+	local name = cast
 	local target = macro.equipment and "exists" or macro.target
 	local function spellFor(unit)
-		local rank = fixedRank or (targetRank and RankFor(macro.ranks, unit))
+		local rank = fixedRank or (targetRank and macro.ranks and RankFor(macro.ranks, unit))
 		return prefix .. name .. (rank and "(" .. rank .. ")" or "")
 	end
 	local spell = spellFor(nil)
-	--[[
-		who the cast tries, in turn: the focus copy its focus then the target; else the mouseover when that
-		option is on, then the target, then (with targetTarget) the target's target, then (with castOnSelf)
-		the player, each only when it can take the spell
-	]]
+	-- who the cast tries, in turn: the focus copy its focus then the target; else its target priority
 	local clauses
 	if macro.focus then
 		clauses = { { "@focus," .. target .. ",nodead", "focus" }, { "", "target" } }
 	else
-		clauses = {}
-		if ns.IsOptionOn(macro, "mouseover") then
-			clauses[1] = { "@mouseover," .. target .. ",nodead", "mouseover" }
-		end
-		local castOnSelf, targetTarget = ns.IsOptionOn(macro, "castOnSelf"), ns.IsOptionOn(macro, "targetTarget")
-		if castOnSelf or targetTarget then
-			clauses[#clauses + 1] = { target .. ",nodead", "target" }
-		end
-		if targetTarget then
-			clauses[#clauses + 1] = { "@targettarget," .. target .. ",nodead", "targettarget" }
-		end
-		clauses[#clauses + 1] = castOnSelf and { "@player", "player" } or { "", "target" }
+		clauses = TargetClauses(ns.TargetPriority(macro), target)
 	end
 	if ns.IsOptionOn(macro, "cursor") then
 		clauses = { { "@cursor" } }
 	end
-	-- a right-click's group version goes before every clause
+	--[[
+		a right-click casts the group (or single) version on the same units in the same order, ahead of every
+		left-click clause; with Dynamic Rank it takes the highest of its own ranks each unit's level can take,
+		so a right-click Power Word: Fortitude on a low-level target doesn't fail as too low level
+	]]
 	if ns.IsOptionOn(macro, "groupVersion") then
-		table.insert(clauses, 1, { "btn:2", nil, macro.groupSpell })
+		local rightClick, ranks = ns.RightClickSpell(macro), macro.rightClickRanks
+		local dynamic = ns.IsOptionOn(macro, "targetRank") and ranks
+		local clicks = {}
+		for i, clause in ipairs(clauses) do
+			local rank = dynamic and RankFor(ranks, clause[2])
+			clicks[i] = {
+				"btn:2" .. ((clause[1] or "") ~= "" and "," .. clause[1] or ""),
+				clause[2],
+				rightClick .. (rank and "(" .. rank .. ")" or ""),
+			}
+		end
+		for _, clause in ipairs(clauses) do
+			clicks[#clicks + 1] = clause
+		end
+		clauses = clicks
 	end
 	if ns.IsOptionOn(macro, "pet") then
 		-- [pet:X] matches the pet's creature family, so another demon being out still summons this one
-		return header
-			.. "/cast "
-			.. Condition(always, "pet:" .. macro.petFamily)
-			.. " "
-			.. macro.petAbility
-			.. "; "
-			.. (always and Condition(always) .. " " or "")
-			.. spell
+		return header .. "/cast " .. Condition("pet:" .. macro.petFamily) .. " " .. macro.petAbility .. "; " .. spell
 	end
-	return header .. CastLine(clauses, always, spellFor, reset, macro.equipment and "/use " or "/cast ")
+	return header .. CastLine(clauses, spellFor, reset, macro.equipment and "/use " or "/cast ")
 end
 
 --[[

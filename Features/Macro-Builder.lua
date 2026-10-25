@@ -14,6 +14,7 @@ local MacroBody = ns.MacroBody
 local StancesOf = ns.StancesOf
 
 local FOCUS_SUFFIX = " @F" -- ends a focus copy's WoW macro name, keeping it apart from the spell's own
+ns.FOCUS_SUFFIX = FOCUS_SUFFIX
 
 local UNLISTED = math.huge -- the Unlearned section sorts after everything else
 --[[
@@ -70,6 +71,8 @@ local function ResolveClassConfig()
 		autoShot = lists.autoShot and SpellName(lists.autoShot),
 		autoShotLabelKey = lists.autoShot and AUTO_SHOT_LABEL_KEYS[class],
 		groupSpells = {},
+		soloSpells = {},
+		spellGroups = {}, -- each grouped spell's name -> its group's names, in the order they are learned
 		categoryRankByName = {}, -- each spellbook tab's name -> its section rank, filled by ns.CollectMacros
 		extraSpells = lists.extraSpells or NO_IDS,
 		petAbilities = {},
@@ -116,6 +119,19 @@ local function ResolveClassConfig()
 		local single, group = C_Spell.GetSpellName(singleId), C_Spell.GetSpellName(groupId)
 		if single and group then
 			config.groupSpells[single] = group
+			config.soloSpells[group] = single
+		end
+	end
+	-- a group whose names aren't all loaded yet waits for the next build, so no spell drops out of it
+	for _, ids in ipairs((ns.SPELL_GROUPS or NO_IDS)[class] or NO_IDS) do
+		local names = {}
+		for _, id in ipairs(ids) do
+			names[#names + 1] = SpellName(id)
+		end
+		if #names == #ids then
+			for _, name in ipairs(names) do
+				config.spellGroups[name] = names
+			end
 		end
 	end
 	--[[
@@ -184,9 +200,14 @@ ns.macros = {}
 
 --[[
 	section is { rank, name, priority }: the spell's spellbook tab, or the Unlearned section. ranks is the
-	spell's ReadSpellbook ranks entry, or nil; groupSpell its learned group version's name, or nil.
+	spell's ReadSpellbook ranks entry, or nil. grouped holds the spells it is grouped with: groupSpell, its
+	learned group version's name, or soloSpell, a group spell's learned single version's (the spell a
+	right-click casts), rightClickRanks, that spell's known ranks as ReadSpellbook lists them, and
+	groupMembers, its SPELL_GROUPS group as { name, learned } in the order they are learned; each is nil where
+	there is none. The caller sets replaces after: the spells it replaced in that
+	group (see ReplacedSpells), whose WoW macro it may have taken over.
 ]]
-local function MakeMacro(name, icon, unlearned, id, section, ranks, groupSpell)
+local function MakeMacro(name, icon, unlearned, id, section, ranks, grouped)
 	local c = ClassConfig()
 	local pet = c.petAbilities[name]
 	local macro = {
@@ -207,7 +228,10 @@ local function MakeMacro(name, icon, unlearned, id, section, ranks, groupSpell)
 		toggles = c.toggleSpells[name] ~= nil,
 		ranks = ranks and ranks.known,
 		unknownRanks = ranks and ranks.unknown,
-		groupSpell = groupSpell,
+		groupSpell = grouped.groupSpell,
+		soloSpell = grouped.soloSpell,
+		rightClickRanks = grouped.rightClickRanks,
+		groupMembers = grouped.groupMembers,
 		macroName = ns.TrimMacroName(name),
 		-- the question mark icon lets #showtooltip show the spell's own icon on the action bar
 		macroIcon = ns.ICON_QUESTION_MARK,
@@ -255,19 +279,32 @@ end
 
 --[[
 	Each spell id's learn level: the class's trainer data (the rows for this character's faction and race),
-	then the trainers this character recorded. The client's own answer (C_Spell.GetSpellLevelLearned, where it
-	has one) fills the rest.
+	then the trainers this character recorded. A rank 1 the class starts with (Frost Armor, Fireball) has no
+	trainer row, only its Rank 2's requires, so a required spell of the same name without a level of its own
+	is learned at level 1. The client's own answer (C_Spell.GetSpellLevelLearned, where it has one) fills the
+	rest.
 ]]
 local function LearnLevels()
-	local levels = {}
+	local levels, rows = {}, {}
 	local faction, race = UnitFactionGroup("player"), select(3, UnitRace("player"))
 	for _, row in ipairs(ns.TRAINER_SPELLS and ns.TRAINER_SPELLS[select(2, UnitClass("player"))] or NO_IDS) do
 		if (not row.faction or row.faction == faction) and (not row.race or row.race == race) then
 			levels[row.id] = row.level
+			rows[#rows + 1] = row
 		end
 	end
 	for id, level in pairs(ns.db.profile.trainerSpells) do
 		levels[id] = levels[id] or level
+	end
+	for _, row in ipairs(rows) do
+		for _, id in ipairs(row.requires or NO_IDS) do
+			if not levels[id] then
+				local name = SpellName(id)
+				if name and name == SpellName(row.id) then
+					levels[id] = 1
+				end
+			end
+		end
 	end
 	return levels
 end
@@ -347,6 +384,68 @@ local function ReadSpellbook()
 end
 
 --[[
+	The spells a learned spell replaced in its SPELL_GROUPS group: those just before it no longer in the
+	spellbook, nearest first, up to the first that still is. Bear Form goes from the book once Dire Bear
+	Form is learned, so its WoW macro, wherever the player placed it, would never be rewritten again; the
+	new spell takes it over instead (see ns.HandOverMacro). members is the group as { name, learned }.
+]]
+local function ReplacedSpells(name, members)
+	local replaced, at = {}, nil
+	for i, member in ipairs(members) do
+		if member.name == name then
+			at = i
+		end
+	end
+	for i = (at or 1) - 1, 1, -1 do
+		if members[i].learned then
+			break
+		end
+		replaced[#replaced + 1] = members[i].name
+	end
+	return replaced
+end
+
+--[[
+	Gives a learned spell the WoW macro of the nearest spell it replaced that has one, settings and all, when
+	it has no macro of its own yet. The sync then finds that macro by its tag, rewrites it to cast the new
+	spell and renames it (see SyncAt in Features/Macro-Sync.lua, which reads macro.replaces).
+]]
+function ns.HandOverMacro(name, replaced)
+	for _, from in ipairs(replaced) do
+		if ns.HandOverMacroTag(from, name) then
+			ns.MoveSpellSettings(from, name)
+			return
+		end
+	end
+end
+
+--[[
+	Whether a spell learned since the last build has a replaced spell's macro to take over, read from the
+	spell IDs alone, so a spell learned with no page open still rewrites that macro (see RefreshForSpells in
+	Features/Spellbook-Page.lua).
+]]
+function ns.HandOverDue()
+	local class = select(2, UnitClass("player"))
+	for _, ids in ipairs((ns.SPELL_GROUPS or NO_IDS)[class] or NO_IDS) do
+		for i = #ids, 2, -1 do
+			local to = IsPlayerSpell(ids[i]) and SpellName(ids[i])
+			if to and not ns.HasSpellMacroTag(to) then
+				for j = i - 1, 1, -1 do
+					if IsPlayerSpell(ids[j]) then
+						break
+					end
+					local from = SpellName(ids[j])
+					if from and ns.HasSpellMacroTag(from) then
+						return true
+					end
+				end
+			end
+		end
+	end
+	return false
+end
+
+--[[
 	Rebuilds ns.macros: the learned spells (from the spellbook), the player's custom macros and the
 	equipped items with a "Use:" effect, plus the spells not learned yet when ns.ShowsUnlearned().
 ]]
@@ -358,16 +457,25 @@ function ns.CollectMacros()
 	local ranks, learned = ReadSpellbook()
 	-- learnLevel and learnTalent say when an unlearned spell can be learned, for its note and tooltip
 	local function add(name, icon, unlearned, id, section, learnLevel, learnTalent)
-		local groupSpell = ClassConfig().groupSpells[name]
-		local macro = MakeMacro(
-			name,
-			icon,
-			unlearned,
-			id,
-			section,
-			not unlearned and ranks[name] or nil,
-			groupSpell and learned[groupSpell] and groupSpell or nil
-		)
+		local c = ClassConfig()
+		local groupSpell, soloSpell, members = c.groupSpells[name], c.soloSpells[name], nil
+		for _, member in ipairs(c.spellGroups[name] or NO_IDS) do
+			members = members or {}
+			members[#members + 1] = { name = member, learned = learned[member] == true }
+		end
+		-- before the macro is made, so its text carries the macro and settings it takes over
+		local replaced = not unlearned and members and ReplacedSpells(name, members) or NO_IDS
+		ns.HandOverMacro(name, replaced)
+		groupSpell = groupSpell and learned[groupSpell] and groupSpell or nil
+		soloSpell = soloSpell and learned[soloSpell] and soloSpell or nil
+		local rightClick = groupSpell or soloSpell
+		local macro = MakeMacro(name, icon, unlearned, id, section, not unlearned and ranks[name] or nil, {
+			groupSpell = groupSpell,
+			soloSpell = soloSpell,
+			rightClickRanks = rightClick and ranks[rightClick] and ranks[rightClick].known,
+			groupMembers = members,
+		})
+		macro.replaces = replaced[1] and replaced or nil
 		macro.learnLevel, macro.learnTalent = learnLevel, learnTalent
 		-- a custom macro already uses the name
 		if unlearned and taken[macro.macroName] then

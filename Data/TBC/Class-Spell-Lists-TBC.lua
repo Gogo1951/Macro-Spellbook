@@ -33,6 +33,7 @@ ns.CLASS_SPELL_LISTS = {
 		buffs = {
 			{ 1126, 5232, 6756, 5234, 8907, 9884, 9885, 26990 }, -- Mark of the Wild
 			{ 467, 782, 1075, 8914, 9756, 9910, 26992 }, -- Thorns
+			21849, -- Gift of the Wild
 		},
 		cursor = {
 			{ 16914, 17401, 17402, 27012, 42230, 42231, 42232, 42233 }, -- Hurricane
@@ -69,7 +70,9 @@ ns.CLASS_SPELL_LISTS = {
 			{ 1513, 14326, 14327 }, -- Scare Beast
 			1462, -- Beast Lore
 		},
-		mouseoverFriend = {},
+		mouseoverFriend = {
+			34477, -- Misdirection
+		},
 		cursor = {
 			{ 1510, 14294, 14295, 27022, 42234, 42243, 42244, 42245 }, -- Volley
 			1543, -- Flare
@@ -141,11 +144,13 @@ ns.CLASS_SPELL_LISTS = {
 			{ 604, 8450, 8451, 10173, 10174, 33944 }, -- Dampen Magic
 			475, -- Remove Lesser Curse
 			130, -- Slow Fall
+			23028, -- Arcane Brilliance
 		},
 		buffs = {
 			{ 1459, 1460, 1461, 10156, 10157, 27126 }, -- Arcane Intellect
 			{ 1008, 8455, 10169, 10170, 27130, 33946 }, -- Amplify Magic
 			{ 604, 8450, 8451, 10173, 10174, 33944 }, -- Dampen Magic
+			23028, -- Arcane Brilliance
 		},
 		cursor = {
 			{ 2120, 2121, 8422, 8423, 10215, 10216, 27086 }, -- Flamestrike
@@ -225,6 +230,12 @@ ns.CLASS_SPELL_LISTS = {
 			1038, -- Blessing of Salvation
 			{ 19977, 19978, 19979, 27144 }, -- Blessing of Light
 			{ 20911, 20912, 20913, 20914, 27168 }, -- Blessing of Sanctuary
+			25782, -- Greater Blessing of Might
+			25894, -- Greater Blessing of Wisdom
+			25898, -- Greater Blessing of Kings
+			25895, -- Greater Blessing of Salvation
+			25890, -- Greater Blessing of Light
+			25899, -- Greater Blessing of Sanctuary
 		},
 		cursor = {},
 		channeled = {},
@@ -284,6 +295,9 @@ ns.CLASS_SPELL_LISTS = {
 			{ 14752, 14818, 14819, 27841, 25312 }, -- Divine Spirit
 			{ 976, 10957, 10958, 25433 }, -- Shadow Protection
 			6346, -- Fear Ward
+			21562, -- Prayer of Fortitude
+			27681, -- Prayer of Spirit
+			27683, -- Prayer of Shadow Protection
 		},
 		cursor = {},
 		channeled = {

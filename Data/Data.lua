@@ -13,7 +13,9 @@ ns.SAVED_VARIABLES_NAME = "MacroSpellbookDB"
 --------------------------------------------------------------------------------
 
 ns.MACRO_BODY_MAX_LENGTH = 255
-ns.MACRO_NAME_MAX_LENGTH = 16 -- longer names are truncated by CreateMacro, so a lookup by name would miss them
+ns.MACRO_NAME_PREFIX = "~" -- starts every WoW macro's name, so the add-on's macros sort together in /macro
+-- a page macro's name; with the prefix it fills WoW's 16 bytes, past which CreateMacro truncates and a lookup by name would miss it
+ns.MACRO_NAME_MAX_LENGTH = 16 - #ns.MACRO_NAME_PREFIX
 ns.ICON_QUESTION_MARK = 134400 -- Interface\Icons\INV_Misc_QuestionMark
 ns.ICON_MACRO = "Interface\\MacroFrame\\MacroFrame-Icon" -- the "M" key shown on Blizzard's macro window
 
@@ -44,6 +46,14 @@ ns.OPTIONS_REGISTRY = {
 	General = ADDON_NAME,
 	SpellbookPage = ADDON_NAME .. "_SpellbookPage",
 	MacroDefaults = ADDON_NAME .. "_MacroDefaults",
+	-- the Macro Defaults sub-panels, one per spell kind (ns.MACRO_KINDS), by ns.KindPanel's key
+	MacroDefaults_enemy = ADDON_NAME .. "_MacroDefaults_enemy",
+	MacroDefaults_friendly = ADDON_NAME .. "_MacroDefaults_friendly",
+	MacroDefaults_buff = ADDON_NAME .. "_MacroDefaults_buff",
+	MacroDefaults_anyone = ADDON_NAME .. "_MacroDefaults_anyone",
+	MacroDefaults_ground = ADDON_NAME .. "_MacroDefaults_ground",
+	MacroDefaults_form = ADDON_NAME .. "_MacroDefaults_form",
+	MacroDefaults_self = ADDON_NAME .. "_MacroDefaults_self",
 	CustomMacros = ADDON_NAME .. "_CustomMacros",
 	Profiles = ADDON_NAME .. "_Profiles",
 	FeedbackSupport = ADDON_NAME .. "_FeedbackSupport",
@@ -59,6 +69,10 @@ ns.OPTIONS_LABEL_WIDTH = 2.1
 ns.OPTIONS_CONTROL_WIDTH = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_LABEL_WIDTH
 ns.OPTIONS_REMOVE_ICON_WIDTH = 0.25 -- the item lists' remove column, sized to its icon
 ns.OPTIONS_SUB_INDENT_WIDTH = 0.115 -- the blank cell a sub-option row leads with
+ns.OPTIONS_LINK_WIDTH = ns.OPTIONS_ROW_WIDTH / 3 -- a spell or item link cell, three to a row
+
+-- the AceGUI widget drawing a spell or item link with its tooltip on hover (Options/Options-Utilities.lua)
+ns.LINK_WIDGET_TYPE = ADDON_NAME .. "_Link"
 
 --------------------------------------------------------------------------------
 -- Color Palette
@@ -75,6 +89,8 @@ ns.PALETTE = {
 	SEPARATOR = "AAAAAA", -- Gray: Separators, Dividers
 	MUTED = "808080", -- Dark Gray: Meta-data, Version Numbers
 }
+
+ns.SPELL_LINK_COLOR = "71D5FF" -- the client's own spell-link blue
 
 -- parchment ink, matching the native spell names and subtext on the spellbook page
 ns.INK_COLOR = { 0.18, 0.106, 0.059 }

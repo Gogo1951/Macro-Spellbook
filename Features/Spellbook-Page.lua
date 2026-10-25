@@ -7,7 +7,7 @@ local HasTemplate = ns.HasTemplate
 --[[
 	Lays ns.macros (built by Features/Macro-Builder.lua) out on a spellbook page frame, with the page's
 	settings menu and macro slot counts. The host files own the tab and the page frame itself;
-	Features/Macro-Button.lua owns each macro's button, Features/Macro-Menu.lua its right-click menu, and
+	Features/Macro-Button.lua owns each macro's button, Features/Macro-Menu.lua its right-click options menu, and
 	Features/Spellbook-Paging.lua the page arrows.
 ]]
 
@@ -34,6 +34,13 @@ local CELL_HEIGHT, CATEGORY_GAP = 52, 12
 
 local INK_COLOR = ns.INK_COLOR
 local FADED_INK_COLOR = ns.FADED_INK_COLOR
+
+--[[
+	The Classic engine's books' settings button: the gear item icon, Vanilla art every client ships. Newer
+	clients' cog atlases are no good here: Classic Era lists QuestLog-icon-setting but has no art for it, so
+	it draws as the missing-texture green.
+]]
+local SETTINGS_COG_ICON = "Interface\\Icons\\INV_Misc_Gear_01"
 
 --[[
 	The same category bar the native page draws over each skill line, on the Retail-engine book. The Classic
@@ -143,6 +150,12 @@ local function Layout(page)
 	page.footer:ClearAllPoints()
 	page.footer:SetPoint("BOTTOMLEFT", page, "BOTTOMLEFT", origins[1] + 8, geometry.footerBottom)
 	page.footer:SetWidth(viewWidth - 16)
+	-- Mark All Spells As Placed sits under the footer; the macro slot counts go by the page arrows, below
+	page.markPlaced:ClearAllPoints()
+	page.markPlaced:SetPoint("TOPLEFT", page.footer, "BOTTOMLEFT", -2, -4)
+	page.markPlaced:SetShown(#ns.macros > 0)
+	page.macroCount:ClearAllPoints()
+	page.macroCount:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", geometry.pagingRight, geometry.pagingBottom + 6)
 	if #ns.macros == 0 then
 		local header = page.headers:Acquire()
 		header:SetPoint("TOPLEFT", page, "TOPLEFT", origins[1], viewTop)
@@ -164,6 +177,16 @@ local function Layout(page)
 	local maxPages = math.ceil(#halves / spread)
 	controls:SetMaxPages(maxPages)
 	controls:SetShown(maxPages > 1)
+	-- the macro slot counts sit left of the page count, or where the arrows go when there's one page
+	if maxPages > 1 then
+		page.macroCount:ClearAllPoints()
+		page.macroCount:SetPoint("RIGHT", controls.PageText, "LEFT", -16, 0)
+	end
+	-- one page shares its bottom edge with the counts and the arrows, so the footer stops short of them
+	if spread == 1 then
+		local reserved = page.macroCount:GetStringWidth() + (maxPages > 1 and 140 or 0) + 24
+		page.footer:SetWidth(viewWidth - 16 - reserved)
+	end
 	local current = math.min(controls:GetCurrentPage(), maxPages)
 	local bars = ns.ScanActionBars()
 	for side = 1, spread do
@@ -196,7 +219,7 @@ local function SlotCount(label, used, max)
 end
 
 --[[
-	The general and character macro slots used, beside the settings menu: "Macro Slots" and the counts in ink,
+	The general and character macro slots used, by the page arrows: "Macro Slots" and the counts in ink,
 	the list names faded between them, and a full list's count in the palette's OFF red.
 ]]
 local function UpdateMacroCount(page)
@@ -214,8 +237,8 @@ end
 local function Refresh(page)
 	ns.CollectMacros()
 	ns.SyncAllMacros()
+	UpdateMacroCount(page) -- first, so the layout knows the counts' width
 	Layout(page)
-	UpdateMacroCount(page)
 end
 
 local pages = {} -- every page built, so a settings change can redraw the open one
@@ -276,25 +299,26 @@ local function BuildPage(page)
 			"SETTINGS_COUNT_SPELLS_ON_BARS",
 			"OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"
 		)
+		--[[
+			Highlight Unplaced Spells: on while no macro is marked placed, so every one not on the bars glows.
+			Turning it off marks them all placed, as the Mark All Spells As Placed button by the page arrows
+			does; turning it on clears the marks
+		]]
 		rootDescription:CreateDivider()
 		AddMenuTooltip(
-			rootDescription:CreateButton(L["SETTINGS_MARK_ALL_PLACED"], function()
-				ns.MarkAllPlaced()
+			rootDescription:CreateCheckbox(L["SETTINGS_HIGHLIGHT_UNPLACED"], function()
+				return not ns.HasPlacedMarks()
+			end, function()
+				if ns.HasPlacedMarks() then
+					ns.ClearPlacedMarks()
+				else
+					ns.MarkAllPlaced()
+				end
 				ns:OnActionbarSlotChanged() -- redraws the glows
 			end),
-			"SETTINGS_MARK_ALL_PLACED",
-			"SETTINGS_MARK_ALL_PLACED_DESCRIPTION"
+			"SETTINGS_HIGHLIGHT_UNPLACED",
+			"SETTINGS_HIGHLIGHT_UNPLACED_DESCRIPTION"
 		)
-		if ns.HasPlacedMarks() then
-			AddMenuTooltip(
-				rootDescription:CreateButton(L["SETTINGS_CLEAR_PLACED"], function()
-					ns.ClearPlacedMarks()
-					ns:OnActionbarSlotChanged() -- redraws the glows
-				end),
-				"SETTINGS_CLEAR_PLACED",
-				"SETTINGS_CLEAR_PLACED_DESCRIPTION"
-			)
-		end
 		rootDescription:CreateDivider()
 		-- the panels the page leads to, each opened directly: { ns.OPTIONS_REGISTRY key, label key, desc key }
 		for _, panel in ipairs({
@@ -329,34 +353,69 @@ local function BuildPage(page)
 	else
 		local options = CreateFrame("Button", nil, page)
 		page.options = options
-		options:SetSize(20, 20)
+		options:SetSize(24, 24)
 		options:SetPoint("TOPRIGHT", page, "TOPRIGHT", -6, -6)
-		options:SetNormalTexture("Interface\\Buttons\\UI-OptionsButton")
-		options:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+		--[[
+			the gear item icon (SETTINGS_COG_ICON), its edges trimmed; lit under the mouse, nudged when pressed
+		]]
+		local cog = options:CreateTexture(nil, "ARTWORK")
+		cog:SetAllPoints()
+		cog:SetTexture(SETTINGS_COG_ICON)
+		cog:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+		options:SetNormalTexture(cog)
+		local highlight = options:CreateTexture(nil, "HIGHLIGHT")
+		highlight:SetAllPoints()
+		highlight:SetTexture(SETTINGS_COG_ICON)
+		highlight:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+		highlight:SetBlendMode("ADD")
+		highlight:SetAlpha(0.35)
+		options:SetScript("OnMouseDown", function()
+			cog:SetPoint("TOPLEFT", 1, -1)
+			cog:SetPoint("BOTTOMRIGHT", 1, -1)
+		end)
+		options:SetScript("OnMouseUp", function()
+			cog:SetAllPoints()
+		end)
+		options:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+			GameTooltip:SetText(SETTINGS, 1, 0.82, 0, 1, true)
+			GameTooltip:Show()
+		end)
+		options:SetScript("OnLeave", HideTooltip)
 		options:SetScript("OnClick", function(self)
+			HideTooltip(self)
 			MenuUtil.CreateContextMenu(self, SetupSettingsMenu)
 		end)
 	end
 
-	--[[
-		The macro slot counts: left of the gear on the Classic engine's books. On the Retail engine's the native
-		search box sits left of the cog, so they go at the page's top right, just under the cog.
-	]]
+	-- stops every macro glowing, whether or not it's on the bars; under the footer, and the settings menu can undo it
+	local markPlaced = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
+	page.markPlaced = markPlaced
+	markPlaced:SetText(L["SETTINGS_MARK_ALL_PLACED"])
+	markPlaced:SetSize(markPlaced:GetFontString():GetStringWidth() + 32, 22)
+	markPlaced:SetScript("OnClick", function()
+		ns.MarkAllPlaced()
+		ns:OnActionbarSlotChanged() -- redraws the glows
+	end)
+	markPlaced:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_TOP")
+		GameTooltip:SetText(L["SETTINGS_MARK_ALL_PLACED"], 1, 0.82, 0, 1, true)
+		GameTooltip:AddLine(L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"], 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	markPlaced:SetScript("OnLeave", HideTooltip)
+
+	-- the macro slot counts, by the page arrows; Layout places them
 	page.macroCount = page:CreateFontString(nil, "OVERLAY", "SystemFont_Med1")
-	page.macroCount:SetJustifyH("RIGHT")
+	page.macroCount:SetJustifyH("LEFT")
 	page.macroCount:SetTextColor(unpack(INK_COLOR)) -- "Macro Slots"; UpdateMacroCount colours the rest
-	if page.options:GetParent() == page.header then
-		page.macroCount:SetPoint("TOPRIGHT", page, "TOPRIGHT", -30, -8)
-	else
-		page.macroCount:SetPoint("RIGHT", page.options, "LEFT", -6, 0)
-	end
 	-- a font string takes no hover, so a frame over the counts carries its tooltip, above the macro buttons
 	local slotsHover = CreateFrame("Frame", nil, page)
 	slotsHover:SetAllPoints(page.macroCount)
 	slotsHover:SetFrameLevel(page:GetFrameLevel() + 10)
 	slotsHover:EnableMouse(true)
 	slotsHover:SetScript("OnEnter", function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+		GameTooltip:SetOwner(self, "ANCHOR_TOP")
 		GameTooltip:SetText(L["PAGE_MACRO_SLOTS"], 1, 0.82, 0, 1, true)
 		GameTooltip:AddLine(L["TOOLTIP_MACRO_SLOTS"], 1, 1, 1, true)
 		GameTooltip:Show()
@@ -421,7 +480,8 @@ end
 --[[
 	A learned spell or the gear worn changes the page's list; redraw the open page, once per burst, since
 	SPELLS_CHANGED fires several times in a row. With no page open, the list is dropped, so the targetRank
-	macros rebuild it, new ranks and all, before their next rewrite.
+	macros rebuild it, new ranks and all, before their next rewrite; but a spell learned that takes over a
+	replaced spell's macro (ns.HandOverDue) rebuilds and rewrites now, so that macro works straight away.
 ]]
 local spellsPending = false
 
@@ -429,6 +489,9 @@ local function RefreshForSpells()
 	spellsPending = false
 	if not ns:RefreshOpenPages() then
 		wipe(ns.macros)
+		if ns.db and ns.HandOverDue() then
+			ns:RefreshMacros()
+		end
 	end
 end
 

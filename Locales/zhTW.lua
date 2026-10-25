@@ -30,11 +30,7 @@ L["MENU_GROUP_ERRORS"] = "錯誤訊息"
 L["MENU_GROUP_USE_ITEMS_FIRST"] = "先使用物品"
 L["MACRO_TEXT"] = "巨集內容"
 L["MENU_MACRO_LENGTH"] = "%d / %d"
-L["MENU_GROUP_VALUE"] = "%s：%s"
 L["MENU_OPTIONS_COUNT"] = "%d 個選項"
-L["MENU_CAST_ON_MOUSEOVER"] = "對滑鼠指向目標施放"
-L["MENU_CAST_ON_SELF"] = "對自己施放"
-L["MENU_CAST_ON_TARGETS_TARGET"] = "對目標的目標施放"
 L["MENU_RANK_LEARN_LEVEL"] = "%s (%d級可學)"
 L["MENU_MAX_RANK"] = "最高等級"
 L["MENU_DYNAMIC_RANK"] = "動態等級"
@@ -68,7 +64,6 @@ L["MENU_SAFE_TO_SPAM_NOTE"] =
 	"想讓巨集可以放心連按，引導法術請開啟引導時停止巨集，潛行請開啟潛行時停止巨集。這樣再次按下就不會打斷引導，也不會讓你脫離潛行。"
 L["MENU_USE_FOR_KIND"] = "對所有%s使用這些選項"
 L["MENU_DUPLICATE"] = "複製"
-L["MENU_REMOVE_COPY"] = "移除此複本"
 L["MENU_USE_FOR_KIND_DESCRIPTION"] =
 	"%s中你沒有親自設定過的每個巨集，都會以這個巨集的選項為初始選項。會開啟巨集預設設定給你查看。"
 
@@ -78,8 +73,6 @@ L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "快捷列上的法術視為已放置"
 L["SETTINGS_MARK_ALL_PLACED"] = "將所有法術標記為已放置"
 L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
 	"本頁的所有巨集不再發光，無論是否在你的快捷列上。之後學會的法術在放置前仍會發光。"
-L["SETTINGS_CLEAR_PLACED"] = "清除放置標記"
-L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] = "讓每個不在快捷列上的已標記巨集重新發光。"
 L["SETTINGS_OPEN_MACRO_DEFAULTS_DESCRIPTION"] =
 	"在選項介面中開啟巨集預設設定，你可以在那裡選擇每種法術巨集的初始選項。"
 L["SETTINGS_OPEN_CUSTOM_MACROS_DESCRIPTION"] =
@@ -91,13 +84,10 @@ L["SUBTEXT_CUSTOM"] = "自訂"
 L["SUBTEXT_FOCUS"] = "專注目標"
 L["SUBTEXT_PET"] = "寵物"
 L["SUBTEXT_CURSOR"] = "游標"
-L["SUBTEXT_MOUSEOVER"] = "滑鼠指向"
-L["SUBTEXT_CAST_ON_SELF"] = "自己"
 L["SUBTEXT_STANCE"] = "姿態"
 L["SUBTEXT_USE_ITEMS"] = "使用物品"
 L["SUBTEXT_PET_ATTACK"] = "寵物攻擊"
 L["SUBTEXT_DYNAMIC_RANK"] = "動態等級"
-L["SUBTEXT_TARGETS_TARGET"] = "目標的目標"
 L["SUBTEXT_TARGET_ENEMY"] = "最近敵人"
 L["SUBTEXT_TARGET_FRIEND"] = "最近友方"
 L["SUBTEXT_GROUP_VERSION"] = "團體版本"
@@ -159,6 +149,19 @@ L["OPTIONS_KEY_SET"] = "設定按鍵"
 L["OPTIONS_KEY_SET_DESCRIPTION"] = "開啟遊戲的按鍵設定清單，Macro Spellbook 在其中有自己的分類。"
 L["OPTIONS_KEY_BINDING_TOGGLE_DESCRIPTION"] =
 	"開啟或關閉 Macro Spellbook。它在你的法術書中也有自己的分頁。"
+L["OPTIONS_DELETE_MACROS_HEADER"] = "刪除巨集"
+L["OPTIONS_DELETE_MACROS_DESCRIPTION"] =
+	"刪除 Macro Spellbook 建立的巨集，同時會將它們從快捷列上移除。你自己的巨集絕不會被改動，在頁面上點擊或拖曳任一個巨集即可重新建立。"
+L["OPTIONS_DELETE_CHARACTER_MACROS"] = "刪除角色巨集"
+L["OPTIONS_DELETE_CHARACTER_MACROS_DESCRIPTION"] =
+	"從此角色的巨集分頁中刪除 Macro Spellbook 的巨集。你的其他角色會保留各自的巨集，直到你在那些角色上也這樣做。"
+L["OPTIONS_DELETE_CHARACTER_MACROS_CONFIRM"] =
+	"刪除此角色上所有 Macro Spellbook 的巨集？它們也會從你的快捷列上移除。"
+L["OPTIONS_DELETE_GENERAL_MACROS"] = "刪除通用巨集"
+L["OPTIONS_DELETE_GENERAL_MACROS_DESCRIPTION"] =
+	"從通用巨集分頁中刪除 Macro Spellbook 的巨集。該分頁由帳號內所有角色共用，因此你的其他角色也會失去那裡的巨集。"
+L["OPTIONS_DELETE_GENERAL_MACROS_CONFIRM"] =
+	"刪除 Macro Spellbook 的所有通用巨集？帳號內所有角色都會失去它們，並且它們也會從你的快捷列上移除。"
 L["OPTIONS_COMMANDS_HEADER"] = "/指令"
 L["OPTIONS_COMMAND"] = "/msb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "開啟此插件的選項介面。"
@@ -174,11 +177,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "巨集預設設定"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"每種法術巨集一開始使用的選項。巨集會保留你在其右鍵選單中設定的內容。每種類型只列出其法術提供的選項。"
-L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "先對滑鼠指向的單位施放，其次是你的目標。"
-L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "你的目標無法接受該法術時，對你自己施放。"
-L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
-	"你的目標無法接受該法術時，嘗試對目標的目標施放，例如敵人正在攻擊的坦克。"
+	"每種巨集一開始使用的選項：物品巨集在這裡設定，每種法術巨集在下方各自的頁面設定。你在巨集的右鍵選單中自行設定的內容會保留。"
 L["OPTIONS_DEFAULT_CURSOR_DESCRIPTION"] = "把法術放在游標所指的位置，不出現瞄準圈。"
 L["OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION"] = "施放友方玩家等級所能接受的最高等級。"
 L["OPTIONS_DEFAULT_STOP_CASTING_DESCRIPTION"] = "先停止你正在施放的法術，讓這個法術立刻施放。"
@@ -202,8 +201,11 @@ L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "清除巨集在畫面上留下�
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "巨集執行期間關閉錯誤音效。"
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
 	"讓這些巨集只在戰鬥中、只在非戰鬥中或在任何時候施放。"
-L["OPTIONS_KIND_EXAMPLES"] = "你的法術：%s"
-L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s 等另外 %d 個"
+L["OPTIONS_KIND_YOUR_SPELLS"] = "你的法術"
+L["OPTIONS_KIND_YOUR_ITEMS"] = "你的物品"
+L["OPTIONS_KIND_MORE"] = "另外還有 %d 個。"
+L["OPTIONS_KIND_NO_SPELLS"] = "你沒有這種類型的法術。"
+L["OPTIONS_KIND_NO_ITEMS"] = "你裝備的物品都沒有使用效果。"
 L["KIND_ENEMY"] = "敵對法術"
 L["KIND_ENEMY_DESCRIPTION"] = "對敵人施放的法術，例如攻擊和減益效果。"
 L["KIND_FRIENDLY"] = "友方法術"
@@ -218,6 +220,8 @@ L["KIND_FORM"] = "形態、姿態和守護"
 L["KIND_FORM_DESCRIPTION"] = "在你關閉或切換之前一直保持的法術。"
 L["KIND_SELF"] = "自身和範圍法術"
 L["KIND_SELF_DESCRIPTION"] = "沒有目標，對自己或周圍施放的法術。"
+L["KIND_ITEM"] = "物品巨集"
+L["KIND_ITEM_DESCRIPTION"] = "使用你所裝備物品的巨集，例如飾品。"
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "自訂巨集"
@@ -279,6 +283,7 @@ L["KEY_BINDINGS_LOCATION"] = "開啟遊戲選單，依序進入 %s 和 %s，找�
 L["ERROR_MACRO_SLOTS_FULL"] = "沒有空的巨集欄位。請在 /macro 中刪除一個巨集來騰出位置。"
 L["ERROR_GENERAL_MACRO_SLOTS_FULL"] =
 	"沒有空的一般巨集欄位。請在 /macro 中刪除一個一般巨集來騰出位置。"
+L["CHAT_MACROS_DELETED"] = "已刪除巨集：%d"
 L["CHAT_MACRO_TOO_LONG"] =
 	'"%s"巨集在開啟選項後為 %d 位元組，超過了巨集能容納的 %d 位元組。關閉一個選項來縮短它。'
 L["CHAT_CUSTOM_NEEDS_NAME_BODY"] = "自訂巨集 #%d 需要名稱和巨集內容才能顯示在頁面上。"

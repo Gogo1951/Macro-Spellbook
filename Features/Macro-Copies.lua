@@ -11,7 +11,7 @@ local NO_COPIES = {}
 	copy numbers, by spell name, in the order made; a number removed is never reused while a later one stands,
 	so a copy keeps its name. A copy offers every option its spell does except a focus copy of its own.
 ]]
-local COPIED_SETTINGS = { "pet", "stance", "groupVersion", "fixedRank", "useItems" }
+local COPIED_SETTINGS = { "pet", "stance", "groupVersion", "fixedRank", "useItems", "groupedSpells", "targetPriority" }
 for _, key in ipairs(ns.DEFAULTABLE_OPTIONS) do
 	COPIED_SETTINGS[#COPIED_SETTINGS + 1] = key
 end
@@ -44,6 +44,36 @@ function ns.DuplicateMacro(macro)
 			value = slots
 		end
 		SpellSettings(key)[to] = value
+	end
+end
+
+--[[
+	Drops every setting of the macro's own, so it follows its kind's defaults again, as the menu's Delete
+	does: a spell's under its settings key, the focus copy among them, or an equipment slot's whole entry.
+]]
+function ns.ResetMacroOptions(macro)
+	if macro.equipment then
+		ns.db.global.equipmentOptions[macro.macroName] = nil
+		return
+	end
+	local key = SettingsKey(macro)
+	for _, setting in ipairs(COPIED_SETTINGS) do
+		SpellSettings(setting)[key] = nil
+	end
+	SpellSettings("focus")[key] = nil
+end
+
+--[[
+	Hands a spell's settings to the spell that replaced it in its group (see ns.HandOverMacro), setting by
+	setting where the new spell has none of its own, and drops the old spell's.
+]]
+function ns.MoveSpellSettings(from, to)
+	for _, key in ipairs(COPIED_SETTINGS) do
+		local settings = SpellSettings(key)
+		if settings[to] == nil then
+			settings[to] = settings[from]
+		end
+		settings[from] = nil
 	end
 end
 

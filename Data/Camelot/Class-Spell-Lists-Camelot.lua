@@ -32,6 +32,7 @@ ns.CLASS_SPELL_LISTS = {
 		buffs = {
 			{ 1126, 5232, 6756, 5234, 8907, 9884, 9885 }, -- Mark of the Wild
 			{ 467, 782, 1075, 8914, 9756, 9910 }, -- Thorns
+			21849, -- Gift of the Wild
 		},
 		cursor = {
 			{ 16914, 17401, 17402 }, -- Hurricane
@@ -141,11 +142,13 @@ ns.CLASS_SPELL_LISTS = {
 			{ 604, 8450, 8451, 10173, 10174 }, -- Dampen Magic
 			475, -- Remove Lesser Curse
 			130, -- Slow Fall
+			23028, -- Arcane Brilliance
 		},
 		buffs = {
 			{ 1459, 1460, 1461, 10156, 10157 }, -- Arcane Intellect
 			{ 1008, 8455, 10169, 10170 }, -- Amplify Magic
 			{ 604, 8450, 8451, 10173, 10174 }, -- Dampen Magic
+			23028, -- Arcane Brilliance
 		},
 		cursor = {
 			{ 2120, 2121, 8422, 8423, 10215, 10216 }, -- Flamestrike
@@ -221,6 +224,11 @@ ns.CLASS_SPELL_LISTS = {
 			{ 19740, 19834, 19835, 19836, 19837, 19838, 25291 }, -- Blessing of Might
 			1038, -- Salvation
 			{ 19977, 19978, 19979 }, -- Blessing of Light
+			25782, -- Greater Blessing of Might
+			25894, -- Greater Blessing of Wisdom
+			25898, -- Greater Blessing of Kings
+			25895, -- Greater Blessing of Salvation
+			25890, -- Greater Blessing of Light
 		},
 		cursor = {},
 		channeled = {},
@@ -312,6 +320,9 @@ ns.CLASS_SPELL_LISTS = {
 			{ 14752, 14818, 14819, 27841 }, -- Divine Spirit
 			{ 976, 10957, 10958 }, -- Shadow Protection
 			6346, -- Fear Ward
+			21562, -- Prayer of Fortitude
+			27681, -- Prayer of Spirit
+			27683, -- Prayer of Shadow Protection
 		},
 		cursor = {},
 		channeled = {

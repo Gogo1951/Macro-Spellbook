@@ -22,11 +22,15 @@ local _, ns = ...
 	casts only in combat), "noCombat" (only out of combat; see ns.CombatCheck), "oncePerCombat" (the macro casts once until combat ends or the target changes),
 	"oncePerTarget" (the macro casts once until the target changes), "stopAttack" (the macro stops melee
 	first), "stopIfChanneling" (the macro does nothing while any spell is channelling), "stopIfStealthed" (the macro does nothing while the player is stealthed), "hideErrors" (the macro clears the error text after), "muteErrors" (the macro mutes error sounds while it runs), "cancelForm" (the macro leaves a form first), "autoShot" (the macro starts Auto Shot,
-	or the wand, after the cast) or "groupVersion" (a right-click casts the spell's group version). Each is true
+	or the wand, after the cast) or "groupVersion" (a right-click casts the spell's group version, or a group
+	spell's single version). Each is true
 	or false where the player set it, overriding the macro kind's default (see KindDefault), and nil where the
 	macro follows that default, except "fixedRank", which holds the rank text, or nil for the highest rank.
 	"useItems" holds a list of equipment slots instead of a flag: the macro uses
-	each slot's item, in that order, before the cast. An equipment macro's settings are account-wide instead,
+	each slot's item, in that order, before the cast. "groupedSpells" holds a list of spell names too: the
+	spells of the macro's SPELL_GROUPS group ticked in its Grouped Spells submenu (see ns.CastSpellName), and
+	"targetPriority" a list of units, who it casts on in turn (see ns.TargetPriority), which took over from
+	"mouseover", "castOnSelf" and "targetTarget"; those are still read where no list was set. An equipment macro's settings are account-wide instead,
 	in ns.db.global.equipmentOptions, like the general macro every character shares, and keyed by its macro
 	name ("Use Trinket 1"), so they stay with the slot when the item in it is swapped.
 ]]
@@ -115,7 +119,8 @@ end
 
 --[[
 	The kinds of spell macro, in the order the options list them. A spell's kind is what decides most of its
-	menu: who it can be cast on, or where. Custom and equipment macros have no kind, and no defaults.
+	menu: who it can be cast on, or where. Equipment macros are a kind of their own (ns.ITEM_KIND); custom
+	macros have no kind, and no defaults.
 ]]
 ns.MACRO_KINDS = {
 	{ key = "enemy", labelKey = "KIND_ENEMY", descKey = "KIND_ENEMY_DESCRIPTION" },
@@ -127,16 +132,35 @@ ns.MACRO_KINDS = {
 	{ key = "self", labelKey = "KIND_SELF", descKey = "KIND_SELF_DESCRIPTION" },
 }
 
+-- The equipment macros' kind, whose defaults are set on the Macro Defaults panel itself.
+ns.ITEM_KIND = { key = "item", labelKey = "KIND_ITEM", descKey = "KIND_ITEM_DESCRIPTION" }
+
+-- A kind's row, spell or item, by its key.
+function ns.KindRow(kind)
+	if kind == ns.ITEM_KIND.key then
+		return ns.ITEM_KIND
+	end
+	for _, row in ipairs(ns.MACRO_KINDS) do
+		if row.key == kind then
+			return row
+		end
+	end
+	return nil
+end
+
 local TARGET_KINDS = { harm = "enemy", help = "friendly", exists = "anyone" }
 
 --[[
 	A spell macro's kind, from the fields Macro-Builder.lua gives it: a ground-targeted spell, then a buff cast
 	on a friend (the class lists' buffs), then one cast on an enemy, a friend or either, then a form, stance,
 	aura or aspect (the stance bar's forms and the spells that cancel when cast again), and every other spell,
-	cast on the player or around them. Nil for custom and equipment macros.
+	cast on the player or around them. "item" for an equipment macro, nil for a custom one.
 ]]
 function ns.MacroKind(macro)
-	if macro.custom or macro.equipment then
+	if macro.equipment then
+		return ns.ITEM_KIND.key
+	end
+	if macro.custom then
 		return nil
 	end
 	if macro.cursor then
@@ -188,7 +212,7 @@ for _, key in ipairs(ns.DEFAULTABLE_OPTIONS) do
 	DEFAULTABLE[key] = true
 end
 
--- Whether a kind ("enemy", "friendly", ...) turns an option on by default.
+-- Whether a kind ("enemy", "friendly", ..., "item") turns an option on by default.
 function ns.KindDefault(kind, key)
 	return DEFAULTABLE[key] == true and ns.db.profile.kindDefaults[kind][key] == true
 end
@@ -196,6 +220,11 @@ end
 -- Stored as true or false, never nil, so turning off a default the add-on ships on (buffs' targetRank) sticks.
 function ns.SetKindDefault(kind, key, on)
 	ns.db.profile.kindDefaults[kind][key] = on == true
+end
+
+-- Drops a macro's own setting for an option, so it follows its kind's default.
+function ns.ClearOwnSetting(macro, key)
+	StoreSetting(macro, key, nil)
 end
 
 -- The default a macro follows for an option it has no setting of its own for.
@@ -281,9 +310,17 @@ function ns.OffersCastOnSelf(macro)
 	return macro.target == "help" or macro.target == "exists" or macro.equipment == true
 end
 
--- A friendly spell with more than one rank known offers "targetRank". A focus copy shares its setting.
+--[[
+	A friendly spell with more than one rank known offers "targetRank", and so does one whose right-click
+	spell has (Arcane Brilliance, right-clicking for Arcane Intellect), which takes its ranks the same way. A
+	focus copy shares its setting.
+]]
 function ns.OffersTargetRank(macro)
-	return ns.OffersCastOnSelf(macro) and macro.ranks ~= nil and #macro.ranks > 1
+	local function ranked(ranks)
+		return ranks ~= nil and #ranks > 1
+	end
+	return ns.OffersCastOnSelf(macro)
+		and (ranked(macro.ranks) or (ns.RightClickSpell(macro) ~= nil and ranked(macro.rightClickRanks)))
 end
 
 --[[
@@ -339,8 +376,22 @@ local OFFERED = {
 	stopCast = function(macro)
 		return ns.OffersStopCast(macro)
 	end,
+	--[[
+		melee after a heal or buff is almost never wanted, so those kinds leave it out, except where it is on
+		already, so it can be turned off
+	]]
 	startAttack = function(macro)
-		return ns.OffersStartAttack(macro)
+		if not ns.OffersStartAttack(macro) then
+			return false
+		end
+		if macro.kind ~= "friendly" and macro.kind ~= "buff" then
+			return true
+		end
+		local on = GetSetting(macro, "startAttack")
+		if on == nil then
+			return MacroDefault(macro, "startAttack")
+		end
+		return on == true
 	end,
 	noToggle = function(macro)
 		return ns.OffersNoToggle(macro)
@@ -378,9 +429,12 @@ local OFFERED = {
 		local autoShot = ns.ClassConfig().autoShot
 		return autoShot ~= nil and macro.target == "harm" and macro.name ~= autoShot
 	end,
-	-- a single-target spell whose group version (Prayer of Fortitude, Portal: Ironforge) is learned
+	--[[
+		a single-target spell whose group version (Prayer of Fortitude, Portal: Ironforge) is learned, or a group
+		spell whose single version is
+	]]
 	groupVersion = function(macro)
-		return macro.groupSpell ~= nil
+		return ns.RightClickSpell(macro) ~= nil
 	end,
 }
 
@@ -399,7 +453,7 @@ function ns.OffersOption(macro, key)
 	return macro.target ~= nil
 end
 
--- The menu label of the "autoShot" option for the player's class (Auto Shot, or the wand), or nil.
+-- The full label of the "autoShot" option for the player's class (Auto Shot, or the wand), or nil.
 function ns.AutoShotLabelKey()
 	return ns.ClassConfig().autoShotLabelKey
 end
@@ -407,6 +461,11 @@ end
 -- The client's name for the ranged attack the "autoShot" option starts (Auto Shot, or the wand's Shoot), or nil.
 function ns.AutoShotName()
 	return ns.ClassConfig().autoShot
+end
+
+-- The spell the "groupVersion" option casts on a right-click: the group version, or a group spell's single version.
+function ns.RightClickSpell(macro)
+	return macro.groupSpell or macro.soloSpell
 end
 
 -- Whether a macro offers an option (see ns.OffersOption) and the player turned it on.
@@ -465,6 +524,10 @@ function ns.HasOptions(macro)
 		or macro.equipment == true
 end
 
+--[[
+	The setters below only change the stored settings; ns.ChangeMacro runs one and rewrites the macro.
+]]
+
 -- Rebuilds the macro's body after a setting changes and rewrites the macro if it already exists.
 local function Rewrite(macro)
 	macro.body = ns.MacroBody(macro)
@@ -476,13 +539,22 @@ local function Rewrite(macro)
 end
 
 --[[
-	Flips a setting (any ns.OffersOption key) and rewrites the macro if it already exists. In combat the
-	rewrite waits until combat ends. The focus setting adds or removes a page entry and most others also
-	change the focus copy, so the page must be rebuilt after them (see the menu in Macro-Menu.lua).
+	Runs change (a function that calls the setters below) and rewrites the macro if it already exists. In
+	combat the rewrite waits until combat ends. The focus setting adds or removes a page entry and most others
+	also change the focus copy, so the page must be rebuilt after (see the menu in Macro-Menu.lua).
 ]]
+function ns.ChangeMacro(macro, change)
+	change()
+	Rewrite(macro)
+end
+
+-- Sets a setting (any ns.OffersOption key) on or off.
+function ns.SetOption(macro, key, on)
+	SetOption(macro, key, on)
+end
+
 function ns.ToggleOption(macro, key)
 	SetOption(macro, key, not ns.IsOptionOn(macro, key))
-	Rewrite(macro)
 end
 
 --[[
@@ -500,12 +572,32 @@ function ns.CombatCheck(macro)
 	return nil
 end
 
--- Sets the combat check (see ns.CombatCheck) and rewrites the macro like ns.ToggleOption.
 function ns.SetCombatCheck(macro, check)
 	for _, key in ipairs(COMBAT_CHECKS) do
 		SetOption(macro, key, key == check)
 	end
-	Rewrite(macro)
+end
+
+--[[
+	How often the macro casts, a choice of one: "oncePerCombat" (once until combat ends or the target
+	changes), "oncePerTarget" (once until the target changes), or nil for every press, the default. Both on,
+	as a release before the choice could store, is once per combat, as the macro text reads it.
+]]
+local REPEAT_RULES = { "oncePerCombat", "oncePerTarget" }
+
+function ns.RepeatRule(macro)
+	for _, key in ipairs(REPEAT_RULES) do
+		if ns.IsOptionOn(macro, key) then
+			return key
+		end
+	end
+	return nil
+end
+
+function ns.SetRepeatRule(macro, rule)
+	for _, key in ipairs(REPEAT_RULES) do
+		SetOption(macro, key, key == rule)
+	end
 end
 
 -- The rank text the macro is fixed to, or nil when it isn't, or that rank isn't among its known ranks.
@@ -527,17 +619,222 @@ function ns.AbilityRank(macro)
 	return ns.IsOptionOn(macro, "targetRank") and "targetRank" or ns.FixedRank(macro)
 end
 
--- Sets the ability rank (see ns.AbilityRank) and rewrites the macro like ns.ToggleOption.
 function ns.SetAbilityRank(macro, choice)
 	SetOption(macro, "targetRank", choice == "targetRank")
 	SpellSettings("fixedRank")[SettingsKey(macro)] = choice ~= "targetRank" and choice or nil
-	Rewrite(macro)
+end
+
+--------------------------------------------------------------------------------
+-- Target Priority
+--------------------------------------------------------------------------------
+
+--[[
+	Who a macro casts on, in turn: a list of up to TARGET_PRIORITY_SLOTS units ("targetPriority"), each tried
+	only when it can take the spell, then a plain cast. Each unit is { unit, menu label key }, in the order the
+	Target submenu lists them. A macro follows its kind's list (kindDefaults[kind].targetPriority) until it is
+	given its own. A list nobody set comes from the checkboxes it replaced, Cast On Mouseover, Cast On Self and
+	Cast On Target's Target: the mouseover, the target, the target's target, then the player, so a profile from
+	before keeps casting as it did, without a migration.
+]]
+ns.TARGET_UNITS = {
+	{ "target", "MENU_UNIT_TARGET" },
+	{ "player", "MENU_UNIT_SELF" },
+	{ "pet", "MENU_UNIT_PET" },
+	{ "focus", "MENU_UNIT_FOCUS" },
+	{ "targettarget", "MENU_UNIT_TARGETS_TARGET" },
+	{ "mouseover", "MENU_UNIT_MOUSEOVER" },
+}
+ns.TARGET_PRIORITY_SLOTS = 3
+
+local DEFAULT_PRIORITY = { "target" }
+local LEGACY_TARGETING = { "mouseover", "castOnSelf", "targetTarget" }
+-- an enemy spell can't go on the player or the pet
+local HARM_UNITS = { player = false, pet = false }
+
+--[[
+	Whether a kind's macros cast on someone, so take a target priority: a spell cast on an enemy, a friend or
+	either, and an equipment macro. Ground spells, forms and the rest have no one to pick.
+]]
+local PRIORITY_KINDS = { enemy = true, friendly = true, buff = true, anyone = true, item = true }
+
+function ns.KindOffersTargetPriority(kind)
+	return PRIORITY_KINDS[kind] == true
+end
+
+-- Whether a unit can be picked for a kind: not the player or the pet for an enemy spell, nor the focus without one.
+function ns.KindOffersUnit(kind, unit)
+	if unit == "focus" and ns.FLAVOR == "Vanilla" then
+		return false
+	end
+	return kind ~= "enemy" or HARM_UNITS[unit] ~= false
+end
+
+-- A macro's own list, a focus copy keeping its own focus-then-target cast.
+function ns.OffersTargetPriority(macro)
+	return not macro.focus and ns.KindOffersTargetPriority(macro.kind)
+end
+
+-- The list the old checkboxes give, from whether each is on.
+local function LegacyPriority(isOn)
+	local list = {}
+	if isOn("mouseover") then
+		list[#list + 1] = "mouseover"
+	end
+	list[#list + 1] = "target"
+	if isOn("targetTarget") then
+		list[#list + 1] = "targettarget"
+	end
+	if isOn("castOnSelf") then
+		list[#list + 1] = "player"
+	end
+	return list
+end
+
+-- A list with the units a kind can't pick, and any unit a second time, left out; the target alone when that leaves none.
+local function Usable(list, kind)
+	local usable, seen = {}, {}
+	for _, unit in ipairs(list) do
+		if not seen[unit] and ns.KindOffersUnit(kind, unit) then
+			seen[unit] = true
+			usable[#usable + 1] = unit
+		end
+	end
+	return #usable > 0 and usable or DEFAULT_PRIORITY
+end
+
+-- A kind's list: the one set on its Macro Defaults panel, or the one its old checkbox defaults give.
+function ns.KindTargetPriority(kind)
+	local list = ns.db.profile.kindDefaults[kind].targetPriority
+	if type(list) ~= "table" then
+		list = LegacyPriority(function(key)
+			return ns.KindDefault(kind, key)
+		end)
+	end
+	return Usable(list, kind)
+end
+
+-- Sets a kind's list, which replaces its old checkbox defaults.
+function ns.SetKindTargetPriority(kind, list)
+	local defaults = ns.db.profile.kindDefaults[kind]
+	defaults.targetPriority = list
+	for _, key in ipairs(LEGACY_TARGETING) do
+		defaults[key] = false
+	end
+end
+
+-- Whether the macro has an old checkbox setting of its own, which it then keeps following until given a list.
+local function HasLegacyTargeting(macro)
+	for _, key in ipairs(LEGACY_TARGETING) do
+		if GetSetting(macro, key) ~= nil then
+			return true
+		end
+	end
+	return false
+end
+
+-- The macro's list, in order. Don't modify it.
+function ns.TargetPriority(macro)
+	if not ns.OffersTargetPriority(macro) then
+		return NO_SLOTS
+	end
+	local own = GetSetting(macro, "targetPriority")
+	if type(own) == "table" then
+		return Usable(own, macro.kind)
+	end
+	if HasLegacyTargeting(macro) then
+		return Usable(
+			LegacyPriority(function(key)
+				return ns.IsOptionOn(macro, key)
+			end),
+			macro.kind
+		)
+	end
+	return ns.KindTargetPriority(macro.kind)
+end
+
+-- Whether the macro tries a unit, such as the mouseover, which rewrites its Dynamic Rank as that unit changes.
+function ns.TriesUnit(macro, unit)
+	for _, tried in ipairs(ns.TargetPriority(macro)) do
+		if tried == unit then
+			return true
+		end
+	end
+	return false
+end
+
+-- Whether the macro's list is anything but the target alone, which is just the plain cast.
+function ns.HasTargetPriority(macro)
+	local list = ns.TargetPriority(macro)
+	return #list > 1 or (list[1] ~= nil and list[1] ~= "target")
+end
+
+-- Whether two lists hold the same units in the same order.
+local function SameList(a, b)
+	if #a ~= #b then
+		return false
+	end
+	for i = 1, #a do
+		if a[i] ~= b[i] then
+			return false
+		end
+	end
+	return true
 end
 
 --[[
-	Adds an equipment slot to the end of the macro's useItems list, or removes it, then rewrites the macro
-	like ns.ToggleOption. The focus copy changes too, so the page must be rebuilt after.
+	A list with unit picked at a place in it, from 1: a unit taken lower down moves up to this place, the one
+	it replaces and those after it move down a place (the last drops off past three), and nil (None, never
+	for the first) ends the list here.
 ]]
+local function PlaceUnit(current, place, unit)
+	local list = {}
+	for i, tried in ipairs(current) do
+		if i < place and tried ~= unit then
+			list[#list + 1] = tried
+		end
+	end
+	if unit then
+		list[#list + 1] = unit
+		for i, tried in ipairs(current) do
+			if i >= place and tried ~= unit and #list < ns.TARGET_PRIORITY_SLOTS then
+				list[#list + 1] = tried
+			end
+		end
+	end
+	return list
+end
+
+-- Picks the unit at a place in a kind's list (see PlaceUnit), as its Macro Defaults panel does.
+function ns.SetKindTargetPriorityUnit(kind, place, unit)
+	ns.SetKindTargetPriority(kind, PlaceUnit(ns.KindTargetPriority(kind), place, unit))
+end
+
+--[[
+	Picks the unit at a place in the macro's list (see PlaceUnit). Stored only where it differs from the kind's
+	list, and the old checkbox settings go, since the list replaces them.
+]]
+function ns.SetTargetPriorityUnit(macro, place, unit)
+	local list = PlaceUnit(ns.TargetPriority(macro), place, unit)
+	for _, key in ipairs(LEGACY_TARGETING) do
+		StoreSetting(macro, key, nil)
+	end
+	StoreSetting(macro, "targetPriority", not SameList(list, ns.KindTargetPriority(macro.kind)) and list or nil)
+end
+
+-- Makes the macro's list its kind's, and has the macro follow it.
+function ns.MakeTargetPriorityDefault(macro)
+	local list = {}
+	for i, unit in ipairs(ns.TargetPriority(macro)) do
+		list[i] = unit
+	end
+	ns.SetKindTargetPriority(macro.kind, list)
+	StoreSetting(macro, "targetPriority", nil)
+	for _, key in ipairs(LEGACY_TARGETING) do
+		StoreSetting(macro, key, nil)
+	end
+end
+
+-- Adds an equipment slot to the end of the macro's useItems list, or removes it.
 function ns.ToggleUseSlot(macro, slot)
 	local slots = {}
 	local at = ns.IsUsingSlot(macro, slot)
@@ -550,5 +847,74 @@ function ns.ToggleUseSlot(macro, slot)
 		slots[#slots + 1] = slot
 	end
 	SpellSettings("useItems")[SettingsKey(macro)] = #slots > 0 and slots or nil
-	Rewrite(macro)
+end
+
+--[[
+	A spell in a SPELL_GROUPS group (Demon Skin, Demon Armor) offers the group's spells, a focus copy sharing its
+	spell's. Ticked, a spell is one the macro may cast; the macro casts the last one learned of those ticked, so
+	it moves up as the player trains. Only the spell itself is ticked to start with.
+]]
+function ns.OffersGroupedSpells(macro)
+	return IsSpellMacro(macro) and macro.groupMembers ~= nil
+end
+
+-- The names ticked in the macro's group, in the group's order. Don't modify it.
+function ns.GroupedSpells(macro)
+	if not ns.OffersGroupedSpells(macro) then
+		return NO_SLOTS
+	end
+	return SpellSettings("groupedSpells")[SettingsKey(macro)] or { macro.name }
+end
+
+function ns.IsGroupedSpellOn(macro, name)
+	for _, ticked in ipairs(ns.GroupedSpells(macro)) do
+		if ticked == name then
+			return true
+		end
+	end
+	return false
+end
+
+-- Whether the macro's group has any spell ticked but its own, which is when the group changes the macro.
+function ns.IsGrouped(macro)
+	for _, ticked in ipairs(ns.GroupedSpells(macro)) do
+		if ticked ~= macro.name then
+			return true
+		end
+	end
+	return false
+end
+
+--[[
+	Ticks or unticks a spell of the macro's group. Unticking the last one ticks the macro's own spell again,
+	and only that ticked is stored as nil, the default.
+]]
+function ns.ToggleGroupedSpell(macro, name)
+	local on = not ns.IsGroupedSpellOn(macro, name)
+	local list = {}
+	for _, member in ipairs(macro.groupMembers) do
+		local ticked = on
+		if member.name ~= name then
+			ticked = ns.IsGroupedSpellOn(macro, member.name)
+		end
+		if ticked then
+			list[#list + 1] = member.name
+		end
+	end
+	local own = #list == 0 or (#list == 1 and list[1] == macro.name)
+	SpellSettings("groupedSpells")[SettingsKey(macro)] = not own and list or nil
+end
+
+--[[
+	The spell the macro casts: of its group's ticked spells, the last one learned, or its own spell when its
+	group has none of them learned, or it has no group.
+]]
+function ns.CastSpellName(macro)
+	local cast
+	for _, member in ipairs(ns.OffersGroupedSpells(macro) and macro.groupMembers or NO_SLOTS) do
+		if member.learned and ns.IsGroupedSpellOn(macro, member.name) then
+			cast = member.name
+		end
+	end
+	return cast or macro.name
 end

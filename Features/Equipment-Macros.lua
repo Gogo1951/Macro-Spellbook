@@ -35,6 +35,8 @@ local function SlotName(slot)
 	return _G[SLOTS[slot][1]]
 end
 
+ns.SlotName = SlotName
+
 --[[
 	Whether the item in an equipment slot has a "Use:" effect. The tooltip check catches effects added to the
 	item, such as engineering tinkers, which GetItemSpell on the item itself may not see.
@@ -71,6 +73,7 @@ local function MakeEquipmentMacro(slot, link, categoryRank)
 		macroIcon = ns.ICON_QUESTION_MARK,
 		icon = GetInventoryItemTexture("player", slot) or ns.ICON_QUESTION_MARK,
 	}
+	macro.kind = ns.MacroKind(macro)
 	macro.body = ns.MacroBody(macro) -- "#showtooltip\n/use 13" with no options on
 	return macro
 end

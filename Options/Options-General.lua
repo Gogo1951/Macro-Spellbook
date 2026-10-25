@@ -1,6 +1,7 @@
 local _, ns = ...
 local L = ns.L
 local GetColor = ns.GetColor
+local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
 --------------------------------------------------------------------------------
 -- Key Bindings
@@ -79,10 +80,39 @@ local function AddKeyBindingRows(args, startOrder)
 end
 
 --------------------------------------------------------------------------------
+-- Delete Macros
+--------------------------------------------------------------------------------
+
+local DELETE_BUTTON_WIDTH = 1.5
+
+--[[
+	A button deleting the add-on's macros from one list (ns.DeleteAddonMacros), behind a confirm, and greyed
+	out while the list holds none. The panel repaints after, so the button greys out at once.
+]]
+local function DeleteMacrosButton(general, nameKey, descKey, confirmKey, order)
+	return {
+		type = "execute",
+		name = L[nameKey],
+		desc = L[descKey],
+		width = DELETE_BUTTON_WIDTH,
+		order = order,
+		confirm = true,
+		confirmText = L[confirmKey],
+		disabled = function()
+			return ns.CountAddonMacros(general) == 0
+		end,
+		func = function()
+			ns.DeleteAddonMacros(general)
+			AceConfigRegistry:NotifyChange(ns.OPTIONS_REGISTRY.General)
+		end,
+	}
+end
+
+--------------------------------------------------------------------------------
 -- General Panel
 --------------------------------------------------------------------------------
 
--- The root panel: the pitch, the Welcome Message switch, Key Bindings, then /Commands.
+-- The root panel: the pitch, the Welcome Message switch, Key Bindings, Delete Macros, then /Commands.
 function ns.BuildGeneralOptions()
 	local args = {
 		descIntro = ns.OptionsDesc(L["OPTIONS_DESCRIPTION"], 1),
@@ -105,6 +135,26 @@ function ns.BuildGeneralOptions()
 		spacerKeyBindings0 = ns.OptionsSpacer(30),
 		headerKeyBindings = ns.OptionsHeader(L["OPTIONS_KEY_BINDINGS_HEADER"], 31),
 		spacerKeyBindings1 = ns.OptionsSpacer(32),
+
+		spacerDeleteMacros0 = ns.OptionsSpacer(60),
+		headerDeleteMacros = ns.OptionsHeader(L["OPTIONS_DELETE_MACROS_HEADER"], 61),
+		spacerDeleteMacros1 = ns.OptionsSpacer(62),
+		descDeleteMacros = ns.OptionsDesc(L["OPTIONS_DELETE_MACROS_DESCRIPTION"], 63),
+		spacerDeleteMacros2 = ns.OptionsSpacer(64),
+		deleteCharacterMacros = DeleteMacrosButton(
+			false,
+			"OPTIONS_DELETE_CHARACTER_MACROS",
+			"OPTIONS_DELETE_CHARACTER_MACROS_DESCRIPTION",
+			"OPTIONS_DELETE_CHARACTER_MACROS_CONFIRM",
+			65
+		),
+		deleteGeneralMacros = DeleteMacrosButton(
+			true,
+			"OPTIONS_DELETE_GENERAL_MACROS",
+			"OPTIONS_DELETE_GENERAL_MACROS_DESCRIPTION",
+			"OPTIONS_DELETE_GENERAL_MACROS_CONFIRM",
+			66
+		),
 
 		spaceCommands0 = ns.OptionsSpacer(90),
 		headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 91),

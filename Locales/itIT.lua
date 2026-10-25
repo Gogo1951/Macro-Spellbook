@@ -30,11 +30,7 @@ L["MENU_GROUP_ERRORS"] = "Messaggi di errore"
 L["MENU_GROUP_USE_ITEMS_FIRST"] = "Usa prima gli oggetti"
 L["MACRO_TEXT"] = "Testo della macro"
 L["MENU_MACRO_LENGTH"] = "%d / %d"
-L["MENU_GROUP_VALUE"] = "%s: %s"
 L["MENU_OPTIONS_COUNT"] = "%d opzioni"
-L["MENU_CAST_ON_MOUSEOVER"] = "Lancia al passaggio del mouse"
-L["MENU_CAST_ON_SELF"] = "Lancia su te stesso"
-L["MENU_CAST_ON_TARGETS_TARGET"] = "Lancia sul bersaglio del bersaglio"
 L["MENU_RANK_LEARN_LEVEL"] = "%s (Livello %d)"
 L["MENU_MAX_RANK"] = "Grado massimo"
 L["MENU_DYNAMIC_RANK"] = "Grado dinamico"
@@ -70,7 +66,6 @@ L["MENU_SAFE_TO_SPAM_NOTE"] =
 	"Per premere una macro a ripetizione senza rischi, attiva Ferma la macro se canalizzi per un incantesimo canalizzato, o Ferma la macro se sei furtivo per Furtività o Aggirarsi. Premerla di nuovo non interromperà più la canalizzazione o la tua furtività."
 L["MENU_USE_FOR_KIND"] = "Usa queste opzioni per la categoria %s"
 L["MENU_DUPLICATE"] = "Duplica"
-L["MENU_REMOVE_COPY"] = "Rimuovi questa copia"
 L["MENU_USE_FOR_KIND_DESCRIPTION"] =
 	"Ogni macro della categoria %s che non hai impostato tu parte con le opzioni di questa macro. Apre Predefiniti delle macro per mostrartelo."
 
@@ -80,8 +75,6 @@ L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "Considera piazzati gli incantesimi sulle b
 L["SETTINGS_MARK_ALL_PLACED"] = "Segna tutti gli incantesimi come piazzati"
 L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
 	"Nessuna macro di questa pagina si illumina più, che sia sulle tue barre o no. Un incantesimo che impari in seguito resta illuminato finché non lo piazzi."
-L["SETTINGS_CLEAR_PLACED"] = "Cancella i segni di piazzamento"
-L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] = "Fa di nuovo illuminare ogni macro segnata che non è sulle tue barre."
 L["SETTINGS_OPEN_MACRO_DEFAULTS_DESCRIPTION"] =
 	"Apre l'interfaccia delle opzioni su Predefiniti delle macro, dove scegli le opzioni con cui parte ogni tipo di macro di incantesimo."
 L["SETTINGS_OPEN_CUSTOM_MACROS_DESCRIPTION"] =
@@ -93,13 +86,10 @@ L["SUBTEXT_CUSTOM"] = "Personale"
 L["SUBTEXT_FOCUS"] = "Sul focus"
 L["SUBTEXT_PET"] = "Famiglio"
 L["SUBTEXT_CURSOR"] = "Cursore"
-L["SUBTEXT_MOUSEOVER"] = "Col mouse"
-L["SUBTEXT_CAST_ON_SELF"] = "Su di te"
 L["SUBTEXT_STANCE"] = "Postura"
 L["SUBTEXT_USE_ITEMS"] = "Usa oggetti"
 L["SUBTEXT_PET_ATTACK"] = "Attacco famiglio"
 L["SUBTEXT_DYNAMIC_RANK"] = "Grado din."
-L["SUBTEXT_TARGETS_TARGET"] = "Bers. del bers."
 L["SUBTEXT_TARGET_ENEMY"] = "Nemico vicino"
 L["SUBTEXT_TARGET_FRIEND"] = "Alleato vicino"
 L["SUBTEXT_GROUP_VERSION"] = "Versione gruppo"
@@ -164,6 +154,19 @@ L["OPTIONS_KEY_SET_DESCRIPTION"] =
 	"Apre l'elenco di assegnazione tasti del gioco, dove Macro Spellbook ha una sezione tutta sua."
 L["OPTIONS_KEY_BINDING_TOGGLE_DESCRIPTION"] =
 	"Apre e chiude Macro Spellbook. Ha anche una scheda tutta sua nel tuo libro degli incantesimi."
+L["OPTIONS_DELETE_MACROS_HEADER"] = "Elimina macro"
+L["OPTIONS_DELETE_MACROS_DESCRIPTION"] =
+	"Elimina le macro create da Macro Spellbook, togliendole anche dalle tue barre delle azioni. Le tue macro non vengono mai toccate, e la pagina ricrea ognuna di esse quando la clicchi o la trascini."
+L["OPTIONS_DELETE_CHARACTER_MACROS"] = "Elimina macro del personaggio"
+L["OPTIONS_DELETE_CHARACTER_MACROS_DESCRIPTION"] =
+	"Elimina le macro di Macro Spellbook dalla scheda macro di questo personaggio. Gli altri tuoi personaggi tengono le loro finché non fai lo stesso su di loro."
+L["OPTIONS_DELETE_CHARACTER_MACROS_CONFIRM"] =
+	"Eliminare tutte le macro di Macro Spellbook di questo personaggio? Vengono tolte anche dalle tue barre delle azioni."
+L["OPTIONS_DELETE_GENERAL_MACROS"] = "Elimina macro generali"
+L["OPTIONS_DELETE_GENERAL_MACROS_DESCRIPTION"] =
+	"Elimina le macro di Macro Spellbook dalla scheda Macro generali, condivisa da tutti i personaggi del tuo account, quindi anche gli altri tuoi personaggi perdono lì le loro."
+L["OPTIONS_DELETE_GENERAL_MACROS_CONFIRM"] =
+	"Eliminare tutte le macro generali di Macro Spellbook? Tutti i personaggi del tuo account le perdono, e vengono tolte anche dalle tue barre delle azioni."
 L["OPTIONS_COMMANDS_HEADER"] = "/Comandi"
 L["OPTIONS_COMMAND"] = "/msb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Apre l'interfaccia delle opzioni di questo add-on."
@@ -180,12 +183,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Predefiniti delle macro"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"Le opzioni con cui parte ogni tipo di macro di incantesimo. Una macro mantiene ciò che imposti dal suo menu del clic destro. Ogni tipo elenca solo le opzioni offerte dai suoi incantesimi."
-L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "Lancia prima su chi è sotto il mouse, poi sul tuo bersaglio."
-L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] =
-	"Lancia su di te quando il tuo bersaglio non può ricevere l'incantesimo."
-L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
-	"Prova il bersaglio del tuo bersaglio quando il tuo bersaglio non può ricevere l'incantesimo, come il tank che un nemico sta attaccando."
+	"Le opzioni con cui parte ogni tipo di macro: le tue macro degli oggetti qui, e ogni tipo di macro di incantesimo nella sua pagina qui sotto. Ciò che imposti su una macro dal suo menu del clic destro resta com'è."
 L["OPTIONS_DEFAULT_CURSOR_DESCRIPTION"] = "Piazza l'incantesimo dove punta il cursore, senza cerchio di selezione."
 L["OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION"] = "Lancia il grado più alto che il livello del giocatore amico consente."
 L["OPTIONS_DEFAULT_STOP_CASTING_DESCRIPTION"] =
@@ -213,8 +211,11 @@ L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "Cancella il testo di errore ross
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Silenzia il suono di errore mentre la macro è in esecuzione."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
 	"Fa lanciare queste macro solo in combattimento, solo fuori dal combattimento o in entrambi i casi."
-L["OPTIONS_KIND_EXAMPLES"] = "I tuoi incantesimi: %s"
-L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s e altri %d"
+L["OPTIONS_KIND_YOUR_SPELLS"] = "I tuoi incantesimi"
+L["OPTIONS_KIND_YOUR_ITEMS"] = "I tuoi oggetti"
+L["OPTIONS_KIND_MORE"] = "E altri %d."
+L["OPTIONS_KIND_NO_SPELLS"] = "Nessuno dei tuoi incantesimi è di questo tipo."
+L["OPTIONS_KIND_NO_ITEMS"] = "Nessuno dei tuoi oggetti equipaggiati ha un effetto Usa."
 L["KIND_ENEMY"] = "Incantesimi sui nemici"
 L["KIND_ENEMY_DESCRIPTION"] = "Incantesimi lanciati su un nemico, come attacchi e penalità."
 L["KIND_FRIENDLY"] = "Incantesimi amichevoli"
@@ -229,6 +230,8 @@ L["KIND_FORM"] = "Forme, posture e aspetti"
 L["KIND_FORM_DESCRIPTION"] = "Incantesimi che restano attivi finché non li spegni o ne scegli un altro."
 L["KIND_SELF"] = "Incantesimi personali e ad area"
 L["KIND_SELF_DESCRIPTION"] = "Incantesimi senza bersaglio, lanciati su di te o intorno a te."
+L["KIND_ITEM"] = "Macro degli oggetti"
+L["KIND_ITEM_DESCRIPTION"] = "Macro che usano i tuoi oggetti equipaggiati, come i monili."
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "Macro personalizzate"
@@ -294,6 +297,7 @@ L["KEY_BINDINGS_LOCATION"] = "Apri il menu di gioco, poi %s, poi %s, e cerca la 
 L["ERROR_MACRO_SLOTS_FULL"] = "Nessuno spazio libero per le macro. Elimina una macro in /macro per fare spazio."
 L["ERROR_GENERAL_MACRO_SLOTS_FULL"] =
 	"Nessuno spazio libero per le macro generali. Elimina una macro generale in /macro per fare spazio."
+L["CHAT_MACROS_DELETED"] = "Macro eliminate: %d"
 L["CHAT_MACRO_TOO_LONG"] =
 	'La macro "%s" è di %d byte con le sue opzioni attive, oltre i %d che una macro può contenere. Disattiva un\'opzione per accorciarla.'
 L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =
