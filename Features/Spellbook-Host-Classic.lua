@@ -153,8 +153,17 @@ function ns.HideSpellbookWindow()
 	end
 end
 
--- The last skill line tab the book shows, which the page's tab lines up under.
-local function LastShownSkillLineTab()
+--[[
+	The skill line tab the page's tab lines up under: the class's last spell tab, so it sits right under the
+	class's own tabs. Other add-ons show tabs of their own in the book's spare slots (WhatsTraining takes the
+	second to last), and lining up under the last shown tab put ours below theirs, off the bottom of the book.
+	Falls back to the last shown tab when the spell tab count doesn't name a shown tab.
+]]
+local function AnchorSkillLineTab()
+	local classLast = GetNumSpellTabs and _G["SpellBookSkillLineTab" .. GetNumSpellTabs()]
+	if classLast and classLast:IsShown() then
+		return classLast
+	end
 	local last
 	local i = 1
 	while _G["SpellBookSkillLineTab" .. i] do
@@ -172,7 +181,7 @@ local function Sync()
 	tab:SetShown(shown)
 	if shown then
 		tab:ClearAllPoints()
-		local last = LastShownSkillLineTab()
+		local last = AnchorSkillLineTab()
 		if last then
 			tab:SetPoint("TOPLEFT", last, "BOTTOMLEFT", 0, -TAB_GAP)
 		else

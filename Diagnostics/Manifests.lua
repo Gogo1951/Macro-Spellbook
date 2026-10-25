@@ -186,6 +186,7 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	-- Writing and placing the macros.
 	Global("CreateMacro"),
 	Global("EditMacro"),
+	Global("DeleteMacro"),
 	Global("GetMacroInfo"),
 	Global("GetNumMacros"),
 	-- The macro slot limits, Retail-engine half then Classic-engine half.
@@ -391,6 +392,8 @@ local PER_SPELL_OPTIONS = {
 	"autoShot",
 	"groupVersion",
 	"useItems",
+	"groupedSpells",
+	"targetPriority",
 }
 
 --------------------------------------------------------------------------------
@@ -775,12 +778,17 @@ function ns:BuildPageContextReport()
 			YesNo(InCombatLockdown())
 		)
 		local kindDefaults = {}
-		for _, kind in ipairs(ns.MACRO_KINDS) do
+		local kinds = { unpack(ns.MACRO_KINDS) }
+		kinds[#kinds + 1] = ns.ITEM_KIND
+		for _, kind in ipairs(kinds) do
 			local on = {}
 			for _, key in ipairs(ns.DEFAULTABLE_OPTIONS) do
 				if ns.KindDefault(kind.key, key) then
 					on[#on + 1] = key
 				end
+			end
+			if ns.KindOffersTargetPriority(kind.key) then
+				on[#on + 1] = "targets:" .. table.concat(ns.KindTargetPriority(kind.key), ">")
 			end
 			kindDefaults[#kindDefaults + 1] = kind.key .. "=" .. (#on > 0 and table.concat(on, "+") or "none")
 		end
@@ -940,8 +948,9 @@ function ns:BuildMacroContextReport()
 				counts.outOfStep = counts.outOfStep + 1
 			end
 		end
-		if found ~= "owned" and found ~= "claim" and found ~= "adopt" and indexes.names[macro.macroName] then
-			leftAlone[#leftAlone + 1] = macro.macroName
+		local wowName = ns.WowMacroName(macro)
+		if found ~= "owned" and found ~= "claim" and found ~= "adopt" and indexes.names[wowName] then
+			leftAlone[#leftAlone + 1] = wowName
 		end
 	end
 	lines[#lines + 1] = string.format(
@@ -1004,7 +1013,8 @@ end
 --[[
 	Every game record Macro Spellbook names by ID, for the Localization tab's Game Names report: the client
 	strings it reads or matches, the slot names its Equipment section shows, every spell and creature family
-	in the player's class lists and its default custom macros' templates, every GROUP_VERSIONS spell, the
+	in the player's class lists and its default custom macros' templates, every GROUP_VERSIONS spell and the
+	class's SPELL_GROUPS spells, the
 	ranged attack the after-cast option starts, and every trainer spell the Unlearned section can list, each
 	read as the features read it. The rank text a fixed or Dynamic Rank macro writes ("Rank 3") is the
 	spell's subtext, so every trainer rank above the first (a row that requires an earlier one) has a rank
@@ -1137,6 +1147,11 @@ do
 	for singleId, groupId in pairs(ns.GROUP_VERSIONS or {}) do
 		AddSpell("GROUP_VERSIONS", singleId)
 		AddSpell("GROUP_VERSIONS", groupId)
+	end
+	for _, ids in ipairs((ns.SPELL_GROUPS or {})[PlayerClass()] or {}) do
+		for _, id in ipairs(ids) do
+			AddSpell("SPELL_GROUPS", id)
+		end
 	end
 	if lists and lists.autoShot then
 		AddSpell("autoShot", lists.autoShot)

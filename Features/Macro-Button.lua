@@ -81,16 +81,14 @@ local function AddHint(keybind, action)
 end
 
 --[[
-	The options a macro's note and tooltip can name, most telling first, as { key, note key, menu label key }:
+	The options a macro's note and tooltip can name, most telling first, as { key, note key, full label key }:
 	the note names the one that is on, or counts them when more than one is; the tooltip lists them all by
-	their right-click menu labels. A row without keys builds its text from the macro.
+	their full labels. A row without keys builds its text from the macro.
 ]]
 local OPTION_SUBTEXTS = {
 	{ "pet", "SUBTEXT_PET", "MENU_CAST_IF_SUMMONED" },
 	{ "cursor", "SUBTEXT_CURSOR", "MENU_CAST_AT_CURSOR" },
-	{ "mouseover", "SUBTEXT_MOUSEOVER", "MENU_CAST_ON_MOUSEOVER" },
-	{ "castOnSelf", "SUBTEXT_CAST_ON_SELF", "MENU_CAST_ON_SELF" },
-	{ "targetTarget", "SUBTEXT_TARGETS_TARGET", "MENU_CAST_ON_TARGETS_TARGET" },
+	{ "targetPriority", "SUBTEXT_TARGET_PRIORITY", "MENU_GROUP_TARGET" },
 	{ "stance", "SUBTEXT_STANCE", "MENU_SWITCH_TO" },
 	{ "useItems", "SUBTEXT_USE_ITEMS" },
 	{ "petAttack", "SUBTEXT_PET_ATTACK", "MENU_START_PET_ATTACK" },
@@ -99,10 +97,11 @@ local OPTION_SUBTEXTS = {
 	{ "targetEnemy", "SUBTEXT_TARGET_ENEMY", "MENU_TARGET_NEAREST_ENEMY" },
 	{ "targetFriend", "SUBTEXT_TARGET_FRIEND", "MENU_TARGET_NEAREST_FRIEND" },
 	{ "groupVersion", "SUBTEXT_GROUP_VERSION", "MENU_RIGHT_CLICK_FOR" },
+	{ "groupedSpells", "SUBTEXT_GROUPED_SPELLS" },
 	{ "oncePerCombat", "SUBTEXT_ONCE_PER_COMBAT", "MENU_ONCE_PER_COMBAT" },
 	{ "oncePerTarget", "SUBTEXT_ONCE_PER_TARGET", "MENU_ONCE_PER_TARGET" },
-	{ "combatOnly", "SUBTEXT_COMBAT_ONLY", "MENU_ONLY_IN_COMBAT" },
-	{ "noCombat", "SUBTEXT_NO_COMBAT", "MENU_NEVER_IN_COMBAT" },
+	{ "combatOnly", "SUBTEXT_COMBAT_ONLY", "MENU_IN_COMBAT" },
+	{ "noCombat", "SUBTEXT_NO_COMBAT", "SUBTEXT_NO_COMBAT" },
 	{ "cancelForm", "SUBTEXT_LEAVE_FORM", "MENU_LEAVE_FORM_BEFORE" },
 	{ "noToggle", "SUBTEXT_NO_TOGGLE", "MENU_NEVER_TURN_OFF" },
 	{ "autoShot" },
@@ -124,6 +123,10 @@ local function ForEachOnOption(macro, fn)
 			on = ns.UseItemSlots(macro)[1] ~= nil
 		elseif key == "fixedRank" then
 			on = ns.FixedRank(macro) ~= nil
+		elseif key == "groupedSpells" then
+			on = ns.IsGrouped(macro)
+		elseif key == "targetPriority" then
+			on = ns.HasTargetPriority(macro)
 		else
 			on = ns.IsOptionOn(macro, key)
 		end
@@ -141,6 +144,18 @@ local function AutoShotSubText()
 	return ns.AutoShotName()
 end
 
+-- The target priority's note: the first unit it tries other than the target ("Mouse Over", "Self").
+local function TargetPrioritySubText(macro)
+	for _, unit in ipairs(ns.TargetPriority(macro)) do
+		for _, row in ipairs(ns.TARGET_UNITS) do
+			if row[1] == unit and unit ~= "target" then
+				return L[row[2]]
+			end
+		end
+	end
+	return L["SUBTEXT_TARGET_PRIORITY"]
+end
+
 --[[
 	A spell or equipment macro's note: the name of its one option that is on, "N Options" when several are, or
 	nil when none is.
@@ -155,6 +170,10 @@ local function OptionSubText(macro)
 				first = ns.FixedRank(macro)
 			elseif entry[1] == "autoShot" then
 				first = AutoShotSubText()
+			elseif entry[1] == "groupVersion" and macro.soloSpell then
+				first = L["SUBTEXT_SOLO_VERSION"]
+			elseif entry[1] == "targetPriority" then
+				first = TargetPrioritySubText(macro)
 			else
 				first = L[entry[2]]
 			end
@@ -166,7 +185,7 @@ local function OptionSubText(macro)
 	return first
 end
 
--- An option's label as its right-click menu shows it.
+-- An option's full label, as the tooltip's Options On line shows it.
 local function OptionLabel(macro, entry)
 	local key = entry[1]
 	if key == "useItems" then
@@ -184,7 +203,19 @@ local function OptionLabel(macro, entry)
 	elseif key == "stance" then
 		return L[entry[3]]:format(macro.stances[1])
 	elseif key == "groupVersion" then
-		return L[entry[3]]:format(macro.groupSpell)
+		return L[entry[3]]:format(ns.RightClickSpell(macro))
+	elseif key == "groupedSpells" then
+		return table.concat(ns.GroupedSpells(macro), ", ")
+	elseif key == "targetPriority" then
+		local labels = {}
+		for i, unit in ipairs(ns.TargetPriority(macro)) do
+			for _, row in ipairs(ns.TARGET_UNITS) do
+				if row[1] == unit then
+					labels[i] = L[row[2]]
+				end
+			end
+		end
+		return L[entry[3]] .. " (" .. table.concat(labels, ", ") .. ")"
 	end
 	return L[entry[3]]
 end

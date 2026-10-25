@@ -42,7 +42,7 @@ local function RewriteRankMacros()
 	for _, macro in ipairs(ns.macros) do
 		if
 			ns.IsOptionOn(macro, "targetRank")
-			and (writeAll or not mouseoverOnly or ns.IsOptionOn(macro, "mouseover"))
+			and (writeAll or not mouseoverOnly or ns.TriesUnit(macro, "mouseover"))
 		then
 			local body = MacroBody(macro)
 			if writeAll or body ~= macro.body then

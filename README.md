@@ -11,7 +11,7 @@ Mouseover, cursor and self-cast macros for every class spell, built in one click
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/macro-spellbook).
 2. Type `/msb` to open the Options Interface.
 3. Open your spellbook and click the Macro Spellbook tab.
-4. Right-click any macro to pick its options, like Cast On Mouseover or Cast At Cursor.
+4. Right-click any macro to pick its options, like who it casts on first (your mouseover, target or self) or Cast At Cursor.
 5. Click or drag the macro onto your action bars.
 6. _"You built a mouseover macro with conditionals? What, like it's hard?"_
 

@@ -30,11 +30,7 @@ L["MENU_GROUP_ERRORS"] = "Mensajes de error"
 L["MENU_GROUP_USE_ITEMS_FIRST"] = "Usar objetos primero"
 L["MACRO_TEXT"] = "Texto de la macro"
 L["MENU_MACRO_LENGTH"] = "%d / %d"
-L["MENU_GROUP_VALUE"] = "%s: %s"
 L["MENU_OPTIONS_COUNT"] = "%d opciones"
-L["MENU_CAST_ON_MOUSEOVER"] = "Lanzar al pasar el ratón"
-L["MENU_CAST_ON_SELF"] = "Lanzar sobre ti"
-L["MENU_CAST_ON_TARGETS_TARGET"] = "Lanzar sobre el objetivo del objetivo"
 L["MENU_RANK_LEARN_LEVEL"] = "%s (Nivel %d)"
 L["MENU_MAX_RANK"] = "Rango máximo"
 L["MENU_DYNAMIC_RANK"] = "Rango dinámico"
@@ -70,7 +66,6 @@ L["MENU_SAFE_TO_SPAM_NOTE"] =
 	"Para poder pulsar una macro repetidamente sin riesgo, activa Detener macro si canalizas para un hechizo canalizado, o Detener macro si estás en sigilo para Sigilo o Acechar. Así, volver a pulsarla no romperá la canalización ni tu sigilo."
 L["MENU_USE_FOR_KIND"] = "Usar estas opciones en la categoría %s"
 L["MENU_DUPLICATE"] = "Duplicar"
-L["MENU_REMOVE_COPY"] = "Quitar esta copia"
 L["MENU_USE_FOR_KIND_DESCRIPTION"] =
 	"Cada macro de la categoría %s que no hayas ajustado tú empieza con las opciones de esta macro. Abre Valores predeterminados de macros para mostrártelo."
 
@@ -80,8 +75,6 @@ L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "Contar hechizos en barras como colocados"
 L["SETTINGS_MARK_ALL_PLACED"] = "Marcar todos los hechizos como colocados"
 L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
 	"Ninguna macro de esta página vuelve a brillar, esté o no en tus barras. Un hechizo que aprendas después seguirá brillando hasta que lo coloques."
-L["SETTINGS_CLEAR_PLACED"] = "Borrar marcas de colocado"
-L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] = "Vuelve a hacer brillar cada macro marcada que no esté en tus barras."
 L["SETTINGS_OPEN_MACRO_DEFAULTS_DESCRIPTION"] =
 	"Abre la interfaz de opciones en Valores predeterminados de macros, donde eliges las opciones con las que empieza cada tipo de macro de hechizo."
 L["SETTINGS_OPEN_CUSTOM_MACROS_DESCRIPTION"] =
@@ -93,13 +86,10 @@ L["SUBTEXT_CUSTOM"] = "Personal"
 L["SUBTEXT_FOCUS"] = "Foco"
 L["SUBTEXT_PET"] = "Mascota"
 L["SUBTEXT_CURSOR"] = "En cursor"
-L["SUBTEXT_MOUSEOVER"] = "Con ratón"
-L["SUBTEXT_CAST_ON_SELF"] = "Sobre ti"
 L["SUBTEXT_STANCE"] = "Actitud"
 L["SUBTEXT_USE_ITEMS"] = "Usar objetos"
 L["SUBTEXT_PET_ATTACK"] = "Ataque mascota"
 L["SUBTEXT_DYNAMIC_RANK"] = "Rango dinám."
-L["SUBTEXT_TARGETS_TARGET"] = "Obj. del obj."
 L["SUBTEXT_TARGET_ENEMY"] = "Enemigo cercano"
 L["SUBTEXT_TARGET_FRIEND"] = "Aliado cercano"
 L["SUBTEXT_GROUP_VERSION"] = "Versión grupal"
@@ -164,6 +154,19 @@ L["OPTIONS_KEY_SET_DESCRIPTION"] =
 	"Abre la lista de asignación de teclas del juego, donde Macro Spellbook tiene su propia sección."
 L["OPTIONS_KEY_BINDING_TOGGLE_DESCRIPTION"] =
 	"Abre y cierra Macro Spellbook. También tiene su propia pestaña en tu libro de hechizos."
+L["OPTIONS_DELETE_MACROS_HEADER"] = "Borrar macros"
+L["OPTIONS_DELETE_MACROS_DESCRIPTION"] =
+	"Borra las macros que creó Macro Spellbook, lo que también las quita de tus barras de acción. Tus propias macros nunca se tocan, y la página vuelve a crear cualquiera de ellas cuando la pulsas o la arrastras."
+L["OPTIONS_DELETE_CHARACTER_MACROS"] = "Borrar macros del personaje"
+L["OPTIONS_DELETE_CHARACTER_MACROS_DESCRIPTION"] =
+	"Borra las macros de Macro Spellbook de la pestaña de macros de este personaje. Tus otros personajes conservan las suyas hasta que hagas lo mismo con ellos."
+L["OPTIONS_DELETE_CHARACTER_MACROS_CONFIRM"] =
+	"¿Borrar todas las macros de Macro Spellbook de este personaje? También se quitan de tus barras de acción."
+L["OPTIONS_DELETE_GENERAL_MACROS"] = "Borrar macros generales"
+L["OPTIONS_DELETE_GENERAL_MACROS_DESCRIPTION"] =
+	"Borra las macros de Macro Spellbook de la pestaña Macros generales, que comparten todos los personajes de tu cuenta, así que tus otros personajes también pierden las suyas ahí."
+L["OPTIONS_DELETE_GENERAL_MACROS_CONFIRM"] =
+	"¿Borrar todas las macros generales de Macro Spellbook? Todos los personajes de tu cuenta las pierden, y también se quitan de tus barras de acción."
 L["OPTIONS_COMMANDS_HEADER"] = "/Comandos"
 L["OPTIONS_COMMAND"] = "/msb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Abre la interfaz de opciones de este add-on."
@@ -180,12 +183,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Valores predeterminados de macros"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"Las opciones con las que empieza cada tipo de macro de hechizo. Una macro conserva lo que ajustes desde su menú de clic derecho. Cada tipo solo muestra las opciones que ofrecen sus hechizos."
-L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] =
-	"Lanza primero sobre quien esté bajo el ratón y, si no, sobre tu objetivo."
-L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "Lanza sobre ti cuando tu objetivo no puede recibir el hechizo."
-L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
-	"Prueba con el objetivo de tu objetivo cuando tu objetivo no puede recibir el hechizo, como el tanque al que ataca un enemigo."
+	"Las opciones con las que empieza cada tipo de macro: tus macros de objetos aquí y cada tipo de macro de hechizo en su propia página debajo. Lo que ajustes en una macro desde su menú de clic derecho se mantiene."
 L["OPTIONS_DEFAULT_CURSOR_DESCRIPTION"] = "Coloca el hechizo donde apunta el cursor, sin círculo de selección."
 L["OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION"] = "Lanza el rango más alto que admite el nivel del jugador amistoso."
 L["OPTIONS_DEFAULT_STOP_CASTING_DESCRIPTION"] =
@@ -212,8 +210,11 @@ L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "Borra el texto de error rojo que
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Silencia el sonido de error mientras se ejecuta la macro."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
 	"Hace que estas macros lancen solo en combate, solo fuera de combate o en ambos casos."
-L["OPTIONS_KIND_EXAMPLES"] = "Tus hechizos: %s"
-L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s y %d más"
+L["OPTIONS_KIND_YOUR_SPELLS"] = "Tus hechizos"
+L["OPTIONS_KIND_YOUR_ITEMS"] = "Tus objetos"
+L["OPTIONS_KIND_MORE"] = "Y %d más."
+L["OPTIONS_KIND_NO_SPELLS"] = "Ninguno de tus hechizos es de este tipo."
+L["OPTIONS_KIND_NO_ITEMS"] = "Ninguno de tus objetos equipados tiene un efecto de uso."
 L["KIND_ENEMY"] = "Hechizos contra enemigos"
 L["KIND_ENEMY_DESCRIPTION"] = "Hechizos que lanzas a un enemigo, como ataques y perjuicios."
 L["KIND_FRIENDLY"] = "Hechizos amistosos"
@@ -228,6 +229,8 @@ L["KIND_FORM"] = "Formas, actitudes y aspectos"
 L["KIND_FORM_DESCRIPTION"] = "Hechizos que siguen activos hasta que los desactivas o cambias a otro."
 L["KIND_SELF"] = "Hechizos propios y de área"
 L["KIND_SELF_DESCRIPTION"] = "Hechizos sin objetivo, lanzados sobre ti o a tu alrededor."
+L["KIND_ITEM"] = "Macros de objetos"
+L["KIND_ITEM_DESCRIPTION"] = "Macros que usan tus objetos equipados, como los abalorios."
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "Macros personalizadas"
@@ -290,6 +293,7 @@ L["KEY_BINDINGS_LOCATION"] = "Abre el menú del juego, luego %s, luego %s, y bus
 L["ERROR_MACRO_SLOTS_FULL"] = "No hay espacios de macros libres. Borra una macro en /macro para hacer sitio."
 L["ERROR_GENERAL_MACRO_SLOTS_FULL"] =
 	"No hay espacios de macros generales libres. Borra una macro general en /macro para hacer sitio."
+L["CHAT_MACROS_DELETED"] = "Macros borradas: %d"
 L["CHAT_MACRO_TOO_LONG"] =
 	'La macro "%s" ocupa %d bytes con sus opciones activadas, más de los %d que admite una macro. Desactiva una opción para acortarla.'
 L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =

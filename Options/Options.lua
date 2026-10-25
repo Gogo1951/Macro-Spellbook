@@ -11,7 +11,9 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 --[[
 	Called from ns:OnPlayerLogin once ns.db exists. AddToBlizOptions returns (frame, categoryID); a category ID
 	is what Settings.OpenToCategory needs, since a title lookup fails wherever the ID is a number. The root's is
-	kept, and so are those of the panels the page's settings menu opens directly, by ns.OPTIONS_REGISTRY key.
+	kept, and so are those of the panels the page's menus open directly, by ns.OPTIONS_REGISTRY key. Macro
+	Defaults' sub-panels, one per spell kind, name it by its category ID: AceConfigDialog maps only a root's
+	display name to its ID, while the Settings panel finds a category at any depth by ID.
 ]]
 function ns.RegisterOptionsPanels()
 	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.General, ns.BuildGeneralOptions())
@@ -25,6 +27,13 @@ function ns.RegisterOptionsPanels()
 	local _, macroDefaultsID =
 		AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.MacroDefaults, L["TAB_MACRO_DEFAULTS"], L["ADDON_TITLE"])
 	ns.optionsFrames.categories.MacroDefaults = macroDefaultsID
+	for _, kind in ipairs(ns.MACRO_KINDS) do
+		local panel = ns.KindPanel(kind.key)
+		AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY[panel], ns.BuildKindDefaultsOptions(kind))
+		local _, kindID =
+			AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY[panel], L[kind.labelKey], macroDefaultsID)
+		ns.optionsFrames.categories[panel] = kindID
+	end
 
 	AceConfig:RegisterOptionsTable(ns.OPTIONS_REGISTRY.CustomMacros, ns.BuildCustomMacrosOptions)
 	local _, customMacrosID =

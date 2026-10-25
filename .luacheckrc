@@ -21,6 +21,7 @@ read_globals = {
 	"Constants",
 	"CreateFrame",
 	"CreateMacro",
+	"DeleteMacro",
 	"EditMacro",
 	"Enum",
 	"ERR_NOT_IN_COMBAT",
@@ -88,6 +89,7 @@ read_globals = {
 	"SPELL_REQUIRED_FORM",
 	"SpellBookFrame",
 	"SpellBookSkillLineTab1",
+	"StaticPopup_Show",
 	"UIErrorsFrame",
 	"UIParent",
 	"UISpecialFrames",
@@ -99,6 +101,8 @@ read_globals = {
 	"UnitRace",
 	"wipe",
 	"WorldFrame",
+	"YES",
+	"NO",
 }
 globals = {
 	"BINDING_NAME_MACROSPELLBOOK_TOGGLE", -- the Key Bindings list's caption for Bindings.xml's binding
@@ -108,4 +112,5 @@ globals = {
 	"MacroSpellbookCharDB", -- MIGRATION (remove after 2026-11-23)
 	"SLASH_MACROSPELLBOOK1",
 	SlashCmdList = { fields = { "MACROSPELLBOOK" } },
+	StaticPopupDialogs = { fields = { "MACROSPELLBOOK_DELETE_MACRO" } }, -- the menu's Delete confirm
 }

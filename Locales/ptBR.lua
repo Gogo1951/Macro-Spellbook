@@ -30,11 +30,7 @@ L["MENU_GROUP_ERRORS"] = "Mensagens de erro"
 L["MENU_GROUP_USE_ITEMS_FIRST"] = "Usar itens primeiro"
 L["MACRO_TEXT"] = "Texto da macro"
 L["MENU_MACRO_LENGTH"] = "%d / %d"
-L["MENU_GROUP_VALUE"] = "%s: %s"
 L["MENU_OPTIONS_COUNT"] = "%d opções"
-L["MENU_CAST_ON_MOUSEOVER"] = "Lançar ao passar o mouse"
-L["MENU_CAST_ON_SELF"] = "Lançar em si mesmo"
-L["MENU_CAST_ON_TARGETS_TARGET"] = "Lançar no alvo do alvo"
 L["MENU_RANK_LEARN_LEVEL"] = "%s (Nível %d)"
 L["MENU_MAX_RANK"] = "Grau máximo"
 L["MENU_DYNAMIC_RANK"] = "Grau dinâmico"
@@ -70,7 +66,6 @@ L["MENU_SAFE_TO_SPAM_NOTE"] =
 	"Para poder apertar uma macro sem parar com segurança, ative Parar macro se canalizando para um feitiço canalizado, ou Parar macro se em furtividade para Furtividade ou Espreitar. Assim, apertar de novo não interrompe a canalização nem a sua furtividade."
 L["MENU_USE_FOR_KIND"] = "Usar estas opções na categoria %s"
 L["MENU_DUPLICATE"] = "Duplicar"
-L["MENU_REMOVE_COPY"] = "Remover esta cópia"
 L["MENU_USE_FOR_KIND_DESCRIPTION"] =
 	"Toda macro da categoria %s que você não ajustou por conta própria começa com as opções desta macro. Abre Padrões das macros para mostrar a você."
 
@@ -80,8 +75,6 @@ L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "Contar feitiços nas barras como colocados
 L["SETTINGS_MARK_ALL_PLACED"] = "Marcar todos os feitiços como colocados"
 L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
 	"Nenhuma macro desta página brilha mais, esteja ou não nas suas barras. Um feitiço que você aprender depois continua brilhando até ser colocado."
-L["SETTINGS_CLEAR_PLACED"] = "Limpar marcas de colocado"
-L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] = "Faz brilhar de novo cada macro marcada que não está nas suas barras."
 L["SETTINGS_OPEN_MACRO_DEFAULTS_DESCRIPTION"] =
 	"Abre a interface de opções em Padrões das macros, onde você escolhe as opções com que cada tipo de macro de feitiço começa."
 L["SETTINGS_OPEN_CUSTOM_MACROS_DESCRIPTION"] =
@@ -93,13 +86,10 @@ L["SUBTEXT_CUSTOM"] = "Pessoal"
 L["SUBTEXT_FOCUS"] = "Foco"
 L["SUBTEXT_PET"] = "Ajudante"
 L["SUBTEXT_CURSOR"] = "No cursor"
-L["SUBTEXT_MOUSEOVER"] = "Com mouse"
-L["SUBTEXT_CAST_ON_SELF"] = "Em si"
 L["SUBTEXT_STANCE"] = "Postura"
 L["SUBTEXT_USE_ITEMS"] = "Usar itens"
 L["SUBTEXT_PET_ATTACK"] = "Ataque ajudante"
 L["SUBTEXT_DYNAMIC_RANK"] = "Grau dinâm."
-L["SUBTEXT_TARGETS_TARGET"] = "Alvo do alvo"
 L["SUBTEXT_TARGET_ENEMY"] = "Inimigo próximo"
 L["SUBTEXT_TARGET_FRIEND"] = "Aliado próximo"
 L["SUBTEXT_GROUP_VERSION"] = "Versão de grupo"
@@ -164,6 +154,19 @@ L["OPTIONS_KEY_SET_DESCRIPTION"] =
 	"Abre a lista de teclas de atalho do jogo, onde o Macro Spellbook tem sua própria seção."
 L["OPTIONS_KEY_BINDING_TOGGLE_DESCRIPTION"] =
 	"Abre e fecha o Macro Spellbook. Ele também tem sua própria aba no seu grimório."
+L["OPTIONS_DELETE_MACROS_HEADER"] = "Excluir macros"
+L["OPTIONS_DELETE_MACROS_DESCRIPTION"] =
+	"Exclui as macros que o Macro Spellbook criou, o que também as tira das suas barras de ação. Suas próprias macros nunca são tocadas, e a página recria qualquer uma delas quando você clica nela ou a arrasta."
+L["OPTIONS_DELETE_CHARACTER_MACROS"] = "Excluir macros do personagem"
+L["OPTIONS_DELETE_CHARACTER_MACROS_DESCRIPTION"] =
+	"Exclui as macros do Macro Spellbook da aba de macros deste personagem. Seus outros personagens mantêm as deles até você fazer o mesmo neles."
+L["OPTIONS_DELETE_CHARACTER_MACROS_CONFIRM"] =
+	"Excluir todas as macros do Macro Spellbook deste personagem? Elas também saem das suas barras de ação."
+L["OPTIONS_DELETE_GENERAL_MACROS"] = "Excluir macros gerais"
+L["OPTIONS_DELETE_GENERAL_MACROS_DESCRIPTION"] =
+	"Exclui as macros do Macro Spellbook da aba Macros gerais, compartilhada por todos os personagens da sua conta, então seus outros personagens também perdem as deles ali."
+L["OPTIONS_DELETE_GENERAL_MACROS_CONFIRM"] =
+	"Excluir todas as macros gerais do Macro Spellbook? Todos os personagens da sua conta as perdem, e elas também saem das suas barras de ação."
 L["OPTIONS_COMMANDS_HEADER"] = "/Comandos"
 L["OPTIONS_COMMAND"] = "/msb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Abre a interface de opções deste add-on."
@@ -179,11 +182,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Padrões das macros"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"As opções com que cada tipo de macro de feitiço começa. Uma macro mantém o que você definir pelo menu do clique direito dela. Cada tipo mostra só as opções que seus feitiços oferecem."
-L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "Lança primeiro em quem estiver sob o mouse e depois no seu alvo."
-L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "Lança em você quando seu alvo não pode receber o feitiço."
-L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
-	"Tenta o alvo do seu alvo quando seu alvo não pode receber o feitiço, como o tanque que um inimigo está atacando."
+	"As opções com que cada tipo de macro começa: suas macros de itens aqui, e cada tipo de macro de feitiço na própria página abaixo. O que você definir em uma macro pelo menu do clique direito é mantido."
 L["OPTIONS_DEFAULT_CURSOR_DESCRIPTION"] = "Posiciona o feitiço onde o cursor aponta, sem círculo de mira."
 L["OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION"] = "Lança o grau mais alto que o nível do jogador amistoso permite."
 L["OPTIONS_DEFAULT_STOP_CASTING_DESCRIPTION"] =
@@ -210,8 +209,11 @@ L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "Limpa o texto de erro vermelho q
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Silencia o som de erro enquanto a macro é executada."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
 	"Faz estas macros lançarem só em combate, só fora de combate ou em ambos."
-L["OPTIONS_KIND_EXAMPLES"] = "Seus feitiços: %s"
-L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s e mais %d"
+L["OPTIONS_KIND_YOUR_SPELLS"] = "Seus feitiços"
+L["OPTIONS_KIND_YOUR_ITEMS"] = "Seus itens"
+L["OPTIONS_KIND_MORE"] = "E mais %d."
+L["OPTIONS_KIND_NO_SPELLS"] = "Nenhum dos seus feitiços é deste tipo."
+L["OPTIONS_KIND_NO_ITEMS"] = "Nenhum dos seus itens equipados tem efeito de Usar."
 L["KIND_ENEMY"] = "Feitiços contra inimigos"
 L["KIND_ENEMY_DESCRIPTION"] = "Feitiços lançados em um inimigo, como ataques e penalidades."
 L["KIND_FRIENDLY"] = "Feitiços amistosos"
@@ -226,6 +228,8 @@ L["KIND_FORM"] = "Formas, posturas e aspectos"
 L["KIND_FORM_DESCRIPTION"] = "Feitiços que ficam ativos até você desligá-los ou trocar por outro."
 L["KIND_SELF"] = "Feitiços pessoais e de área"
 L["KIND_SELF_DESCRIPTION"] = "Feitiços sem alvo, lançados em você ou ao seu redor."
+L["KIND_ITEM"] = "Macros de itens"
+L["KIND_ITEM_DESCRIPTION"] = "Macros que usam seus itens equipados, como berloques."
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "Macros personalizadas"
@@ -287,6 +291,7 @@ L["KEY_BINDINGS_LOCATION"] = "Abra o menu do jogo, depois %s, depois %s, e procu
 L["ERROR_MACRO_SLOTS_FULL"] = "Não há espaços de macro livres. Apague uma macro em /macro para abrir espaço."
 L["ERROR_GENERAL_MACRO_SLOTS_FULL"] =
 	"Não há espaços de macro gerais livres. Apague uma macro geral em /macro para abrir espaço."
+L["CHAT_MACROS_DELETED"] = "Macros excluídas: %d"
 L["CHAT_MACRO_TOO_LONG"] =
 	'A macro "%s" tem %d bytes com as opções ativadas, acima dos %d que cabem em uma macro. Desative uma opção para encurtá-la.'
 L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =

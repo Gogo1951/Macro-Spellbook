@@ -30,11 +30,7 @@ L["MENU_GROUP_ERRORS"] = "错误信息"
 L["MENU_GROUP_USE_ITEMS_FIRST"] = "先使用物品"
 L["MACRO_TEXT"] = "宏文本"
 L["MENU_MACRO_LENGTH"] = "%d / %d"
-L["MENU_GROUP_VALUE"] = "%s：%s"
 L["MENU_OPTIONS_COUNT"] = "%d 个选项"
-L["MENU_CAST_ON_MOUSEOVER"] = "对鼠标悬停目标施放"
-L["MENU_CAST_ON_SELF"] = "对自己施放"
-L["MENU_CAST_ON_TARGETS_TARGET"] = "对目标的目标施放"
 L["MENU_RANK_LEARN_LEVEL"] = "%s (%d级可学)"
 L["MENU_MAX_RANK"] = "最高等级"
 L["MENU_DYNAMIC_RANK"] = "动态等级"
@@ -68,7 +64,6 @@ L["MENU_SAFE_TO_SPAM_NOTE"] =
 	"想让宏可以放心连按，引导法术请开启引导时停止宏，潜行请开启潜行时停止宏。这样再次按下就不会打断引导，也不会让你脱离潜行。"
 L["MENU_USE_FOR_KIND"] = "对所有%s使用这些选项"
 L["MENU_DUPLICATE"] = "复制"
-L["MENU_REMOVE_COPY"] = "移除此副本"
 L["MENU_USE_FOR_KIND_DESCRIPTION"] =
 	"%s中你没有亲自设置过的每个宏，都会以这个宏的选项为初始选项。会打开宏默认设置给你查看。"
 
@@ -78,8 +73,6 @@ L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "动作条上的法术视为已放置"
 L["SETTINGS_MARK_ALL_PLACED"] = "将所有法术标记为已放置"
 L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
 	"本页的所有宏不再发光，无论是否在你的动作条上。之后学会的法术在放置前仍会发光。"
-L["SETTINGS_CLEAR_PLACED"] = "清除放置标记"
-L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] = "让每个不在动作条上的已标记宏重新发光。"
 L["SETTINGS_OPEN_MACRO_DEFAULTS_DESCRIPTION"] =
 	"在选项界面中打开宏默认设置，你可以在那里选择每种法术宏的初始选项。"
 L["SETTINGS_OPEN_CUSTOM_MACROS_DESCRIPTION"] =
@@ -91,13 +84,10 @@ L["SUBTEXT_CUSTOM"] = "自定义"
 L["SUBTEXT_FOCUS"] = "焦点"
 L["SUBTEXT_PET"] = "宠物"
 L["SUBTEXT_CURSOR"] = "光标"
-L["SUBTEXT_MOUSEOVER"] = "鼠标悬停"
-L["SUBTEXT_CAST_ON_SELF"] = "自己"
 L["SUBTEXT_STANCE"] = "姿态"
 L["SUBTEXT_USE_ITEMS"] = "使用物品"
 L["SUBTEXT_PET_ATTACK"] = "宠物攻击"
 L["SUBTEXT_DYNAMIC_RANK"] = "动态等级"
-L["SUBTEXT_TARGETS_TARGET"] = "目标的目标"
 L["SUBTEXT_TARGET_ENEMY"] = "最近敌人"
 L["SUBTEXT_TARGET_FRIEND"] = "最近友方"
 L["SUBTEXT_GROUP_VERSION"] = "团体版本"
@@ -159,6 +149,19 @@ L["OPTIONS_KEY_SET"] = "设置按键"
 L["OPTIONS_KEY_SET_DESCRIPTION"] = "打开游戏的按键设置列表，Macro Spellbook 在其中有自己的分类。"
 L["OPTIONS_KEY_BINDING_TOGGLE_DESCRIPTION"] =
 	"打开或关闭 Macro Spellbook。它在你的法术书中也有自己的标签页。"
+L["OPTIONS_DELETE_MACROS_HEADER"] = "删除宏"
+L["OPTIONS_DELETE_MACROS_DESCRIPTION"] =
+	"删除 Macro Spellbook 创建的宏，同时会将它们从动作条上移除。你自己的宏绝不会被改动，在页面上点击或拖动任意一个宏即可重新创建。"
+L["OPTIONS_DELETE_CHARACTER_MACROS"] = "删除角色宏"
+L["OPTIONS_DELETE_CHARACTER_MACROS_DESCRIPTION"] =
+	"从此角色的宏标签中删除 Macro Spellbook 的宏。你的其他角色会保留各自的宏，直到你在那些角色上也这样做。"
+L["OPTIONS_DELETE_CHARACTER_MACROS_CONFIRM"] =
+	"删除此角色上所有 Macro Spellbook 的宏？它们也会从你的动作条上移除。"
+L["OPTIONS_DELETE_GENERAL_MACROS"] = "删除通用宏"
+L["OPTIONS_DELETE_GENERAL_MACROS_DESCRIPTION"] =
+	"从通用宏标签中删除 Macro Spellbook 的宏。该标签由账号内所有角色共享，因此你的其他角色也会失去那里的宏。"
+L["OPTIONS_DELETE_GENERAL_MACROS_CONFIRM"] =
+	"删除 Macro Spellbook 的所有通用宏？账号内所有角色都会失去它们，并且它们也会从你的动作条上移除。"
 L["OPTIONS_COMMANDS_HEADER"] = "/命令"
 L["OPTIONS_COMMAND"] = "/msb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "打开此插件的选项界面。"
@@ -174,11 +177,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "宏默认设置"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"每种法术宏一开始使用的选项。宏会保留你在其右键菜单中设置的内容。每种类型只列出其法术提供的选项。"
-L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "先对鼠标指向的单位施放，其次是你的目标。"
-L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "你的目标无法接受该法术时，对你自己施放。"
-L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
-	"你的目标无法接受该法术时，尝试对目标的目标施放，例如敌人正在攻击的坦克。"
+	"每种宏一开始使用的选项：物品宏在这里设置，每种法术宏在下方各自的页面设置。你在宏的右键菜单中自行设置的内容会保留。"
 L["OPTIONS_DEFAULT_CURSOR_DESCRIPTION"] = "把法术放在光标所指的位置，不出现瞄准圈。"
 L["OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION"] = "施放友方玩家等级所能接受的最高等级。"
 L["OPTIONS_DEFAULT_STOP_CASTING_DESCRIPTION"] = "先停止你正在施放的法术，让这个法术立刻施放。"
@@ -202,8 +201,11 @@ L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "清除宏在屏幕上留下的�
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "宏运行期间关闭错误音效。"
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
 	"让这些宏只在战斗中、只在非战斗中或在任何时候施放。"
-L["OPTIONS_KIND_EXAMPLES"] = "你的法术：%s"
-L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s 等另外 %d 个"
+L["OPTIONS_KIND_YOUR_SPELLS"] = "你的法术"
+L["OPTIONS_KIND_YOUR_ITEMS"] = "你的物品"
+L["OPTIONS_KIND_MORE"] = "另外还有 %d 个。"
+L["OPTIONS_KIND_NO_SPELLS"] = "你没有这种类型的法术。"
+L["OPTIONS_KIND_NO_ITEMS"] = "你装备的物品都没有使用效果。"
 L["KIND_ENEMY"] = "敌对法术"
 L["KIND_ENEMY_DESCRIPTION"] = "对敌人施放的法术，例如攻击和减益效果。"
 L["KIND_FRIENDLY"] = "友方法术"
@@ -218,6 +220,8 @@ L["KIND_FORM"] = "形态、姿态和守护"
 L["KIND_FORM_DESCRIPTION"] = "在你关闭或切换之前一直保持的法术。"
 L["KIND_SELF"] = "自身和范围法术"
 L["KIND_SELF_DESCRIPTION"] = "没有目标，对自己或周围施放的法术。"
+L["KIND_ITEM"] = "物品宏"
+L["KIND_ITEM_DESCRIPTION"] = "使用你所装备物品的宏，例如饰品。"
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "自定义宏"
@@ -279,6 +283,7 @@ L["KEY_BINDINGS_LOCATION"] = "打开游戏菜单，依次进入 %s 和 %s，找�
 L["ERROR_MACRO_SLOTS_FULL"] = "没有空余的宏栏位。请在 /macro 中删除一个宏来腾出位置。"
 L["ERROR_GENERAL_MACRO_SLOTS_FULL"] =
 	"没有空余的通用宏栏位。请在 /macro 中删除一个通用宏来腾出位置。"
+L["CHAT_MACROS_DELETED"] = "已删除宏：%d"
 L["CHAT_MACRO_TOO_LONG"] =
 	'"%s"宏在开启选项后为 %d 字节，超过了宏能容纳的 %d 字节。关闭一个选项来缩短它。'
 L["CHAT_CUSTOM_NEEDS_NAME_BODY"] = "自定义宏 #%d 需要名称和宏文本才能显示在页面上。"

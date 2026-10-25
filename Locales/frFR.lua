@@ -30,11 +30,7 @@ L["MENU_GROUP_ERRORS"] = "Messages d'erreur"
 L["MENU_GROUP_USE_ITEMS_FIRST"] = "Utiliser d'abord des objets"
 L["MACRO_TEXT"] = "Texte de la macro"
 L["MENU_MACRO_LENGTH"] = "%d / %d"
-L["MENU_GROUP_VALUE"] = "%s : %s"
 L["MENU_OPTIONS_COUNT"] = "%d options"
-L["MENU_CAST_ON_MOUSEOVER"] = "Lancer au survol"
-L["MENU_CAST_ON_SELF"] = "Lancer sur soi"
-L["MENU_CAST_ON_TARGETS_TARGET"] = "Lancer sur la cible de la cible"
 L["MENU_RANK_LEARN_LEVEL"] = "%s (Niveau %d)"
 L["MENU_MAX_RANK"] = "Rang maximum"
 L["MENU_DYNAMIC_RANK"] = "Rang dynamique"
@@ -70,7 +66,6 @@ L["MENU_SAFE_TO_SPAM_NOTE"] =
 	"Pour pouvoir marteler une macro sans risque, activez Arrêter la macro en canalisation pour un sort canalisé, ou Arrêter la macro en camouflage pour Camouflage ou Rôder. Appuyer de nouveau ne rompra alors ni la canalisation ni votre camouflage."
 L["MENU_USE_FOR_KIND"] = "Utiliser ces options pour la catégorie %s"
 L["MENU_DUPLICATE"] = "Dupliquer"
-L["MENU_REMOVE_COPY"] = "Retirer cette copie"
 L["MENU_USE_FOR_KIND_DESCRIPTION"] =
 	"Chaque macro de la catégorie %s que vous n'avez pas réglée vous-même commence avec les options de cette macro. Ouvre Réglages par défaut des macros pour vous le montrer."
 
@@ -80,8 +75,6 @@ L["SETTINGS_COUNT_SPELLS_ON_BARS"] = "Compter les sorts des barres comme placés
 L["SETTINGS_MARK_ALL_PLACED"] = "Marquer tous les sorts comme placés"
 L["SETTINGS_MARK_ALL_PLACED_DESCRIPTION"] =
 	"Plus aucune macro de cette page ne brille, qu'elle soit sur vos barres ou non. Un sort appris plus tard brille tant que vous ne l'avez pas placé."
-L["SETTINGS_CLEAR_PLACED"] = "Effacer les marques de placement"
-L["SETTINGS_CLEAR_PLACED_DESCRIPTION"] = "Fait de nouveau briller chaque macro marquée qui n'est pas sur vos barres."
 L["SETTINGS_OPEN_MACRO_DEFAULTS_DESCRIPTION"] =
 	"Ouvre l'interface des options à Réglages par défaut des macros, où vous choisissez les options de départ de chaque type de macro de sort."
 L["SETTINGS_OPEN_CUSTOM_MACROS_DESCRIPTION"] =
@@ -93,13 +86,10 @@ L["SUBTEXT_CUSTOM"] = "Perso"
 L["SUBTEXT_FOCUS"] = "Focalisation"
 L["SUBTEXT_PET"] = "Familier"
 L["SUBTEXT_CURSOR"] = "Curseur"
-L["SUBTEXT_MOUSEOVER"] = "Survol"
-L["SUBTEXT_CAST_ON_SELF"] = "Sur soi"
 L["SUBTEXT_STANCE"] = "Posture"
 L["SUBTEXT_USE_ITEMS"] = "Objets"
 L["SUBTEXT_PET_ATTACK"] = "Attaque familier"
 L["SUBTEXT_DYNAMIC_RANK"] = "Rang dyn."
-L["SUBTEXT_TARGETS_TARGET"] = "Cible de cible"
 L["SUBTEXT_TARGET_ENEMY"] = "Ennemi proche"
 L["SUBTEXT_TARGET_FRIEND"] = "Allié proche"
 L["SUBTEXT_GROUP_VERSION"] = "Version groupe"
@@ -164,6 +154,19 @@ L["OPTIONS_KEY_SET_DESCRIPTION"] =
 	"Ouvre la liste des raccourcis clavier du jeu, où Macro Spellbook a sa propre section."
 L["OPTIONS_KEY_BINDING_TOGGLE_DESCRIPTION"] =
 	"Ouvre et ferme Macro Spellbook. Il a aussi son propre onglet dans votre grimoire."
+L["OPTIONS_DELETE_MACROS_HEADER"] = "Supprimer les macros"
+L["OPTIONS_DELETE_MACROS_DESCRIPTION"] =
+	"Supprime les macros créées par Macro Spellbook, ce qui les retire aussi de vos barres d'action. Vos propres macros ne sont jamais touchées, et la page recrée chacune d'elles quand vous cliquez dessus ou la faites glisser."
+L["OPTIONS_DELETE_CHARACTER_MACROS"] = "Supprimer les macros du personnage"
+L["OPTIONS_DELETE_CHARACTER_MACROS_DESCRIPTION"] =
+	"Supprime les macros de Macro Spellbook de l'onglet de macros de ce personnage. Vos autres personnages gardent les leurs jusqu'à ce que vous fassiez de même sur eux."
+L["OPTIONS_DELETE_CHARACTER_MACROS_CONFIRM"] =
+	"Supprimer toutes les macros de Macro Spellbook de ce personnage ? Elles sont aussi retirées de vos barres d'action."
+L["OPTIONS_DELETE_GENERAL_MACROS"] = "Supprimer les macros générales"
+L["OPTIONS_DELETE_GENERAL_MACROS_DESCRIPTION"] =
+	"Supprime les macros de Macro Spellbook de l'onglet Macros générales, partagé par tous les personnages de votre compte : vos autres personnages y perdent donc aussi les leurs."
+L["OPTIONS_DELETE_GENERAL_MACROS_CONFIRM"] =
+	"Supprimer toutes les macros générales de Macro Spellbook ? Tous les personnages de votre compte les perdent, et elles sont aussi retirées de vos barres d'action."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commandes"
 L["OPTIONS_COMMAND"] = "/msb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Ouvre l'interface des options de cet add-on."
@@ -179,11 +182,7 @@ L["OPTIONS_COUNT_SPELLS_ON_BARS_DESCRIPTION"] =
 -- Options: Macro Defaults Panel
 L["TAB_MACRO_DEFAULTS"] = "Réglages par défaut des macros"
 L["OPTIONS_MACRO_DEFAULTS_DESCRIPTION"] =
-	"Les options avec lesquelles commence chaque type de macro de sort. Une macro conserve ce que vous réglez depuis son menu clic droit. Chaque type n'affiche que les options que ses sorts proposent."
-L["OPTIONS_DEFAULT_MOUSEOVER_DESCRIPTION"] = "Lance d'abord sur celui qui est sous votre souris, puis sur votre cible."
-L["OPTIONS_DEFAULT_CAST_ON_SELF_DESCRIPTION"] = "Lance sur vous quand votre cible ne peut pas recevoir le sort."
-L["OPTIONS_DEFAULT_TARGETS_TARGET_DESCRIPTION"] =
-	"Essaie la cible de votre cible quand votre cible ne peut pas recevoir le sort, comme le tank qu'un ennemi attaque."
+	"Les options avec lesquelles commence chaque type de macro : vos macros d'objets ici, et chaque type de macro de sort sur sa propre page en dessous. Ce que vous réglez sur une macro depuis son menu clic droit est conservé."
 L["OPTIONS_DEFAULT_CURSOR_DESCRIPTION"] = "Place le sort là où pointe votre curseur, sans cercle de ciblage."
 L["OPTIONS_DEFAULT_DYNAMIC_RANK_DESCRIPTION"] = "Lance le rang le plus élevé que permet le niveau du joueur allié."
 L["OPTIONS_DEFAULT_STOP_CASTING_DESCRIPTION"] =
@@ -211,8 +210,11 @@ L["OPTIONS_DEFAULT_HIDE_ERRORS_DESCRIPTION"] = "Efface le texte d'erreur rouge q
 L["OPTIONS_DEFAULT_MUTE_ERRORS_DESCRIPTION"] = "Coupe le son d'erreur pendant que la macro s'exécute."
 L["OPTIONS_DEFAULT_COMBAT_CHECK_DESCRIPTION"] =
 	"Permet à ces macros de lancer seulement en combat, seulement hors combat, ou les deux."
-L["OPTIONS_KIND_EXAMPLES"] = "Vos sorts : %s"
-L["OPTIONS_KIND_EXAMPLES_MORE"] = "%s et %d autres"
+L["OPTIONS_KIND_YOUR_SPELLS"] = "Vos sorts"
+L["OPTIONS_KIND_YOUR_ITEMS"] = "Vos objets"
+L["OPTIONS_KIND_MORE"] = "Et %d autres."
+L["OPTIONS_KIND_NO_SPELLS"] = "Aucun de vos sorts n'est de ce type."
+L["OPTIONS_KIND_NO_ITEMS"] = "Aucun de vos objets équipés n'a d'effet Utiliser."
 L["KIND_ENEMY"] = "Sorts offensifs"
 L["KIND_ENEMY_DESCRIPTION"] = "Les sorts lancés sur un ennemi, comme vos attaques et affaiblissements."
 L["KIND_FRIENDLY"] = "Sorts amicaux"
@@ -227,6 +229,8 @@ L["KIND_FORM"] = "Formes, postures et aspects"
 L["KIND_FORM_DESCRIPTION"] = "Les sorts qui restent actifs jusqu'à ce que vous les coupiez ou en changiez."
 L["KIND_SELF"] = "Sorts personnels et de zone"
 L["KIND_SELF_DESCRIPTION"] = "Les sorts sans cible, lancés sur vous ou autour de vous."
+L["KIND_ITEM"] = "Macros d'objets"
+L["KIND_ITEM_DESCRIPTION"] = "Les macros qui utilisent vos objets équipés, comme les bijoux."
 
 -- Options: Custom Macros Panel
 L["TAB_CUSTOM_MACROS"] = "Macros personnalisées"
@@ -293,6 +297,7 @@ L["ERROR_MACRO_SLOTS_FULL"] =
 	"Aucun emplacement de macro libre. Supprimez une macro dans /macro pour faire de la place."
 L["ERROR_GENERAL_MACRO_SLOTS_FULL"] =
 	"Aucun emplacement de macro générale libre. Supprimez une macro générale dans /macro pour faire de la place."
+L["CHAT_MACROS_DELETED"] = "Macros supprimées : %d"
 L["CHAT_MACRO_TOO_LONG"] =
 	'La macro "%s" fait %d octets avec ses options activées, au-delà des %d qu\'une macro peut contenir. Désactivez une option pour la raccourcir.'
 L["CHAT_CUSTOM_NEEDS_NAME_BODY"] =

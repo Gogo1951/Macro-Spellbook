@@ -22,7 +22,7 @@ ns.DATABASE_DEFAULTS = {
 		countSpellsOnBars = true,
 		markedPlaced = {}, -- macros marked placed from the page's settings menu, by WoW macro name
 		--[[
-			the options each kind of spell macro starts with (see ns.MACRO_KINDS), as kind -> option -> true or
+			the options each kind of macro starts with (see ns.MACRO_KINDS and ns.ITEM_KIND), as kind -> option -> true or
 			false. Buffs start on Dynamic Rank: a buff's rank can't land on a player too far below its level.
 		]]
 		kindDefaults = {
@@ -33,6 +33,7 @@ ns.DATABASE_DEFAULTS = {
 			ground = {},
 			form = {},
 			self = {},
+			item = {},
 		},
 		mouseover = {},
 		cursor = {},
@@ -61,6 +62,8 @@ ns.DATABASE_DEFAULTS = {
 		cancelForm = {},
 		autoShot = {},
 		groupVersion = {},
+		groupedSpells = {},
+		targetPriority = {}, -- each spell's own target priority, as a list of units (see ns.TargetPriority)
 		useItems = {},
 		macroCopies = {}, -- the Duplicate copies of each spell's macro, by spell name, as a list of copy numbers
 		customMacros = {},
